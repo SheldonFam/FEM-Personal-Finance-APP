@@ -1,59 +1,10 @@
 "use client";
 
-import React, { useState } from "react";
+import React from "react";
 import { Card } from "@/components/ui/Card";
+import { useSearchParams } from "next/navigation";
 
-// Sidebar Navigation Component
-const Sidebar = ({
-  activeTab,
-  setActiveTab,
-}: {
-  activeTab: string;
-  setActiveTab: (tab: string) => void;
-}) => {
-  const menuItems = [
-    { id: "overview", label: "Overview", icon: "🏠" },
-    { id: "transactions", label: "Transactions", icon: "↕️" },
-    { id: "budgets", label: "Budgets", icon: "📊" },
-    { id: "pots", label: "Pots", icon: "💰" },
-    { id: "bills", label: "Recurring Bills", icon: "📋" },
-  ];
-
-  return (
-    <div className="w-64 bg-gray-800 min-h-screen flex flex-col">
-      {/* Logo */}
-      <div className="p-6">
-        <h1 className="text-white text-xl font-bold">finance</h1>
-      </div>
-
-      {/* Navigation Menu */}
-      <nav className="flex-1 px-4">
-        {menuItems.map((item) => (
-          <button
-            key={item.id}
-            onClick={() => setActiveTab(item.id)}
-            className={`w-full flex items-center space-x-3 px-4 py-3 rounded-lg mb-2 text-left transition-colors ${
-              activeTab === item.id
-                ? "bg-teal-100 text-gray-900"
-                : "text-white hover:bg-gray-700"
-            }`}
-          >
-            <span className="text-lg">{item.icon}</span>
-            <span className="font-medium">{item.label}</span>
-          </button>
-        ))}
-      </nav>
-
-      {/* Minimize Menu */}
-      <div className="p-4">
-        <button className="flex items-center space-x-2 text-white hover:text-gray-300">
-          <span>←</span>
-          <span className="text-sm">Minimize Menu</span>
-        </button>
-      </div>
-    </div>
-  );
-};
+// Global sidebar is provided in root layout; this page renders content only
 
 // Summary Cards Component
 const SummaryCards = () => {
@@ -79,7 +30,7 @@ const SummaryCards = () => {
   ];
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 mb-6 md:mb-8">
       {cards.map((card, index) => (
         <Card key={index} className={`p-6 ${card.bgColor}`}>
           <h3
@@ -357,36 +308,40 @@ const RecurringBillsSection = () => {
 
 // Main Dashboard Component
 export default function DashboardPage() {
-  const [activeTab, setActiveTab] = useState("overview");
+  const searchParams = useSearchParams();
+  const activeTab = searchParams.get("tab") ?? "overview";
+  const titleMap: Record<string, string> = {
+    overview: "Overview",
+    transactions: "Transactions",
+    budgets: "Budgets",
+    pots: "Pots",
+    bills: "Recurring Bills",
+  };
+  const pageTitle = titleMap[activeTab] ?? "Overview";
 
   return (
-    <div className="min-h-screen bg-gray-50 flex">
-      {/* Sidebar */}
-      <Sidebar activeTab={activeTab} setActiveTab={setActiveTab} />
+    <div className="min-h-screen bg-gray-50 p-4 md:p-8">
+      <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-6 md:mb-8">
+        {pageTitle}
+      </h1>
 
-      {/* Main Content */}
-      <div className="flex-1 p-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-8">Overview</h1>
+      {/* Summary Cards */}
+      <SummaryCards />
 
-        {/* Summary Cards */}
-        <SummaryCards />
+      {/* Main Content Grid */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-8">
+        {/* Left Column */}
+        <div className="space-y-4 md:space-y-8">
+          <PotsSection />
+          <TransactionsSection />
+        </div>
 
-        {/* Main Content Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {/* Left Column */}
-          <div className="space-y-8">
-            <PotsSection />
-            <TransactionsSection />
-          </div>
-
-          {/* Right Column */}
-          <div className="space-y-8">
-            <BudgetsSection />
-            <RecurringBillsSection />
-          </div>
+        {/* Right Column */}
+        <div className="space-y-4 md:space-y-8">
+          <BudgetsSection />
+          <RecurringBillsSection />
         </div>
       </div>
     </div>
   );
 }
-
