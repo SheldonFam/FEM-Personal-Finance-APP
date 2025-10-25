@@ -16,7 +16,11 @@ export function StatCard({
   const isDark = variant === "dark";
 
   return (
-    <Card className={`${isDark ? "bg-[#201F24] text-white" : ""} ${className}`}>
+    <Card
+      className={`px-5 md:px-6 ${
+        isDark ? "bg-[#201F24] text-white" : ""
+      } ${className}`}
+    >
       <p
         className={`text-sm mb-3 ${isDark ? "text-gray-300" : "text-gray-500"}`}
       >

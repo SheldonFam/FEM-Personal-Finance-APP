@@ -1,4 +1,5 @@
 import Image from "next/image";
+import { normalizeImagePath } from "@/lib/utils";
 
 interface TransactionItemProps {
   name: string;
@@ -20,7 +21,7 @@ export function TransactionItem({
       <div className="flex items-center gap-4">
         <div className="w-10 h-10 rounded-full overflow-hidden bg-gray-100">
           <Image
-            src={avatar}
+            src={normalizeImagePath(avatar)}
             alt={name}
             width={40}
             height={40}
