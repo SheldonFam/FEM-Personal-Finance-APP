@@ -23,36 +23,29 @@ export default function BudgetDonutChart({
   totalLimit,
   className = "",
 }: BudgetDonutChartProps) {
-  // Calculate remaining budget (shown as gray)
-  const remaining = Math.max(0, totalLimit - totalSpent);
-
-  // Prepare data for the chart
-  const chartData = [
-    ...categories.map((cat) => ({
-      name: cat.name,
-      value: cat.spent,
-      color: cat.color,
-    })),
-    // Add remaining budget as gray segment if there's any left
-    ...(remaining > 0
-      ? [{ name: "Remaining", value: remaining, color: "#F2F2F2" }]
-      : []),
-  ];
+  // Prepare data for the chart (only show spent amounts for each category)
+  const chartData = categories.map((cat) => ({
+    name: cat.name,
+    value: cat.spent,
+    color: cat.color,
+  }));
 
   return (
     <div className={`relative ${className}`}>
       {/* Donut Chart */}
-      <ResponsiveContainer width="100%" height={240}>
+      <ResponsiveContainer width="100%" height={200}>
         <PieChart>
           <Pie
             data={chartData}
             cx="50%"
             cy="50%"
-            innerRadius={80}
-            outerRadius={120}
+            innerRadius={60}
+            outerRadius={85}
             paddingAngle={0}
             dataKey="value"
             strokeWidth={0}
+            startAngle={90} // <- Rotate starting point
+            endAngle={-270} // <- Makes it go clockwise visually
           >
             {chartData.map((entry, index) => (
               <Cell key={`cell-${index}`} fill={entry.color} />
@@ -64,10 +57,10 @@ export default function BudgetDonutChart({
       {/* Center Text */}
       <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
         <div className="text-center">
-          <p className="text-3xl font-bold text-gray-900">
+          <p className="text-[32px] leading-none font-bold text-[#201F24]">
             ${totalSpent.toLocaleString("en-US")}
           </p>
-          <p className="text-sm text-gray-500 mt-1">
+          <p className="text-xs text-[#696868] mt-2">
             of ${totalLimit.toLocaleString("en-US")} limit
           </p>
         </div>
@@ -136,55 +129,3 @@ export function BudgetChartWithLegend({
     </div>
   );
 }
-
-// ============================================
-// USAGE EXAMPLE
-// ============================================
-/*
-// In your page/component:
-import BudgetDonutChart, { BudgetChartWithLegend } from "@/components/charts/BudgetDonutChart";
-
-const budgetData = [
-  {
-    name: "Entertainment",
-    spent: 50.00,
-    limit: 50.00,
-    color: "#277C78",
-  },
-  {
-    name: "Bills",
-    spent: 750.00,
-    limit: 750.00,
-    color: "#82C9D7",
-  },
-  {
-    name: "Dining Out",
-    spent: 75.00,
-    limit: 75.00,
-    color: "#F2CDAC",
-  },
-  {
-    name: "Personal Care",
-    spent: 100.00,
-    limit: 100.00,
-    color: "#626070",
-  },
-];
-
-const totalSpent = budgetData.reduce((sum, cat) => sum + cat.spent, 0);
-const totalLimit = budgetData.reduce((sum, cat) => sum + cat.limit, 0);
-
-// Option 1: Chart only
-<BudgetDonutChart
-  categories={budgetData}
-  totalSpent={totalSpent}
-  totalLimit={totalLimit}
-/>
-
-// Option 2: Chart with legend (like in your design)
-<BudgetChartWithLegend
-  categories={budgetData}
-  totalSpent={338}
-  totalLimit={975}
-/>
-*/

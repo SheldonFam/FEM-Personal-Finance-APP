@@ -11,11 +11,11 @@ export function RecurringBillCard({
 }: RecurringBillCardProps) {
   return (
     <div
-      className="bg-gray-50 rounded-lg p-5 border-l-4 flex items-center justify-between"
+      className="bg-[#F8F4F0] rounded-lg p-4 flex items-center justify-between border-l-4"
       style={{ borderLeftColor: borderColor }}
     >
-      <span className="text-sm text-gray-600">{label}</span>
-      <span className="font-bold text-sm text-gray-900">
+      <span className="text-sm text-[#201F24] font-normal">{label}</span>
+      <span className="text-sm text-[#201F24] font-bold">
         ${amount.toFixed(2)}
       </span>
     </div>

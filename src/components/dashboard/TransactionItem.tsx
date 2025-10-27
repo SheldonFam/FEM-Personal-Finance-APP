@@ -17,9 +17,9 @@ export function TransactionItem({
   isPositive = false,
 }: TransactionItemProps) {
   return (
-    <div className="flex items-center justify-between py-4 border-b border-gray-100 last:border-0">
-      <div className="flex items-center gap-4">
-        <div className="w-10 h-10 rounded-full overflow-hidden bg-gray-100">
+    <div className="flex items-center justify-between py-3">
+      <div className="flex items-center gap-3">
+        <div className="w-10 h-10 rounded-full overflow-hidden bg-gray-100 flex-shrink-0">
           <Image
             src={normalizeImagePath(avatar)}
             alt={name}
@@ -28,18 +28,18 @@ export function TransactionItem({
             className="w-full h-full object-cover"
           />
         </div>
-        <p className="font-bold text-sm text-gray-900">{name}</p>
+        <p className="font-bold text-sm text-[#201F24]">{name}</p>
       </div>
 
-      <div className="text-right">
+      <div className="text-right flex-shrink-0">
         <p
           className={`font-bold text-sm ${
-            isPositive ? "text-green-600" : "text-gray-900"
+            isPositive ? "text-[#277C78]" : "text-[#201F24]"
           }`}
         >
           {isPositive ? "+" : "-"}${Math.abs(amount).toFixed(2)}
         </p>
-        <p className="text-xs text-gray-500 mt-1">{date}</p>
+        <p className="text-xs text-[#696868] mt-1">{date}</p>
       </div>
     </div>
   );

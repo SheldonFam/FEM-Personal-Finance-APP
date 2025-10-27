@@ -3,50 +3,24 @@
 import React from "react";
 import { Card } from "@/components/ui/Card";
 import { useSearchParams } from "next/navigation";
+import { StatCard } from "@/components/dashboard/StatCard";
+import { TransactionItem } from "@/components/dashboard/TransactionItem";
+import { PotItem } from "@/components/dashboard/PotItem";
+import { BudgetItem } from "@/components/dashboard/BudgetItem";
+import { RecurringBillCard } from "@/components/dashboard/RecurringBillCard";
+import { SectionHeader } from "@/components/dashboard/SectionHeader";
+import BudgetDonutChart from "@/components/charts/BudgetDonutChart";
+import Image from "next/image";
 
 // Global sidebar is provided in root layout; this page renders content only
 
 // Summary Cards Component
 const SummaryCards = () => {
-  const cards = [
-    {
-      title: "Current Balance",
-      amount: "$4,836.00",
-      bgColor: "bg-gray-800",
-      textColor: "text-white",
-    },
-    {
-      title: "Income",
-      amount: "$3,814.25",
-      bgColor: "bg-gray-100",
-      textColor: "text-gray-900",
-    },
-    {
-      title: "Expenses",
-      amount: "$1,700.50",
-      bgColor: "bg-gray-100",
-      textColor: "text-gray-900",
-    },
-  ];
-
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 mb-6 md:mb-8">
-      {cards.map((card, index) => (
-        <Card key={index} className={`p-6 ${card.bgColor}`}>
-          <h3
-            className={`text-sm font-medium mb-2 ${
-              card.textColor === "text-white"
-                ? "text-gray-300"
-                : "text-gray-600"
-            }`}
-          >
-            {card.title}
-          </h3>
-          <p className={`text-2xl font-bold ${card.textColor}`}>
-            {card.amount}
-          </p>
-        </Card>
-      ))}
+      <StatCard label="Current Balance" amount={4836.0} variant="dark" />
+      <StatCard label="Income" amount={3814.25} variant="light" />
+      <StatCard label="Expenses" amount={1700.5} variant="light" />
     </div>
   );
 };
@@ -54,40 +28,44 @@ const SummaryCards = () => {
 // Pots Component
 const PotsSection = () => {
   const pots = [
-    { name: "Savings", amount: "$159" },
-    { name: "Gift", amount: "$40" },
-    { name: "Concert Ticket", amount: "$110" },
-    { name: "New Laptop", amount: "$10" },
+    { name: "Savings", amount: 159, color: "#277C78" },
+    { name: "Gift", amount: 40, color: "#82C9D7" },
+    { name: "Concert Ticket", amount: 110, color: "#626070" },
+    { name: "New Laptop", amount: 10, color: "#F2CDAC" },
   ];
 
   return (
     <Card className="p-6">
-      <div className="flex justify-between items-center mb-6">
-        <h3 className="text-lg font-semibold text-gray-900">Pots</h3>
-        <button className="text-sm text-gray-600 hover:text-gray-900">
-          See Details
-        </button>
-      </div>
+      <SectionHeader title="Pots" href="/pots" linkText="See Details" />
 
-      <div className="flex items-center space-x-6">
+      <div className="flex items-start gap-5">
         {/* Total Saved */}
-        <div className="bg-gray-100 rounded-lg p-4 flex items-center space-x-3">
-          <div className="w-8 h-8 bg-gray-800 rounded flex items-center justify-center">
-            <span className="text-white text-sm font-bold">$</span>
+        <div className="bg-[#F8F4F0] rounded-xl p-5 flex items-center gap-4 flex-shrink-0">
+          <div className="w-10 h-10 rounded-full flex items-center justify-center">
+            <Image
+              src="/assets/images/icon-pot.svg"
+              alt="Pot"
+              width={20}
+              height={20}
+            />
           </div>
           <div>
-            <p className="text-sm text-gray-600">Total Saved</p>
-            <p className="text-xl font-bold text-gray-900">$850</p>
+            <p className="text-sm text-[#696868] mb-1">Total Saved</p>
+            <p className="text-[32px] leading-[1.2] font-bold text-[#201F24]">
+              $850
+            </p>
           </div>
         </div>
 
         {/* Individual Pots */}
-        <div className="flex-1 space-y-2">
+        <div className="flex-1 grid grid-cols-2 gap-4">
           {pots.map((pot, index) => (
-            <div key={index} className="flex justify-between items-center">
-              <span className="text-gray-700">{pot.name}</span>
-              <span className="font-semibold text-gray-900">{pot.amount}</span>
-            </div>
+            <PotItem
+              key={index}
+              label={pot.name}
+              amount={pot.amount}
+              color={pot.color}
+            />
           ))}
         </div>
       </div>
@@ -100,81 +78,59 @@ const TransactionsSection = () => {
   const transactions = [
     {
       name: "Emma Richardson",
-      amount: "+$75.50",
+      amount: 75.5,
       date: "19 Aug 2024",
-      type: "income",
+      avatar: "./assets/images/avatars/emma-richardson.jpg",
+      isPositive: true,
     },
     {
       name: "Savory Bites Bistro",
-      amount: "-$55.50",
+      amount: 55.5,
       date: "19 Aug 2024",
-      type: "expense",
-      icon: "🍞",
+      avatar: "./assets/images/avatars/savory-bites-bistro.jpg",
+      isPositive: false,
     },
     {
       name: "Daniel Carter",
-      amount: "-$42.30",
+      amount: 42.3,
       date: "18 Aug 2024",
-      type: "expense",
+      avatar: "./assets/images/avatars/daniel-carter.jpg",
+      isPositive: false,
     },
     {
       name: "Sun Park",
-      amount: "+$120.00",
+      amount: 120.0,
       date: "17 Aug 2024",
-      type: "income",
+      avatar: "./assets/images/avatars/sun-park.jpg",
+      isPositive: true,
     },
     {
       name: "Urban Services Hub",
-      amount: "-$65.00",
+      amount: 65.0,
       date: "17 Aug 2024",
-      type: "expense",
-      icon: "⚙️",
+      avatar: "./assets/images/avatars/urban-services-hub.jpg",
+      isPositive: false,
     },
   ];
 
   return (
     <Card className="p-6">
-      <div className="flex justify-between items-center mb-6">
-        <h3 className="text-lg font-semibold text-gray-900">Transactions</h3>
-        <button className="text-sm text-gray-600 hover:text-gray-900">
-          View All
-        </button>
-      </div>
+      <SectionHeader
+        title="Transactions"
+        href="/transactions"
+        linkText="View All"
+      />
 
-      <div className="space-y-4">
+      <div className="space-y-1">
         {transactions.map((transaction, index) => (
-          <div key={index} className="flex items-center space-x-4">
-            {/* Avatar/Icon */}
-            <div className="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center">
-              {transaction.icon ? (
-                <span className="text-lg">{transaction.icon}</span>
-              ) : (
-                <span className="text-sm font-medium text-gray-600">
-                  {transaction.name
-                    .split(" ")
-                    .map((n) => n[0])
-                    .join("")}
-                </span>
-              )}
-            </div>
-
-            {/* Transaction Details */}
-            <div className="flex-1">
-              <p className="font-medium text-gray-900">{transaction.name}</p>
-              <p className="text-sm text-gray-500">{transaction.date}</p>
-            </div>
-
-            {/* Amount */}
-            <p
-              className={`font-semibold ${
-                transaction.type === "income"
-                  ? "text-green-600"
-                  : "text-red-600"
-              }`}
-            >
-              {transaction.amount}
-            </p>
-          </div>
+          <TransactionItem
+            key={index}
+            name={transaction.name}
+            amount={transaction.amount}
+            date={transaction.date}
+            avatar={transaction.avatar}
+            isPositive={transaction.isPositive}
+          />
         ))}
       </div>
     </Card>
@@ -183,90 +139,39 @@ const TransactionsSection = () => {
 
 // Budgets Component
 const BudgetsSection = () => {
-  const categories = [
-    { name: "Entertainment", amount: "$50.00", color: "bg-teal-600" },
-    { name: "Bills", amount: "$750.00", color: "bg-teal-300" },
-    { name: "Dining Out", amount: "$75.00", color: "bg-orange-300" },
-    { name: "Personal Care", amount: "$100.00", color: "bg-gray-600" },
+  const budgetCategories = [
+    { name: "Entertainment", spent: 50.0, limit: 50.0, color: "#277C78" },
+    { name: "Bills", spent: 750.0, limit: 750.0, color: "#82C9D7" },
+    { name: "Dining Out", spent: 75.0, limit: 75.0, color: "#F2CDAC" },
+    { name: "Personal Care", spent: 100.0, limit: 100.0, color: "#626070" },
   ];
+
+  const totalSpent = 338;
+  const totalLimit = 975;
 
   return (
     <Card className="p-6">
-      <div className="flex justify-between items-center mb-6">
-        <h3 className="text-lg font-semibold text-gray-900">Budgets</h3>
-        <button className="text-sm text-gray-600 hover:text-gray-900">
-          See Details
-        </button>
-      </div>
+      <SectionHeader title="Budgets" href="/budgets" linkText="See Details" />
 
-      <div className="flex items-center space-x-6">
+      <div className="flex items-center gap-5">
         {/* Donut Chart */}
-        <div className="relative w-24 h-24">
-          <svg className="w-24 h-24 transform -rotate-90" viewBox="0 0 100 100">
-            <circle
-              cx="50"
-              cy="50"
-              r="40"
-              fill="none"
-              stroke="#e5e7eb"
-              strokeWidth="8"
-            />
-            <circle
-              cx="50"
-              cy="50"
-              r="40"
-              fill="none"
-              stroke="#374151"
-              strokeWidth="8"
-              strokeDasharray={`${(100 / 975) * 251.2} 251.2`}
-            />
-            <circle
-              cx="50"
-              cy="50"
-              r="40"
-              fill="none"
-              stroke="#14b8a6"
-              strokeWidth="8"
-              strokeDasharray={`${(750 / 975) * 251.2} 251.2`}
-              strokeDashoffset={`-${(100 / 975) * 251.2}`}
-            />
-            <circle
-              cx="50"
-              cy="50"
-              r="40"
-              fill="none"
-              stroke="#6ee7b7"
-              strokeWidth="8"
-              strokeDasharray={`${(50 / 975) * 251.2} 251.2`}
-              strokeDashoffset={`-${(850 / 975) * 251.2}`}
-            />
-            <circle
-              cx="50"
-              cy="50"
-              r="40"
-              fill="none"
-              stroke="#fdba74"
-              strokeWidth="8"
-              strokeDasharray={`${(75 / 975) * 251.2} 251.2`}
-              strokeDashoffset={`-${(900 / 975) * 251.2}`}
-            />
-          </svg>
-          <div className="absolute inset-0 flex flex-col items-center justify-center">
-            <p className="text-lg font-bold text-gray-900">$338</p>
-            <p className="text-xs text-gray-500">of $975 limit</p>
-          </div>
+        <div className="flex-shrink-0 w-[240px]">
+          <BudgetDonutChart
+            categories={budgetCategories}
+            totalSpent={totalSpent}
+            totalLimit={totalLimit}
+          />
         </div>
 
         {/* Budget Categories */}
-        <div className="flex-1 space-y-3">
-          {categories.map((category, index) => (
-            <div key={index} className="flex items-center space-x-3">
-              <div className={`w-3 h-3 rounded-full ${category.color}`}></div>
-              <span className="text-gray-700 flex-1">{category.name}</span>
-              <span className="font-semibold text-gray-900">
-                {category.amount}
-              </span>
-            </div>
+        <div className="flex-1 py-2">
+          {budgetCategories.map((category, index) => (
+            <BudgetItem
+              key={index}
+              category={category.name}
+              amount={category.limit}
+              color={category.color}
+            />
           ))}
         </div>
       </div>
@@ -277,29 +182,27 @@ const BudgetsSection = () => {
 // Recurring Bills Component
 const RecurringBillsSection = () => {
   const bills = [
-    { label: "Paid Bills", amount: "$190.00", bgColor: "bg-green-100" },
-    { label: "Total Upcoming", amount: "$194.98", bgColor: "bg-orange-100" },
-    { label: "Due Soon", amount: "$59.98", bgColor: "bg-red-100" },
+    { label: "Paid Bills", amount: 190.0, borderColor: "#277C78" },
+    { label: "Total Upcoming", amount: 194.98, borderColor: "#F2CDAC" },
+    { label: "Due Soon", amount: 59.98, borderColor: "#82C9D7" },
   ];
 
   return (
     <Card className="p-6">
-      <div className="flex justify-between items-center mb-6">
-        <h3 className="text-lg font-semibold text-gray-900">Recurring Bills</h3>
-        <button className="text-sm text-gray-600 hover:text-gray-900">
-          See Details
-        </button>
-      </div>
+      <SectionHeader
+        title="Recurring Bills"
+        href="/recurring-bills"
+        linkText="See Details"
+      />
 
       <div className="space-y-3">
         {bills.map((bill, index) => (
-          <div
+          <RecurringBillCard
             key={index}
-            className={`${bill.bgColor} rounded-lg p-3 flex justify-between items-center`}
-          >
-            <span className="font-medium text-gray-900">{bill.label}</span>
-            <span className="font-semibold text-gray-900">{bill.amount}</span>
-          </div>
+            label={bill.label}
+            amount={bill.amount}
+            borderColor={bill.borderColor}
+          />
         ))}
       </div>
     </Card>
