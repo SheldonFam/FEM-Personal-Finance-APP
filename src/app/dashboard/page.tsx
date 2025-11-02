@@ -35,12 +35,12 @@ const PotsSection = () => {
   ];
 
   return (
-    <Card className="p-6">
+    <Card className="p-8">
       <SectionHeader title="Pots" href="/pots" linkText="See Details" />
 
-      <div className="flex items-start gap-5">
+      <div className="flex items-start gap-5 flex-col md:flex-row">
         {/* Total Saved */}
-        <div className="bg-[#F8F4F0] rounded-xl p-5 flex items-center gap-4 flex-shrink-0">
+        <div className="bg-[#F8F4F0] rounded-xl p-5 flex items-center gap-4 w-full md:flex-1">
           <div className="w-10 h-10 rounded-full flex items-center justify-center">
             <Image
               src="/assets/images/icon-pot.svg"
@@ -58,7 +58,7 @@ const PotsSection = () => {
         </div>
 
         {/* Individual Pots */}
-        <div className="flex-1 grid grid-cols-2 gap-4">
+        <div className="w-full md:flex-1 grid grid-cols-2 gap-4">
           {pots.map((pot, index) => (
             <PotItem
               key={index}
@@ -114,7 +114,7 @@ const TransactionsSection = () => {
   ];
 
   return (
-    <Card className="p-6">
+    <Card className="p-8">
       <SectionHeader
         title="Transactions"
         href="/transactions"
@@ -150,10 +150,10 @@ const BudgetsSection = () => {
   const totalLimit = 975;
 
   return (
-    <Card className="p-6">
+    <Card className="p-8">
       <SectionHeader title="Budgets" href="/budgets" linkText="See Details" />
 
-      <div className="flex items-center gap-5">
+      <div className="flex items-center gap-4 flex-col md:flex-row">
         {/* Donut Chart */}
         <div className="flex-shrink-0 w-[240px]">
           <BudgetDonutChart
@@ -164,7 +164,7 @@ const BudgetsSection = () => {
         </div>
 
         {/* Budget Categories */}
-        <div className="flex-1 py-2">
+        <div className="flex-1 py-2 min-w-0 grid grid-cols-2 md:grid-cols-1 gap-4 w-full h-full">
           {budgetCategories.map((category, index) => (
             <BudgetItem
               key={index}
@@ -188,7 +188,7 @@ const RecurringBillsSection = () => {
   ];
 
   return (
-    <Card className="p-6">
+    <Card className="h-full p-8">
       <SectionHeader
         title="Recurring Bills"
         href="/recurring-bills"
@@ -223,26 +223,34 @@ export default function DashboardPage() {
   const pageTitle = titleMap[activeTab] ?? "Overview";
 
   return (
-    <div className="min-h-screen bg-gray-50 p-4 md:p-8">
+    <div className="min-h-screen bg-gray-50 p-4 md:p-10">
       <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-6 md:mb-8">
         {pageTitle}
       </h1>
 
       {/* Summary Cards */}
-      <SummaryCards />
+      <div className="max-w-[1060px] mx-auto">
+        <SummaryCards />
+      </div>
 
       {/* Main Content Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-8">
-        {/* Left Column */}
-        <div className="space-y-4 md:space-y-8">
-          <PotsSection />
-          <TransactionsSection />
-        </div>
+      <div className="max-w-[1060px] mx-auto">
+        <div className="flex flex-col lg:flex-row gap-6 items-stretch">
+          {/* Left Column - 608px */}
+          <div className="flex flex-col gap-4 md:gap-6 w-full lg:w-[608px]">
+            <PotsSection />
+            <div className="flex-1">
+              <TransactionsSection />
+            </div>
+          </div>
 
-        {/* Right Column */}
-        <div className="space-y-4 md:space-y-8">
-          <BudgetsSection />
-          <RecurringBillsSection />
+          {/* Right Column - 428px */}
+          <div className="flex flex-col gap-4 md:gap-6 w-full lg:w-[428px]">
+            <BudgetsSection />
+            <div className="flex-1">
+              <RecurringBillsSection />
+            </div>
+          </div>
         </div>
       </div>
     </div>

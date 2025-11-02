@@ -108,9 +108,9 @@ const BudgetCard = ({
     .slice(0, 3);
 
   return (
-    <Card className="p-5 md:p-8">
+    <Card className="p-6 bg-white">
       {/* Header */}
-      <div className="flex items-center justify-between mb-5">
+      <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-4">
           <div
             className="w-4 h-4 rounded-full"
@@ -156,30 +156,33 @@ const BudgetCard = ({
       </div>
 
       {/* Spending Summary */}
-      <div className="mb-5">
-        <p className="text-sm text-gray-500 mb-3">
+      <div className="mb-6">
+        <p className="text-sm text-gray-500 mb-4">
           Maximum of {formatCurrency(budget.maximum)}
         </p>
 
         {/* Progress Bar */}
-        <div className="relative">
-          <Progress
-            value={percentage}
-            className="h-8 rounded-lg"
-            color={budget.theme}
-          />
-          {/* Overlay text on progress bar */}
-          <div className="absolute inset-0 flex items-center px-4 pointer-events-none">
-            <div className="flex items-center justify-between w-full text-xs font-bold">
-              <span className="text-white drop-shadow-sm">
-                {formatCurrency(spent)} spent
-              </span>
-              {!isOverBudget && (
-                <span className="text-gray-700">
-                  {formatCurrency(remaining)} remaining
-                </span>
-              )}
-            </div>
+        <Progress
+          value={percentage}
+          className="h-8 mb-3"
+          color={budget.theme}
+        />
+
+        {/* Spending info below progress bar */}
+        <div className="grid grid-cols-2 gap-8 mt-4">
+          {/* Spent */}
+          <div>
+            <p className="text-xs text-gray-500 mb-1">Spent</p>
+            <p className="text-base font-bold text-gray-900">
+              {formatCurrency(spent)}
+            </p>
+          </div>
+          {/* Remaining */}
+          <div>
+            <p className="text-xs text-gray-500 mb-1">Remaining</p>
+            <p className="text-base font-bold text-gray-900">
+              {formatCurrency(remaining)}
+            </p>
           </div>
         </div>
 
@@ -191,56 +194,73 @@ const BudgetCard = ({
       </div>
 
       {/* Spending Breakdown */}
-      <div className="pt-5 border-t border-gray-100">
-        <div className="flex items-center justify-between mb-4">
-          <h4 className="text-sm font-bold text-gray-900">Latest Spending</h4>
-          {latestTransactions.length > 0 && (
-            <button className="text-sm text-gray-600 hover:text-gray-900">
-              See All
-            </button>
-          )}
-        </div>
-
-        {latestTransactions.length > 0 ? (
-          <div className="space-y-3">
-            {latestTransactions.map((transaction, index) => {
-              const avatarPath = normalizeImagePath(transaction.avatar);
-              return (
-                <div
-                  key={index}
-                  className="flex items-center justify-between py-3 border-b border-gray-50 last:border-0"
+      <div className="pt-6 border-t border-gray-100">
+        <div className="bg-amber-50 rounded-lg p-4 -mx-1">
+          <div className="flex items-center justify-between mb-4">
+            <h4 className="text-sm font-bold text-gray-900">Latest Spending</h4>
+            {latestTransactions.length > 0 && (
+              <button className="flex items-center gap-1 text-sm text-gray-600 hover:text-gray-900 transition-colors font-medium">
+                See All
+                <svg
+                  width="12"
+                  height="12"
+                  viewBox="0 0 12 12"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
                 >
-                  <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-full overflow-hidden bg-gray-100 flex-shrink-0">
-                      <Image
-                        src={avatarPath}
-                        alt={transaction.name}
-                        width={32}
-                        height={32}
-                        className="w-full h-full object-cover"
-                      />
-                    </div>
-                    <div>
-                      <p className="font-bold text-xs text-gray-900">
+                  <path
+                    d="M4.5 3L7.5 6L4.5 9"
+                    stroke="currentColor"
+                    strokeWidth="1.5"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
+              </button>
+            )}
+          </div>
+
+          {latestTransactions.length > 0 ? (
+            <div className="space-y-0">
+              {latestTransactions.map((transaction, index) => {
+                const avatarPath = normalizeImagePath(transaction.avatar);
+                return (
+                  <div
+                    key={index}
+                    className="flex items-center justify-between py-3 border-b border-gray-200 last:border-0"
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className="w-8 h-8 rounded-full overflow-hidden bg-gray-100 flex-shrink-0">
+                        <Image
+                          src={avatarPath}
+                          alt={transaction.name}
+                          width={32}
+                          height={32}
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+                      <p className="text-sm text-gray-900">
                         {transaction.name}
+                      </p>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-sm text-gray-900">
+                        -{formatCurrency(transaction.amount)}
                       </p>
                       <p className="text-xs text-gray-500">
                         {formatDate(transaction.date)}
                       </p>
                     </div>
                   </div>
-                  <p className="font-bold text-sm text-gray-900">
-                    -{formatCurrency(transaction.amount)}
-                  </p>
-                </div>
-              );
-            })}
-          </div>
-        ) : (
-          <p className="text-sm text-gray-500 text-center py-4">
-            No transactions yet
-          </p>
-        )}
+                );
+              })}
+            </div>
+          ) : (
+            <p className="text-sm text-gray-500 text-center py-4">
+              No transactions yet
+            </p>
+          )}
+        </div>
       </div>
     </Card>
   );
@@ -274,7 +294,7 @@ const SpendingSummary = ({
   }));
 
   return (
-    <Card className="p-5 md:p-8 h-fit sticky top-8">
+    <Card className="p-6 xl:sticky xl:top-8 border-b border-gray-200 bg-white">
       <h2 className="text-xl font-bold text-gray-900 mb-6">Spending Summary</h2>
       <BudgetChartWithLegend
         categories={categories}
@@ -356,12 +376,10 @@ export default function BudgetsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 p-4 md:p-8 pb-24 md:pb-8">
+    <div className="min-h-screen bg-[#F5F5F5] p-6 md:p-8 pb-24 md:pb-8">
       {/* Header */}
       <div className="flex items-center justify-between mb-6 md:mb-8">
-        <h1 className="text-2xl md:text-3xl font-bold text-gray-900">
-          Budgets
-        </h1>
+        <h1 className="text-3xl font-bold text-gray-900">Budgets</h1>
         <Button onClick={() => setIsAddModalOpen(true)}>
           + Add New Budget
         </Button>
@@ -369,9 +387,9 @@ export default function BudgetsPage() {
 
       {/* Main Content Layout */}
       {budgetsWithSpending.length > 0 ? (
-        <div className="grid grid-cols-1 xl:grid-cols-[400px_1fr] gap-6">
+        <div className="grid grid-cols-1 xl:grid-cols-[400px_1fr] gap-8">
           {/* Left: Spending Summary */}
-          <div>
+          <div className="h-fit">
             <SpendingSummary budgetsWithSpending={budgetsWithSpending} />
           </div>
 

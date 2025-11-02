@@ -22,7 +22,7 @@ function Progress({
     <ProgressPrimitive.Root
       data-slot="progress"
       className={cn(
-        "bg-secondary relative h-2 w-full overflow-hidden rounded-full",
+        "bg-amber-50 relative h-2 w-full overflow-hidden rounded-full",
         className
       )}
       {...props}
@@ -30,7 +30,7 @@ function Progress({
       <ProgressPrimitive.Indicator
         data-slot="progress-indicator"
         className={cn(
-          "h-full w-full flex-1 transition-all",
+          "h-full w-full flex-1 transition-all rounded-full",
           indicatorClassName
         )}
         style={{

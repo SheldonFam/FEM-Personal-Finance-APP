@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 
 interface SectionHeaderProps {
   title: string;
@@ -20,15 +21,12 @@ export function SectionHeader({
           className="text-sm text-[#696868] hover:text-[#201F24] flex items-center gap-3 transition-colors"
         >
           {linkText}
-          <svg width="6" height="11" viewBox="0 0 6 11" fill="none">
-            <path
-              d="M1 1L5 5.5L1 10"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-          </svg>
+          <Image
+            src="/assets/images/icon-caret-right.svg"
+            alt=""
+            width={6}
+            height={11}
+          />
         </Link>
       )}
     </div>

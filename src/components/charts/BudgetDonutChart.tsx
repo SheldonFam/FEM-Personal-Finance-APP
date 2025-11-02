@@ -33,14 +33,14 @@ export default function BudgetDonutChart({
   return (
     <div className={`relative ${className}`}>
       {/* Donut Chart */}
-      <ResponsiveContainer width="100%" height={200}>
+      <ResponsiveContainer width="100%" height={240}>
         <PieChart>
           <Pie
             data={chartData}
             cx="50%"
             cy="50%"
-            innerRadius={60}
-            outerRadius={85}
+            innerRadius={75}
+            outerRadius={95}
             paddingAngle={0}
             dataKey="value"
             strokeWidth={0}
@@ -57,11 +57,11 @@ export default function BudgetDonutChart({
       {/* Center Text */}
       <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
         <div className="text-center">
-          <p className="text-[32px] leading-none font-bold text-[#201F24]">
-            ${totalSpent.toLocaleString("en-US")}
+          <p className="text-4xl leading-none font-bold text-gray-900">
+            ${Math.round(totalSpent).toLocaleString("en-US")}
           </p>
-          <p className="text-xs text-[#696868] mt-2">
-            of ${totalLimit.toLocaleString("en-US")} limit
+          <p className="text-xs text-gray-500 mt-2">
+            of ${Math.round(totalLimit).toLocaleString("en-US")} limit
           </p>
         </div>
       </div>
@@ -78,9 +78,16 @@ interface BudgetLegendProps {
 
 export function BudgetLegend({ categories }: BudgetLegendProps) {
   return (
-    <div className="space-y-3 mt-6">
-      {categories.map((category) => (
-        <div key={category.name} className="flex items-center justify-between">
+    <div className="space-y-0 mt-6">
+      {categories.map((category, index) => (
+        <div
+          key={category.name}
+          className={`flex items-center justify-between ${
+            index < categories.length - 1
+              ? "pb-3 mb-3 border-b border-gray-200"
+              : ""
+          }`}
+        >
           <div className="flex items-center gap-3">
             <div
               className="w-1 h-10 rounded-full flex-shrink-0"
