@@ -69,76 +69,69 @@ const formatDate = (dateString: string) => {
   }).format(date);
 };
 
-// Transaction Item Component
+// Transaction Item Component (4-column grid layout)
 const TransactionRow = ({ transaction }: { transaction: Transaction }) => {
   const isPositive = transaction.amount > 0;
   const avatarPath = normalizeImagePath(transaction.avatar);
 
   return (
-    <div className="flex items-center justify-between py-4 border-b border-gray-100 last:border-0 hover:bg-gray-50 transition-colors group">
-      <div className="flex items-center gap-4 flex-1">
-        <div className="w-10 h-10 rounded-full overflow-hidden bg-gray-100 flex-shrink-0 ring-2 ring-transparent group-hover:ring-gray-200 transition-all">
-          <Image
-            src={avatarPath}
-            alt={transaction.name}
-            width={40}
-            height={40}
-            className="w-full h-full object-cover"
-          />
-        </div>
-        <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2">
+    <div className="py-4 border-b border-gray-100 last:border-0 hover:bg-gray-50 transition-colors">
+      <div className="flex flex-col gap-3 sm:grid sm:grid-cols-4 sm:items-center sm:gap-0">
+        {/* Recipient / Sender */}
+        <div className="flex items-start gap-4 min-w-0 sm:col-span-1">
+          <div className="w-10 h-10 rounded-full overflow-hidden bg-gray-100 flex-shrink-0">
+            <Image
+              src={avatarPath}
+              alt={transaction.name}
+              width={40}
+              height={40}
+              className="w-full h-full object-cover"
+            />
+          </div>
+          <div className="min-w-0 flex-1">
             <p className="font-bold text-sm text-gray-900 truncate">
               {transaction.name}
             </p>
-            {transaction.recurring && (
-              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-green-100 text-green-700 text-xs font-medium flex-shrink-0">
-                <svg
-                  width="12"
-                  height="12"
-                  viewBox="0 0 12 12"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    d="M9 3.5L9 1L11.5 3.5L9 6L9 3.5Z"
-                    fill="currentColor"
-                  />
-                  <path
-                    d="M3 8.5L3 11L0.5 8.5L3 6L3 8.5Z"
-                    fill="currentColor"
-                  />
-                  <path
-                    d="M9 3.5C9 5.433 7.433 7 5.5 7C3.567 7 2 5.433 2 3.5"
-                    stroke="currentColor"
-                    strokeLinecap="round"
-                  />
-                  <path
-                    d="M3 8.5C3 6.567 4.567 5 6.5 5C8.433 5 10 6.567 10 8.5"
-                    stroke="currentColor"
-                    strokeLinecap="round"
-                  />
-                </svg>
-                Recurring
-              </span>
-            )}
+            <p className="mt-1 text-xs text-gray-500 sm:hidden">
+              {transaction.category}
+            </p>
           </div>
-          <p className="text-xs text-gray-500 mt-1">{transaction.category}</p>
+          <div className="ml-auto text-right sm:hidden">
+            <p
+              className={`font-bold text-sm ${
+                isPositive ? "text-green-600" : "text-gray-900"
+              }`}
+            >
+              {isPositive ? "+" : "-"}
+              {formatCurrency(transaction.amount)}
+            </p>
+            <p className="mt-1 text-xs text-gray-500">
+              {formatDate(transaction.date)}
+            </p>
+          </div>
         </div>
-      </div>
 
-      <div className="text-right flex-shrink-0 ml-4">
-        <p
-          className={`font-bold text-sm md:text-base ${
-            isPositive ? "text-green-600" : "text-gray-900"
-          }`}
-        >
-          {isPositive ? "+" : "-"}
-          {formatCurrency(transaction.amount)}
-        </p>
-        <p className="text-xs text-gray-500 mt-1">
+        {/* Category */}
+        <div className="hidden sm:block text-sm text-gray-500">
+          {transaction.category}
+        </div>
+
+        {/* Transaction Date */}
+        <div className="hidden sm:block text-sm text-gray-500">
           {formatDate(transaction.date)}
-        </p>
+        </div>
+
+        {/* Amount */}
+        <div className="hidden sm:block text-right">
+          <p
+            className={`font-bold text-sm md:text-base ${
+              isPositive ? "text-green-600" : "text-gray-900"
+            }`}
+          >
+            {isPositive ? "+" : "-"}
+            {formatCurrency(transaction.amount)}
+          </p>
+        </div>
       </div>
     </div>
   );
@@ -195,17 +188,18 @@ const Pagination = ({
         size="sm"
         onClick={() => onPageChange(currentPage - 1)}
         disabled={currentPage === 1}
+        className="h-full px-4 py-[9.5px]  gap-4"
       >
         <Image
           src="/assets/images/icon-caret-left.svg"
           alt="Previous"
-          width={12}
-          height={12}
+          width={6}
+          height={6}
         />
-        Prev
+        <p className="hidden md:block text-sm leading-[150%]">Prev</p>
       </Button>
 
-      <div className="flex items-center gap-1">
+      <div className="flex items-center gap-2">
         {pageNumbers.map((page, index) => {
           if (page < 0) {
             return (
@@ -215,15 +209,21 @@ const Pagination = ({
             );
           }
 
+          const isActive = currentPage === page;
+
           return (
             <button
               key={page}
               onClick={() => onPageChange(page)}
-              className={`w-8 h-8 rounded-md text-sm font-medium transition-colors ${
-                currentPage === page
-                  ? "bg-gray-900 text-white"
-                  : "text-gray-600 hover:bg-gray-100"
-              }`}
+              className={`
+                w-10 h-10 rounded-md text-sm font-medium transition-colors cursor-pointer 
+                flex items-center justify-center
+                ${
+                  isActive
+                    ? "bg-[#282828] text-[#E0E0E0]"
+                    : "bg-[#F8F8F8] text-[#404040] border border-[#D0D0D0] hover:bg-[#F0F0F0]"
+                }
+              `}
             >
               {page}
             </button>
@@ -236,13 +236,14 @@ const Pagination = ({
         size="sm"
         onClick={() => onPageChange(currentPage + 1)}
         disabled={currentPage === totalPages}
+        className="h-full px-4 py-[9.5px] gap-4"
       >
-        Next
+        <p className="hidden md:block text-sm leading-[150%]">Next</p>
         <Image
           src="/assets/images/icon-caret-right.svg"
           alt="Next"
-          width={12}
-          height={12}
+          width={6}
+          height={6}
         />
       </Button>
     </div>
@@ -255,6 +256,8 @@ export default function TransactionsPage() {
   const [selectedCategory, setSelectedCategory] = useState("All Transactions");
   const [sortBy, setSortBy] = useState("latest");
   const [currentPage, setCurrentPage] = useState(1);
+  const [isCategorySelectOpen, setIsCategorySelectOpen] = useState(false);
+  const [isSortSelectOpen, setIsSortSelectOpen] = useState(false);
 
   // Filter and sort transactions
   const filteredAndSortedTransactions = useMemo(() => {
@@ -328,120 +331,184 @@ export default function TransactionsPage() {
       {/* Transactions Card */}
       <Card className="p-5 md:p-8">
         {/* Search and Filters */}
-        <div className="mb-6 space-y-4">
-          <div className="flex flex-col lg:flex-row gap-4">
+        <div className="mb-6 w-full">
+          <div className="w-full flex flex-row items-center justify-between gap-4">
             {/* Search Input */}
-            <div className="flex-1">
+            <div className="w-full lg:w-[320px]">
               <div className="relative">
-                <Image
-                  src="/assets/images/icon-search.svg"
-                  alt="Search"
-                  width={16}
-                  height={16}
-                  className="absolute left-5 top-1/2 -translate-y-1/2 opacity-50 pointer-events-none"
-                />
                 <Input
                   type="text"
                   placeholder="Search transaction"
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-12"
+                  className="pr-12 h-[45px]"
+                />
+                <Image
+                  src="/assets/images/icon-search.svg"
+                  alt="Search"
+                  width={14}
+                  height={14}
+                  className="absolute right-5 top-1/2 -translate-y-1/2 opacity-50 pointer-events-none"
                 />
               </div>
             </div>
 
             {/* Category Filter and Sort */}
-            <div className="flex gap-3 flex-col sm:flex-row">
-              <Select
-                value={selectedCategory}
-                onValueChange={setSelectedCategory}
-              >
-                <SelectTrigger className="w-full sm:w-[180px] h-12 bg-white">
-                  <SelectValue placeholder="Category" />
-                </SelectTrigger>
-                <SelectContent>
-                  {CATEGORIES.map((category) => (
-                    <SelectItem key={category} value={category}>
-                      {category}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+            <div className="flex gap-6 flex-row w-auto md:w-full lg:justify-end">
+              <div className="relative flex flex-row gap-2 items-center">
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon-sm"
+                  className="sm:hidden size-[45px] rounded-lg bg-transparent p-0 hover:bg-gray-100 focus-visible:ring-0 focus-visible:ring-offset-0"
+                  aria-label="Open sort options"
+                  aria-haspopup="listbox"
+                  aria-expanded={isSortSelectOpen}
+                  onClick={() => setIsSortSelectOpen(true)}
+                >
+                  <Image
+                    src="/assets/images/icon-sort-mobile.svg"
+                    alt=""
+                    width={16}
+                    height={15}
+                    className="shrink-0"
+                  />
+                </Button>
+                <span className="hidden sm:inline text-xs font-medium text-gray-500">
+                  Category
+                </span>
+                <Select
+                  value={selectedCategory}
+                  onValueChange={(value) => {
+                    setSelectedCategory(value);
+                    setIsCategorySelectOpen(false);
+                  }}
+                  open={isCategorySelectOpen}
+                  onOpenChange={setIsCategorySelectOpen}
+                >
+                  <SelectTrigger
+                    aria-label="Category"
+                    className="absolute inset-0 h-0 w-0 opacity-0 pointer-events-none sm:static sm:h-[45px] sm:w-[180px] sm:opacity-100 sm:pointer-events-auto sm:flex bg-white border border-gray-200 rounded-lg px-4 text-sm font-medium text-gray-700 justify-between shadow-sm hover:bg-gray-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-200 data-[state=open]:border-primary-300"
+                  >
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {CATEGORIES.map((category) => (
+                      <SelectItem
+                        key={category}
+                        value={category}
+                        showIndicator={false}
+                        className="px-4 py-2 text-sm text-gray-600 border-b border-gray-200 last:border-b-0 data-[state=checked]:font-semibold data-[state=checked]:text-gray-900 data-[highlighted]:bg-gray-100"
+                      >
+                        {category}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
 
               {/* Sort By */}
-              <Select value={sortBy} onValueChange={setSortBy}>
-                <SelectTrigger className="w-full sm:w-[150px] h-12 bg-white">
-                  <div className="flex items-center gap-2 justify-start">
-                    <span className="text-gray-500 text-sm">Sort by</span>
+              <div className="relative flex flex-row gap-2 items-center">
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon-sm"
+                  className="sm:hidden size-[45px] rounded-lg bg-transparent p-0 hover:bg-gray-100 focus-visible:ring-0 focus-visible:ring-offset-0"
+                  aria-label="Open category filter"
+                  aria-haspopup="listbox"
+                  aria-expanded={isCategorySelectOpen}
+                  onClick={() => setIsCategorySelectOpen(true)}
+                >
+                  <Image
+                    src="/assets/images/icon-filter-mobile.svg"
+                    alt=""
+                    width={18}
+                    height={16}
+                    className="shrink-0"
+                  />
+                </Button>
+
+                <span className="hidden sm:inline text-xs font-medium text-gray-500">
+                  Sort by
+                </span>
+                <Select
+                  value={sortBy}
+                  onValueChange={(value) => {
+                    setSortBy(value);
+                    setIsSortSelectOpen(false);
+                  }}
+                  open={isSortSelectOpen}
+                  onOpenChange={setIsSortSelectOpen}
+                >
+                  <SelectTrigger
+                    aria-label="Sort by"
+                    className="absolute inset-0 h-0 w-0 opacity-0 pointer-events-none sm:static sm:h-[45px] sm:w-[150px] sm:opacity-100 sm:pointer-events-auto sm:flex bg-white border border-gray-200 rounded-lg px-4 text-sm font-medium text-gray-700 justify-between shadow-sm hover:bg-gray-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-200 data-[state=open]:border-primary-300"
+                  >
                     <SelectValue />
-                  </div>
-                </SelectTrigger>
-                <SelectContent>
-                  {SORT_OPTIONS.map((option) => (
-                    <SelectItem key={option.value} value={option.value}>
-                      {option.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+                  </SelectTrigger>
+                  <SelectContent
+                    align="end"
+                    className="min-w-[164px] rounded-2xl border border-gray-200 bg-white py-1 shadow-[0px_16px_40px_rgba(15,23,42,0.15)]"
+                  >
+                    {SORT_OPTIONS.map((option) => (
+                      <SelectItem
+                        key={option.value}
+                        value={option.value}
+                        showIndicator={false}
+                        className="px-4 py-2 text-sm text-gray-600 border-b border-gray-200 last:border-b-0 data-[state=checked]:font-semibold data-[state=checked]:text-gray-900 data-[highlighted]:bg-gray-100"
+                      >
+                        {option.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
           </div>
+        </div>
 
-          {/* Results Count */}
-          <div className="flex items-center justify-between flex-wrap gap-2">
-            <p className="text-sm text-gray-600">
-              {filteredAndSortedTransactions.length} transaction
-              {filteredAndSortedTransactions.length !== 1 ? "s" : ""} found
-            </p>
-            {(searchTerm || selectedCategory !== "All Transactions") && (
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => {
-                  setSearchTerm("");
-                  setSelectedCategory("All Transactions");
-                  setSortBy("latest");
-                }}
-                className="text-sm"
-              >
-                Clear filters
-              </Button>
+        <div className="w-full">
+          {/* Table Header */}
+          <div className="hidden grid-cols-4 text-xs text-gray-500 px-0 pt-2 pb-3 border-b border-gray-200 sm:grid">
+            <div>Recipient / Sender</div>
+            <div>Category</div>
+            <div>Transaction Date</div>
+            <div className="text-right">Amount</div>
+          </div>
+
+          {/* Transactions List */}
+          <div>
+            {paginatedTransactions.length > 0 ? (
+              paginatedTransactions.map((transaction, index) => (
+                <TransactionRow key={index} transaction={transaction} />
+              ))
+            ) : (
+              <div className="text-center py-12">
+                <p className="text-gray-500">No transactions found</p>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => {
+                    setSearchTerm("");
+                    setSelectedCategory("All Transactions");
+                  }}
+                  className="mt-4"
+                >
+                  Clear filters
+                </Button>
+              </div>
             )}
           </div>
-        </div>
 
-        {/* Transactions List */}
-        <div className="space-y-1">
-          {paginatedTransactions.length > 0 ? (
-            paginatedTransactions.map((transaction, index) => (
-              <TransactionRow key={index} transaction={transaction} />
-            ))
-          ) : (
-            <div className="text-center py-12">
-              <p className="text-gray-500">No transactions found</p>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => {
-                  setSearchTerm("");
-                  setSelectedCategory("All Transactions");
-                }}
-                className="mt-4"
-              >
-                Clear filters
-              </Button>
-            </div>
+          {/* Pagination */}
+          {totalPages > 1 && (
+            <Pagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              onPageChange={setCurrentPage}
+            />
           )}
         </div>
-
-        {/* Pagination */}
-        {totalPages > 1 && (
-          <Pagination
-            currentPage={currentPage}
-            totalPages={totalPages}
-            onPageChange={setCurrentPage}
-          />
-        )}
       </Card>
     </div>
   );

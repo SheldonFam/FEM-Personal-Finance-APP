@@ -229,15 +229,15 @@ export default function DashboardPage() {
       </h1>
 
       {/* Summary Cards */}
-      <div className="max-w-[1060px] mx-auto">
+      <div className="w-full">
         <SummaryCards />
       </div>
 
       {/* Main Content Grid */}
-      <div className="max-w-[1060px] mx-auto">
+      <div className="w-full">
         <div className="flex flex-col lg:flex-row gap-6 items-stretch">
           {/* Left Column - 608px */}
-          <div className="flex flex-col gap-4 md:gap-6 w-full lg:w-[608px]">
+          <div className="flex flex-col gap-4 md:gap-6 w-full">
             <PotsSection />
             <div className="flex-1">
               <TransactionsSection />
@@ -245,7 +245,7 @@ export default function DashboardPage() {
           </div>
 
           {/* Right Column - 428px */}
-          <div className="flex flex-col gap-4 md:gap-6 w-full lg:w-[428px]">
+          <div className="flex flex-col gap-4 md:gap-6 w-full">
             <BudgetsSection />
             <div className="flex-1">
               <RecurringBillsSection />

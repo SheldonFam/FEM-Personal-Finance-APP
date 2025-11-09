@@ -100,7 +100,7 @@ const BudgetCard = ({
   const [showMenu, setShowMenu] = useState(false);
   const percentage = Math.min((spent / budget.maximum) * 100, 100);
   const remaining = Math.max(0, budget.maximum - spent);
-  const isOverBudget = spent > budget.maximum;
+  // const isOverBudget = spent > budget.maximum;
 
   // Get latest 3 transactions for this category
   const latestTransactions = transactions
@@ -186,11 +186,11 @@ const BudgetCard = ({
           </div>
         </div>
 
-        {isOverBudget && (
+        {/* {isOverBudget && (
           <p className="text-sm text-red-600 mt-2 font-medium">
             Over budget by {formatCurrency(spent - budget.maximum)}!
           </p>
-        )}
+        )} */}
       </div>
 
       {/* Spending Breakdown */}
