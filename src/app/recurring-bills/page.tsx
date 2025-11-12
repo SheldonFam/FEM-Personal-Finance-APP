@@ -3,6 +3,7 @@
 import React, { useState, useMemo } from "react";
 import { Card } from "@/components/ui/Card";
 import { Input } from "@/components/ui/Input";
+import { Button } from "@/components/ui/Button";
 import {
   Select,
   SelectContent,
@@ -10,7 +11,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import Image from "next/image";
 import transactionsData from "@/../data.json";
 import { normalizeImagePath } from "@/lib/utils";
@@ -115,55 +115,107 @@ const BillRow = ({ bill }: { bill: RecurringBill }) => {
   const dueDateColor = bill.isPaid ? "text-[#277C78]" : "text-[#696868]";
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 px-6 py-5 border-b border-gray-100 last:border-0 hover:bg-gray-50/50 transition-colors">
-      {/* Bill Title with Avatar */}
-      <div className="flex items-center gap-4 min-w-0">
-        <div className="w-10 h-10 rounded-full overflow-hidden bg-gray-100 flex-shrink-0">
-          <Image
-            src={avatarPath}
-            alt={bill.name}
-            width={40}
-            height={40}
-            className="w-full h-full object-cover"
-          />
+    <div className="px-4 sm:px-6 py-5 border-b border-gray-100 last:border-0 hover:bg-gray-50/50 transition-colors">
+      {/* Mobile Layout */}
+      <div className="sm:hidden space-y-3">
+        <div className="flex items-center gap-3 min-w-0">
+          <div className="w-10 h-10 rounded-full overflow-hidden bg-gray-100 flex-shrink-0">
+            <Image
+              src={avatarPath}
+              alt={bill.name}
+              width={40}
+              height={40}
+              className="w-full h-full object-cover"
+            />
+          </div>
+          <p className="font-bold text-sm text-gray-900 truncate">
+            {bill.name}
+          </p>
         </div>
-        <p className="font-bold text-sm text-gray-900 truncate">{bill.name}</p>
+        <div className="flex items-center justify-between">
+          <div className={`flex items-center gap-2 text-xs ${dueDateColor}`}>
+            <span>{dueLabel}</span>
+            {bill.isPaid && (
+              <Image
+                src="/assets/images/icon-bill-paid.svg"
+                alt="Bill paid"
+                width={12}
+                height={12}
+                className="shrink-0"
+              />
+            )}
+            {!bill.isPaid && bill.isDueSoon && (
+              <Image
+                src="/assets/images/icon-bill-due.svg"
+                alt="Bill due soon"
+                width={12}
+                height={12}
+                className="shrink-0"
+              />
+            )}
+          </div>
+          <span
+            className={`font-bold text-sm ${
+              bill.isDueSoon && !bill.isPaid
+                ? "text-[#C94736]"
+                : "text-gray-900"
+            }`}
+          >
+            {formatCurrency(bill.amount)}
+          </span>
+        </div>
       </div>
 
-      {/* Due Date */}
-      <div
-        className={`flex items-center gap-2 text-sm sm:justify-center sm:text-center ${dueDateColor}`}
-      >
-        <span className="whitespace-nowrap">{dueLabel}</span>
-        {bill.isPaid && (
-          <Image
-            src="/assets/images/icon-bill-paid.svg"
-            alt="Bill paid"
-            width={14}
-            height={14}
-            className="shrink-0"
-          />
-        )}
-        {bill.isDueSoon && !bill.isPaid && (
-          <Image
-            src="/assets/images/icon-bill-due.svg"
-            alt="Bill due soon"
-            width={14}
-            height={14}
-            className="shrink-0"
-          />
-        )}
-      </div>
-
-      {/* Amount */}
-      <div className="sm:text-right">
-        <span
-          className={`font-bold text-sm ${
-            bill.isDueSoon && !bill.isPaid ? "text-[#C94736]" : "text-gray-900"
-          }`}
+      {/* Desktop Layout */}
+      <div className="hidden sm:grid sm:grid-cols-3 sm:items-center sm:gap-4">
+        <div className="flex items-center gap-4 min-w-0">
+          <div className="w-10 h-10 rounded-full overflow-hidden bg-gray-100 flex-shrink-0">
+            <Image
+              src={avatarPath}
+              alt={bill.name}
+              width={40}
+              height={40}
+              className="w-full h-full object-cover"
+            />
+          </div>
+          <p className="font-bold text-sm text-gray-900 truncate">
+            {bill.name}
+          </p>
+        </div>
+        <div
+          className={`flex items-center justify-center gap-2 text-sm ${dueDateColor}`}
         >
-          {formatCurrency(bill.amount)}
-        </span>
+          <span className="whitespace-nowrap">{dueLabel}</span>
+          {bill.isPaid && (
+            <Image
+              src="/assets/images/icon-bill-paid.svg"
+              alt="Bill paid"
+              width={14}
+              height={14}
+              className="shrink-0"
+            />
+          )}
+          {bill.isDueSoon && !bill.isPaid && (
+            <Image
+              src="/assets/images/icon-bill-due.svg"
+              alt="Bill due soon"
+              width={14}
+              height={14}
+              className="shrink-0"
+            />
+          )}
+        </div>
+        <div className="text-right">
+          <span
+            className={`font-bold text-sm ${
+              bill.isDueSoon && !bill.isPaid
+                ? "text-[#C94736]"
+                : "text-gray-900"
+            }`}
+          >
+            {formatCurrency(bill.amount)}
+          </span>
+        </div>
       </div>
     </div>
   );
@@ -173,6 +225,7 @@ const BillRow = ({ bill }: { bill: RecurringBill }) => {
 export default function RecurringBillsPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [sortBy, setSortBy] = useState("latest");
+  const [isSortSelectOpen, setIsSortSelectOpen] = useState(false);
 
   // Process bills
   const allBills = useMemo(
@@ -298,8 +351,8 @@ export default function RecurringBillsPage() {
           {/* Bills List */}
           <Card className="overflow-hidden flex-1 mt-6 lg:mt-0">
             {/* Search and Filter Bar */}
-            <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between p-6 border-b border-gray-200 bg-white">
-              <div className="w-full lg:w-[320px]">
+            <div className="flex flex-wrap items-center gap-4 p-6 bg-white sm:flex-nowrap sm:justify-between">
+              <div className="flex-1 min-w-[200px] sm:max-w-[320px]">
                 <div className="relative">
                   <Input
                     type="text"
@@ -319,29 +372,57 @@ export default function RecurringBillsPage() {
               </div>
 
               <div className="flex flex-row items-center gap-3 md:gap-6">
-                <span className="hidden sm:inline text-xs font-medium text-gray-500">
-                  Sort by
-                </span>
-                <Select value={sortBy} onValueChange={setSortBy}>
-                  <SelectTrigger className="h-[45px] w-[150px] bg-white border border-gray-200 rounded-lg px-4 text-sm font-medium text-gray-700 justify-between shadow-sm hover:bg-gray-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-200 data-[state=open]:border-primary-300">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent
-                    align="end"
-                    className="min-w-[164px] rounded-2xl border border-gray-200 bg-white py-1 shadow-[0px_16px_40px_rgba(15,23,42,0.15)]"
+                <div className="relative flex flex-row items-center gap-2">
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon-sm"
+                    className="sm:hidden size-[45px] rounded-lg bg-transparent p-0 hover:bg-gray-100 focus-visible:ring-0 focus-visible:ring-offset-0"
+                    aria-label="Open sort options"
+                    aria-haspopup="listbox"
+                    aria-expanded={isSortSelectOpen}
+                    onClick={() => setIsSortSelectOpen(true)}
                   >
-                    {SORT_OPTIONS.map((option) => (
-                      <SelectItem
-                        key={option.value}
-                        value={option.value}
-                        showIndicator={false}
-                        className="px-4 py-2 text-sm text-gray-600 border-b border-gray-200 last:border-b-0 data-[state=checked]:font-semibold data-[state=checked]:text-gray-900 data-[highlighted]:bg-gray-100"
-                      >
-                        {option.label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                    <Image
+                      src="/assets/images/icon-sort-mobile.svg"
+                      alt=""
+                      width={16}
+                      height={15}
+                      className="shrink-0"
+                    />
+                  </Button>
+                  <span className="hidden sm:inline text-xs font-medium text-gray-500">
+                    Sort by
+                  </span>
+                  <Select
+                    value={sortBy}
+                    onValueChange={(value) => {
+                      setSortBy(value);
+                      setIsSortSelectOpen(false);
+                    }}
+                    open={isSortSelectOpen}
+                    onOpenChange={setIsSortSelectOpen}
+                  >
+                    <SelectTrigger className="absolute inset-0 h-0 w-0 opacity-0 pointer-events-none sm:static sm:h-[45px] sm:w-[150px] sm:opacity-100 sm:pointer-events-auto sm:flex bg-white border border-gray-200 rounded-lg px-4 text-sm font-medium text-gray-700 justify-between shadow-sm hover:bg-gray-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-200 data-[state=open]:border-primary-300">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent
+                      align="end"
+                      className="min-w-[164px] rounded-2xl border border-gray-200 bg-white py-1 shadow-[0px_16px_40px_rgba(15,23,42,0.15)]"
+                    >
+                      {SORT_OPTIONS.map((option) => (
+                        <SelectItem
+                          key={option.value}
+                          value={option.value}
+                          showIndicator={false}
+                          className="px-4 py-2 text-sm text-gray-600 border-b border-gray-200 last:border-b-0 data-[state=checked]:font-semibold data-[state=checked]:text-gray-900 data-[highlighted]:bg-gray-100"
+                        >
+                          {option.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
               </div>
             </div>
 
