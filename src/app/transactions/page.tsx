@@ -78,7 +78,7 @@ const TransactionRow = ({ transaction }: { transaction: Transaction }) => {
     <div className="py-4 border-b border-gray-100 last:border-0 hover:bg-gray-50 transition-colors">
       <div className="flex flex-col gap-3 sm:grid sm:grid-cols-4 sm:items-center sm:gap-0">
         {/* Recipient / Sender */}
-        <div className="flex items-start gap-4 min-w-0 sm:col-span-1">
+        <div className="flex gap-4 min-w-0 sm:col-span-1 items-center">
           <div className="w-10 h-10 rounded-full overflow-hidden bg-gray-100 flex-shrink-0">
             <Image
               src={avatarPath}

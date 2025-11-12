@@ -171,18 +171,31 @@ const BudgetCard = ({
         {/* Spending info below progress bar */}
         <div className="grid grid-cols-2 gap-8 mt-4">
           {/* Spent */}
-          <div>
-            <p className="text-xs text-gray-500 mb-1">Spent</p>
-            <p className="text-base font-bold text-gray-900">
-              {formatCurrency(spent)}
-            </p>
+          <div className="flex items-center gap-3">
+            <div
+              className="w-1 h-10 rounded-full flex-shrink-0"
+              style={{ backgroundColor: budget.theme }}
+              aria-hidden="true"
+            />
+            <div>
+              <p className="text-xs text-gray-500 mb-1">Spent</p>
+              <p className="text-base font-bold text-gray-900">
+                {formatCurrency(spent)}
+              </p>
+            </div>
           </div>
           {/* Remaining */}
-          <div>
-            <p className="text-xs text-gray-500 mb-1">Remaining</p>
-            <p className="text-base font-bold text-gray-900">
-              {formatCurrency(remaining)}
-            </p>
+          <div className="flex items-center gap-3">
+            <div
+              className="w-1 h-10 rounded-full flex-shrink-0 bg-gray-200"
+              aria-hidden="true"
+            />
+            <div>
+              <p className="text-xs text-gray-500 mb-1">Remaining</p>
+              <p className="text-base font-bold text-gray-900">
+                {formatCurrency(remaining)}
+              </p>
+            </div>
           </div>
         </div>
 
@@ -195,27 +208,20 @@ const BudgetCard = ({
 
       {/* Spending Breakdown */}
       <div className="pt-6 border-t border-gray-100">
-        <div className="bg-amber-50 rounded-lg p-4 -mx-1">
+        <div className="bg-[#F8F4F0] rounded-lg p-4 -mx-1">
           <div className="flex items-center justify-between mb-4">
             <h4 className="text-sm font-bold text-gray-900">Latest Spending</h4>
             {latestTransactions.length > 0 && (
-              <button className="flex items-center gap-1 text-sm text-gray-600 hover:text-gray-900 transition-colors font-medium">
+              <button className="flex items-center gap-3 text-sm text-gray-600 hover:text-gray-900 transition-colors font-medium">
                 See All
-                <svg
-                  width="12"
-                  height="12"
-                  viewBox="0 0 12 12"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    d="M4.5 3L7.5 6L4.5 9"
-                    stroke="currentColor"
-                    strokeWidth="1.5"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                </svg>
+                <Image
+                  src="/assets/images/icon-caret-right.svg"
+                  alt=""
+                  width={6}
+                  height={11}
+                  aria-hidden="true"
+                  className="h-3 w-auto"
+                />
               </button>
             )}
           </div>

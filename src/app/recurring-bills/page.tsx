@@ -69,14 +69,29 @@ const getOrdinalSuffix = (day: number): string => {
 };
 
 // Process recurring bills from transactions
+const REFERENCE_DATE = new Date("2024-08-18T00:00:00Z");
+
 const processRecurringBills = (
   transactions: Transaction[]
 ): RecurringBill[] => {
-  const recurringTransactions = transactions.filter((t) => t.recurring);
-  const today = new Date();
+  const recurringTransactions = transactions
+    .filter((t) => t.recurring)
+    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+
+  const uniqueByName = Array.from(
+    recurringTransactions
+      .reduce((map, transaction) => {
+        if (!map.has(transaction.name)) {
+          map.set(transaction.name, transaction);
+        }
+        return map;
+      }, new Map<string, Transaction>())
+      .values()
+  );
+  const today = REFERENCE_DATE;
   const currentDay = today.getDate();
 
-  return recurringTransactions.map((transaction) => {
+  return uniqueByName.map((transaction) => {
     const dayOfMonth = getDayOfMonth(transaction.date);
     const isPaid = dayOfMonth < currentDay;
     const daysUntilDue = dayOfMonth - currentDay;
@@ -94,11 +109,15 @@ const processRecurringBills = (
 // Bill Row Component
 const BillRow = ({ bill }: { bill: RecurringBill }) => {
   const avatarPath = normalizeImagePath(bill.avatar);
+  const dueLabel = `Monthly - ${bill.dayOfMonth}${getOrdinalSuffix(
+    bill.dayOfMonth
+  )}`;
+  const dueDateColor = bill.isPaid ? "text-[#277C78]" : "text-[#696868]";
 
   return (
-    <div className="flex items-center justify-between py-5 border-b border-gray-100 last:border-0 hover:bg-gray-50/50 transition-colors px-6">
+    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 px-6 py-5 border-b border-gray-100 last:border-0 hover:bg-gray-50/50 transition-colors">
       {/* Bill Title with Avatar */}
-      <div className="flex items-center gap-4 flex-1 min-w-0">
+      <div className="flex items-center gap-4 min-w-0">
         <div className="w-10 h-10 rounded-full overflow-hidden bg-gray-100 flex-shrink-0">
           <Image
             src={avatarPath}
@@ -112,42 +131,35 @@ const BillRow = ({ bill }: { bill: RecurringBill }) => {
       </div>
 
       {/* Due Date */}
-      <div className="flex items-center gap-3 flex-1 justify-center">
-        <div className="flex items-center gap-2">
-          <span className="text-sm text-gray-600">
-            Monthly - {bill.dayOfMonth}
-            {getOrdinalSuffix(bill.dayOfMonth)}
-          </span>
-          {bill.isPaid && (
-            <div className="w-5 h-5 rounded-full bg-green-500 flex items-center justify-center">
-              <svg
-                width="12"
-                height="10"
-                viewBox="0 0 12 10"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  d="M1 5L4.5 8.5L11 1"
-                  stroke="white"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
-            </div>
-          )}
-          {bill.isDueSoon && !bill.isPaid && (
-            <div className="w-2 h-2 rounded-full bg-red-500"></div>
-          )}
-        </div>
+      <div
+        className={`flex items-center gap-2 text-sm sm:justify-center sm:text-center ${dueDateColor}`}
+      >
+        <span className="whitespace-nowrap">{dueLabel}</span>
+        {bill.isPaid && (
+          <Image
+            src="/assets/images/icon-bill-paid.svg"
+            alt="Bill paid"
+            width={14}
+            height={14}
+            className="shrink-0"
+          />
+        )}
+        {bill.isDueSoon && !bill.isPaid && (
+          <Image
+            src="/assets/images/icon-bill-due.svg"
+            alt="Bill due soon"
+            width={14}
+            height={14}
+            className="shrink-0"
+          />
+        )}
       </div>
 
       {/* Amount */}
-      <div className="flex-1 text-right">
+      <div className="sm:text-right">
         <span
           className={`font-bold text-sm ${
-            bill.isDueSoon && !bill.isPaid ? "text-red-600" : "text-gray-900"
+            bill.isDueSoon && !bill.isPaid ? "text-[#C94736]" : "text-gray-900"
           }`}
         >
           {formatCurrency(bill.amount)}
@@ -204,10 +216,10 @@ export default function RecurringBillsPage() {
     const sorted = [...filtered];
     switch (sortBy) {
       case "latest":
-        sorted.sort((a, b) => b.dayOfMonth - a.dayOfMonth);
+        sorted.sort((a, b) => a.dayOfMonth - b.dayOfMonth);
         break;
       case "oldest":
-        sorted.sort((a, b) => a.dayOfMonth - b.dayOfMonth);
+        sorted.sort((a, b) => b.dayOfMonth - a.dayOfMonth);
         break;
       case "highest":
         sorted.sort((a, b) => Math.abs(b.amount) - Math.abs(a.amount));
@@ -234,123 +246,130 @@ export default function RecurringBillsPage() {
           Recurring Bills
         </h1>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
-          {/* Total Bills Card */}
-          <Card className="bg-[#201F24] text-white p-6 border-0 lg:col-span-1">
-            <div className="flex items-center gap-3 mb-3">
-              <Image
-                src="/assets/images/icon-recurring-bills.svg"
-                alt="Recurring Bills"
-                width={32}
-                height={32}
-                className="brightness-0 invert"
-              />
-            </div>
-            <p className="text-sm text-gray-400 mb-1">Total Bills</p>
-            <p className="text-4xl font-bold">${summary.total.toFixed(2)}</p>
-          </Card>
-
-          {/* Summary Card */}
-          <Card className="p-6 lg:col-span-2">
-            <h3 className="text-xl font-bold text-gray-900 mb-6">Summary</h3>
-            <div className="space-y-4">
-              {/* Paid Bills */}
-              <div className="flex items-center justify-between pb-4 border-b border-gray-200">
-                <span className="text-sm text-gray-600">Paid Bills</span>
-                <span className="font-bold text-sm text-gray-900">
-                  {summary.paidCount} (${summary.paidAmount.toFixed(2)})
-                </span>
+        <div className="flex flex-col lg:flex-row lg:items-start gap-6 mb-8">
+          <div className="space-y-6 lg:w-80 flex-shrink-0">
+            {/* Total Bills Card */}
+            <Card className="bg-[#201F24] text-white p-6 border-0">
+              <div className="flex items-center gap-3 mb-3">
+                <Image
+                  src="/assets/images/icon-recurring-bills.svg"
+                  alt="Recurring Bills"
+                  width={32}
+                  height={32}
+                  className="brightness-0 invert"
+                />
               </div>
+              <p className="text-sm text-gray-400 mb-1">Total Bills</p>
+              <p className="text-4xl font-bold">${summary.total.toFixed(2)}</p>
+            </Card>
 
-              {/* Total Upcoming */}
-              <div className="flex items-center justify-between pb-4 border-b border-gray-200">
-                <span className="text-sm text-gray-600">Total Upcoming</span>
-                <span className="font-bold text-sm text-gray-900">
-                  {summary.upcomingCount} (${summary.upcomingAmount.toFixed(2)})
-                </span>
+            {/* Summary Card */}
+            <Card className="p-6">
+              <h3 className="text-xl font-bold text-gray-900 mb-6">Summary</h3>
+              <div className="space-y-4">
+                {/* Paid Bills */}
+                <div className="flex items-center justify-between pb-4 border-b border-gray-200">
+                  <span className="text-sm text-gray-600">Paid Bills</span>
+                  <span className="font-bold text-sm text-gray-900">
+                    {summary.paidCount} (${summary.paidAmount.toFixed(2)})
+                  </span>
+                </div>
+
+                {/* Total Upcoming */}
+                <div className="flex items-center justify-between pb-4 border-b border-gray-200">
+                  <span className="text-sm text-gray-600">Total Upcoming</span>
+                  <span className="font-bold text-sm text-gray-900">
+                    {summary.upcomingCount} ($
+                    {summary.upcomingAmount.toFixed(2)})
+                  </span>
+                </div>
+
+                {/* Due Soon */}
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-red-600">Due Soon</span>
+                  <span className="font-bold text-sm text-red-600">
+                    {summary.dueSoonCount} (${summary.dueSoonAmount.toFixed(2)})
+                  </span>
+                </div>
               </div>
-
-              {/* Due Soon */}
-              <div className="flex items-center justify-between">
-                <span className="text-sm text-red-600">Due Soon</span>
-                <span className="font-bold text-sm text-red-600">
-                  {summary.dueSoonCount} (${summary.dueSoonAmount.toFixed(2)})
-                </span>
-              </div>
-            </div>
-          </Card>
-        </div>
-
-        {/* Bills List */}
-        <Card className="overflow-hidden">
-          {/* Search and Filter Bar */}
-          <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4 p-6 border-b border-gray-200 bg-white">
-            <div className="relative flex-1 max-w-md">
-              <Image
-                src="/assets/images/icon-search.svg"
-                alt="Search"
-                width={16}
-                height={16}
-                className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400"
-              />
-              <Input
-                type="text"
-                placeholder="Search bills"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-12 pr-4 py-3 w-full bg-white border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-gray-900 focus:border-transparent"
-              />
-            </div>
-
-            <div className="flex items-center gap-3">
-              <span className="text-sm text-gray-600 whitespace-nowrap">
-                Sort by
-              </span>
-              <Select value={sortBy} onValueChange={setSortBy}>
-                <SelectTrigger className="w-[140px] bg-white border border-gray-300 rounded-lg">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {SORT_OPTIONS.map((option) => (
-                    <SelectItem key={option.value} value={option.value}>
-                      {option.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-
-          {/* Table Header */}
-          <div className="grid grid-cols-3 gap-4 px-6 py-4 bg-gray-50 border-b border-gray-200">
-            <div className="text-xs font-medium text-gray-600 uppercase tracking-wider">
-              Bill Title
-            </div>
-            <div className="text-xs font-medium text-gray-600 uppercase tracking-wider text-center">
-              Due Date
-            </div>
-            <div className="text-xs font-medium text-gray-600 uppercase tracking-wider text-right">
-              Amount
-            </div>
+            </Card>
           </div>
 
           {/* Bills List */}
-          <div className="bg-white">
-            {filteredAndSortedBills.length > 0 ? (
-              filteredAndSortedBills.map((bill, index) => (
-                <BillRow key={`${bill.name}-${index}`} bill={bill} />
-              ))
-            ) : (
-              <div className="py-12 text-center">
-                <p className="text-gray-500 text-sm">
-                  {searchQuery
-                    ? "No bills found matching your search."
-                    : "No recurring bills found."}
-                </p>
+          <Card className="overflow-hidden flex-1 mt-6 lg:mt-0">
+            {/* Search and Filter Bar */}
+            <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between p-6 border-b border-gray-200 bg-white">
+              <div className="w-full lg:w-[320px]">
+                <div className="relative">
+                  <Input
+                    type="text"
+                    placeholder="Search bills"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="w-full h-[45px] pr-12"
+                  />
+                  <Image
+                    src="/assets/images/icon-search.svg"
+                    alt="Search"
+                    width={14}
+                    height={14}
+                    className="absolute right-5 top-1/2 -translate-y-1/2 opacity-50 pointer-events-none"
+                  />
+                </div>
               </div>
-            )}
-          </div>
-        </Card>
+
+              <div className="flex flex-row items-center gap-3 md:gap-6">
+                <span className="hidden sm:inline text-xs font-medium text-gray-500">
+                  Sort by
+                </span>
+                <Select value={sortBy} onValueChange={setSortBy}>
+                  <SelectTrigger className="h-[45px] w-[150px] bg-white border border-gray-200 rounded-lg px-4 text-sm font-medium text-gray-700 justify-between shadow-sm hover:bg-gray-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-200 data-[state=open]:border-primary-300">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent
+                    align="end"
+                    className="min-w-[164px] rounded-2xl border border-gray-200 bg-white py-1 shadow-[0px_16px_40px_rgba(15,23,42,0.15)]"
+                  >
+                    {SORT_OPTIONS.map((option) => (
+                      <SelectItem
+                        key={option.value}
+                        value={option.value}
+                        showIndicator={false}
+                        className="px-4 py-2 text-sm text-gray-600 border-b border-gray-200 last:border-b-0 data-[state=checked]:font-semibold data-[state=checked]:text-gray-900 data-[highlighted]:bg-gray-100"
+                      >
+                        {option.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+
+            {/* Table Header */}
+            <div className="hidden grid-cols-3 text-xs text-gray-500 px-6 pt-2 pb-3 border-b border-gray-200 sm:grid">
+              <div>Bill Title</div>
+              <div>Due Date</div>
+              <div className="text-right">Amount</div>
+            </div>
+
+            {/* Bills List */}
+            <div className="bg-white">
+              {filteredAndSortedBills.length > 0 ? (
+                filteredAndSortedBills.map((bill, index) => (
+                  <BillRow key={`${bill.name}-${index}`} bill={bill} />
+                ))
+              ) : (
+                <div className="py-12 text-center">
+                  <p className="text-gray-500 text-sm">
+                    {searchQuery
+                      ? "No bills found matching your search."
+                      : "No recurring bills found."}
+                  </p>
+                </div>
+              )}
+            </div>
+          </Card>
+        </div>
       </div>
     </div>
   );
