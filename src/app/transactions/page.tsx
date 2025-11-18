@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useMemo } from "react";
+import React, { useState, useEffect } from "react";
 import { Card } from "@/components/ui/Card";
 import { Input } from "@/components/ui/Input";
 import { Button } from "@/components/ui/Button";
@@ -13,312 +13,41 @@ import {
 } from "@/components/ui/select";
 import Image from "next/image";
 import transactionsData from "@/../data.json";
-import { normalizeImagePath } from "@/lib/utils";
+import { Transaction } from "@/lib/types";
+import { TRANSACTION_CATEGORIES, SORT_OPTIONS } from "@/lib/constants";
+import { useTransactionFilters } from "@/lib/hooks/useTransactionFilters";
+import { usePagination } from "@/lib/hooks/usePagination";
+import { TransactionRow } from "@/components/transactions/TransactionRow";
+import { Pagination } from "@/components/ui/Pagination";
 
-// Types
-interface Transaction {
-  avatar: string;
-  name: string;
-  category: string;
-  date: string;
-  amount: number;
-  recurring: boolean;
-}
-
-// Constants
-const ITEMS_PER_PAGE = 10;
-
-const CATEGORIES = [
-  "All Transactions",
-  "Entertainment",
-  "Bills",
-  "Dining Out",
-  "Personal Care",
-  "General",
-  "Groceries",
-  "Transportation",
-  "Lifestyle",
-  "Shopping",
-  "Education",
-];
-
-const SORT_OPTIONS = [
-  { value: "latest", label: "Latest" },
-  { value: "oldest", label: "Oldest" },
-  { value: "highest", label: "Highest" },
-  { value: "lowest", label: "Lowest" },
-  { value: "a-z", label: "A to Z" },
-  { value: "z-a", label: "Z to A" },
-];
-
-// Format currency
-const formatCurrency = (amount: number) => {
-  return new Intl.NumberFormat("en-US", {
-    style: "currency",
-    currency: "USD",
-  }).format(Math.abs(amount));
-};
-
-// Format date
-const formatDate = (dateString: string) => {
-  const date = new Date(dateString);
-  return new Intl.DateTimeFormat("en-US", {
-    day: "numeric",
-    month: "short",
-    year: "numeric",
-  }).format(date);
-};
-
-// Transaction Item Component (4-column grid layout)
-const TransactionRow = ({ transaction }: { transaction: Transaction }) => {
-  const isPositive = transaction.amount > 0;
-  const avatarPath = normalizeImagePath(transaction.avatar);
-
-  return (
-    <div className="py-4 border-b border-gray-100 last:border-0 hover:bg-gray-50 transition-colors">
-      <div className="flex flex-col gap-3 sm:grid sm:grid-cols-4 sm:items-center sm:gap-0">
-        {/* Recipient / Sender */}
-        <div className="flex gap-4 min-w-0 sm:col-span-1 items-center">
-          <div className="w-10 h-10 rounded-full overflow-hidden bg-gray-100 flex-shrink-0">
-            <Image
-              src={avatarPath}
-              alt={transaction.name}
-              width={40}
-              height={40}
-              className="w-full h-full object-cover"
-            />
-          </div>
-          <div className="min-w-0 flex-1">
-            <p className="font-bold text-sm text-gray-900 truncate">
-              {transaction.name}
-            </p>
-            <p className="mt-1 text-xs text-gray-500 sm:hidden">
-              {transaction.category}
-            </p>
-          </div>
-          <div className="ml-auto text-right sm:hidden">
-            <p
-              className={`font-bold text-sm ${
-                isPositive ? "text-green-600" : "text-gray-900"
-              }`}
-            >
-              {isPositive ? "+" : "-"}
-              {formatCurrency(transaction.amount)}
-            </p>
-            <p className="mt-1 text-xs text-gray-500">
-              {formatDate(transaction.date)}
-            </p>
-          </div>
-        </div>
-
-        {/* Category */}
-        <div className="hidden sm:block text-sm text-gray-500">
-          {transaction.category}
-        </div>
-
-        {/* Transaction Date */}
-        <div className="hidden sm:block text-sm text-gray-500">
-          {formatDate(transaction.date)}
-        </div>
-
-        {/* Amount */}
-        <div className="hidden sm:block text-right">
-          <p
-            className={`font-bold text-sm md:text-base ${
-              isPositive ? "text-green-600" : "text-gray-900"
-            }`}
-          >
-            {isPositive ? "+" : "-"}
-            {formatCurrency(transaction.amount)}
-          </p>
-        </div>
-      </div>
-    </div>
-  );
-};
-
-// Pagination Component
-const Pagination = ({
-  currentPage,
-  totalPages,
-  onPageChange,
-}: {
-  currentPage: number;
-  totalPages: number;
-  onPageChange: (page: number) => void;
-}) => {
-  const pageNumbers = [];
-  const showEllipsis = totalPages > 7;
-
-  if (showEllipsis) {
-    // Always show first page
-    pageNumbers.push(1);
-
-    if (currentPage > 3) {
-      pageNumbers.push(-1); // Ellipsis
-    }
-
-    // Show current page and neighbors
-    for (
-      let i = Math.max(2, currentPage - 1);
-      i <= Math.min(totalPages - 1, currentPage + 1);
-      i++
-    ) {
-      pageNumbers.push(i);
-    }
-
-    if (currentPage < totalPages - 2) {
-      pageNumbers.push(-2); // Ellipsis
-    }
-
-    // Always show last page
-    if (totalPages > 1) {
-      pageNumbers.push(totalPages);
-    }
-  } else {
-    for (let i = 1; i <= totalPages; i++) {
-      pageNumbers.push(i);
-    }
-  }
-
-  return (
-    <div className="flex items-center justify-between mt-6 pt-6 border-t border-gray-100">
-      <Button
-        variant="outline"
-        size="sm"
-        onClick={() => onPageChange(currentPage - 1)}
-        disabled={currentPage === 1}
-        className="h-full px-4 py-[9.5px]  gap-4"
-      >
-        <Image
-          src="/assets/images/icon-caret-left.svg"
-          alt="Previous"
-          width={6}
-          height={6}
-        />
-        <p className="hidden md:block text-sm leading-[150%]">Prev</p>
-      </Button>
-
-      <div className="flex items-center gap-2">
-        {pageNumbers.map((page, index) => {
-          if (page < 0) {
-            return (
-              <span key={`ellipsis-${index}`} className="px-2 text-gray-400">
-                ...
-              </span>
-            );
-          }
-
-          const isActive = currentPage === page;
-
-          return (
-            <button
-              key={page}
-              onClick={() => onPageChange(page)}
-              className={`
-                w-10 h-10 rounded-md text-sm font-medium transition-colors cursor-pointer 
-                flex items-center justify-center
-                ${
-                  isActive
-                    ? "bg-[#282828] text-[#E0E0E0]"
-                    : "bg-[#F8F8F8] text-[#404040] border border-[#D0D0D0] hover:bg-[#F0F0F0]"
-                }
-              `}
-            >
-              {page}
-            </button>
-          );
-        })}
-      </div>
-
-      <Button
-        variant="outline"
-        size="sm"
-        onClick={() => onPageChange(currentPage + 1)}
-        disabled={currentPage === totalPages}
-        className="h-full px-4 py-[9.5px] gap-4"
-      >
-        <p className="hidden md:block text-sm leading-[150%]">Next</p>
-        <Image
-          src="/assets/images/icon-caret-right.svg"
-          alt="Next"
-          width={6}
-          height={6}
-        />
-      </Button>
-    </div>
-  );
-};
-
-// Main Transactions Page Component
 export default function TransactionsPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("All Transactions");
-  const [sortBy, setSortBy] = useState("latest");
+  const [sortBy, setSortBy] = useState<
+    "latest" | "oldest" | "highest" | "lowest" | "a-z" | "z-a"
+  >("latest");
   const [currentPage, setCurrentPage] = useState(1);
   const [isCategorySelectOpen, setIsCategorySelectOpen] = useState(false);
   const [isSortSelectOpen, setIsSortSelectOpen] = useState(false);
 
+  const transactions = transactionsData.transactions as Transaction[];
+
   // Filter and sort transactions
-  const filteredAndSortedTransactions = useMemo(() => {
-    let filtered = transactionsData.transactions as Transaction[];
-
-    // Apply search filter
-    if (searchTerm) {
-      filtered = filtered.filter((transaction) =>
-        transaction.name.toLowerCase().includes(searchTerm.toLowerCase())
-      );
-    }
-
-    // Apply category filter
-    if (selectedCategory !== "All Transactions") {
-      filtered = filtered.filter(
-        (transaction) => transaction.category === selectedCategory
-      );
-    }
-
-    // Apply sorting
-    const sorted = [...filtered];
-    switch (sortBy) {
-      case "latest":
-        sorted.sort(
-          (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
-        );
-        break;
-      case "oldest":
-        sorted.sort(
-          (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
-        );
-        break;
-      case "highest":
-        sorted.sort((a, b) => b.amount - a.amount);
-        break;
-      case "lowest":
-        sorted.sort((a, b) => a.amount - b.amount);
-        break;
-      case "a-z":
-        sorted.sort((a, b) => a.name.localeCompare(b.name));
-        break;
-      case "z-a":
-        sorted.sort((a, b) => b.name.localeCompare(a.name));
-        break;
-    }
-
-    return sorted;
-  }, [searchTerm, selectedCategory, sortBy]);
+  const filteredAndSortedTransactions = useTransactionFilters({
+    transactions,
+    searchTerm,
+    selectedCategory,
+    sortBy,
+  });
 
   // Pagination
-  const totalPages = Math.ceil(
-    filteredAndSortedTransactions.length / ITEMS_PER_PAGE
-  );
-  const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
-  const paginatedTransactions = filteredAndSortedTransactions.slice(
-    startIndex,
-    startIndex + ITEMS_PER_PAGE
-  );
+  const { paginatedItems: paginatedTransactions, totalPages } = usePagination({
+    items: filteredAndSortedTransactions,
+    currentPage,
+  });
 
   // Reset to page 1 when filters change
-  React.useEffect(() => {
+  useEffect(() => {
     setCurrentPage(1);
   }, [searchTerm, selectedCategory, sortBy]);
 
@@ -393,7 +122,7 @@ export default function TransactionsPage() {
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    {CATEGORIES.map((category) => (
+                    {TRANSACTION_CATEGORIES.map((category) => (
                       <SelectItem
                         key={category}
                         value={category}
@@ -434,7 +163,7 @@ export default function TransactionsPage() {
                 <Select
                   value={sortBy}
                   onValueChange={(value) => {
-                    setSortBy(value);
+                    setSortBy(value as typeof sortBy);
                     setIsSortSelectOpen(false);
                   }}
                   open={isSortSelectOpen}

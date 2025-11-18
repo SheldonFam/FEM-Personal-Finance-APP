@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useMemo } from "react";
+import React, { useState } from "react";
 import { Card } from "@/components/ui/Card";
 import { Input } from "@/components/ui/Input";
 import { Button } from "@/components/ui/Button";
@@ -13,283 +13,48 @@ import {
 } from "@/components/ui/select";
 import Image from "next/image";
 import transactionsData from "@/../data.json";
-import { normalizeImagePath } from "@/lib/utils";
+import { Transaction, RecurringBill } from "@/lib/types";
+import { SORT_OPTIONS } from "@/lib/constants";
+import { formatCurrency } from "@/lib/formatters";
+import { processRecurringBills } from "@/lib/utils/recurringBills";
+import { useBillFilters } from "@/lib/hooks/useBillFilters";
+import { BillRow } from "@/components/recurring-bills/BillRow";
 
-// Types
-interface Transaction {
-  avatar: string;
-  name: string;
-  category: string;
-  date: string;
-  amount: number;
-  recurring: boolean;
-}
-
-interface RecurringBill extends Transaction {
-  dayOfMonth: number;
-  isPaid: boolean;
-  isDueSoon: boolean;
-}
-
-// Constants
-const SORT_OPTIONS = [
-  { value: "latest", label: "Latest" },
-  { value: "oldest", label: "Oldest" },
-  { value: "highest", label: "Highest" },
-  { value: "lowest", label: "Lowest" },
-  { value: "a-z", label: "A to Z" },
-  { value: "z-a", label: "Z to A" },
-];
-
-// Helper Functions
-const formatCurrency = (amount: number): string => {
-  return new Intl.NumberFormat("en-US", {
-    style: "currency",
-    currency: "USD",
-  }).format(Math.abs(amount));
-};
-
-const getDayOfMonth = (dateString: string): number => {
-  const date = new Date(dateString);
-  return date.getDate();
-};
-
-const getOrdinalSuffix = (day: number): string => {
-  if (day > 3 && day < 21) return "th";
-  switch (day % 10) {
-    case 1:
-      return "st";
-    case 2:
-      return "nd";
-    case 3:
-      return "rd";
-    default:
-      return "th";
-  }
-};
-
-// Process recurring bills from transactions
-const REFERENCE_DATE = new Date("2024-08-18T00:00:00Z");
-
-const processRecurringBills = (
-  transactions: Transaction[]
-): RecurringBill[] => {
-  const recurringTransactions = transactions
-    .filter((t) => t.recurring)
-    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
-
-  const uniqueByName = Array.from(
-    recurringTransactions
-      .reduce((map, transaction) => {
-        if (!map.has(transaction.name)) {
-          map.set(transaction.name, transaction);
-        }
-        return map;
-      }, new Map<string, Transaction>())
-      .values()
-  );
-  const today = REFERENCE_DATE;
-  const currentDay = today.getDate();
-
-  return uniqueByName.map((transaction) => {
-    const dayOfMonth = getDayOfMonth(transaction.date);
-    const isPaid = dayOfMonth < currentDay;
-    const daysUntilDue = dayOfMonth - currentDay;
-    const isDueSoon = daysUntilDue > 0 && daysUntilDue <= 5;
-
-    return {
-      ...transaction,
-      dayOfMonth,
-      isPaid,
-      isDueSoon,
-    };
-  });
-};
-
-// Bill Row Component
-const BillRow = ({ bill }: { bill: RecurringBill }) => {
-  const avatarPath = normalizeImagePath(bill.avatar);
-  const dueLabel = `Monthly - ${bill.dayOfMonth}${getOrdinalSuffix(
-    bill.dayOfMonth
-  )}`;
-  const dueDateColor = bill.isPaid ? "text-[#277C78]" : "text-[#696868]";
-
-  return (
-    <div className="px-4 sm:px-6 py-5 border-b border-gray-100 last:border-0 hover:bg-gray-50/50 transition-colors">
-      {/* Mobile Layout */}
-      <div className="sm:hidden space-y-3">
-        <div className="flex items-center gap-3 min-w-0">
-          <div className="w-10 h-10 rounded-full overflow-hidden bg-gray-100 flex-shrink-0">
-            <Image
-              src={avatarPath}
-              alt={bill.name}
-              width={40}
-              height={40}
-              className="w-full h-full object-cover"
-            />
-          </div>
-          <p className="font-bold text-sm text-gray-900 truncate">
-            {bill.name}
-          </p>
-        </div>
-        <div className="flex items-center justify-between">
-          <div className={`flex items-center gap-2 text-xs ${dueDateColor}`}>
-            <span>{dueLabel}</span>
-            {bill.isPaid && (
-              <Image
-                src="/assets/images/icon-bill-paid.svg"
-                alt="Bill paid"
-                width={12}
-                height={12}
-                className="shrink-0"
-              />
-            )}
-            {!bill.isPaid && bill.isDueSoon && (
-              <Image
-                src="/assets/images/icon-bill-due.svg"
-                alt="Bill due soon"
-                width={12}
-                height={12}
-                className="shrink-0"
-              />
-            )}
-          </div>
-          <span
-            className={`font-bold text-sm ${
-              bill.isDueSoon && !bill.isPaid
-                ? "text-[#C94736]"
-                : "text-gray-900"
-            }`}
-          >
-            {formatCurrency(bill.amount)}
-          </span>
-        </div>
-      </div>
-
-      {/* Desktop Layout */}
-      <div className="hidden sm:grid sm:grid-cols-3 sm:items-center sm:gap-4">
-        <div className="flex items-center gap-4 min-w-0">
-          <div className="w-10 h-10 rounded-full overflow-hidden bg-gray-100 flex-shrink-0">
-            <Image
-              src={avatarPath}
-              alt={bill.name}
-              width={40}
-              height={40}
-              className="w-full h-full object-cover"
-            />
-          </div>
-          <p className="font-bold text-sm text-gray-900 truncate">
-            {bill.name}
-          </p>
-        </div>
-        <div
-          className={`flex items-center justify-center gap-2 text-sm ${dueDateColor}`}
-        >
-          <span className="whitespace-nowrap">{dueLabel}</span>
-          {bill.isPaid && (
-            <Image
-              src="/assets/images/icon-bill-paid.svg"
-              alt="Bill paid"
-              width={14}
-              height={14}
-              className="shrink-0"
-            />
-          )}
-          {bill.isDueSoon && !bill.isPaid && (
-            <Image
-              src="/assets/images/icon-bill-due.svg"
-              alt="Bill due soon"
-              width={14}
-              height={14}
-              className="shrink-0"
-            />
-          )}
-        </div>
-        <div className="text-right">
-          <span
-            className={`font-bold text-sm ${
-              bill.isDueSoon && !bill.isPaid
-                ? "text-[#C94736]"
-                : "text-gray-900"
-            }`}
-          >
-            {formatCurrency(bill.amount)}
-          </span>
-        </div>
-      </div>
-    </div>
-  );
-};
-
-// Main Component
 export default function RecurringBillsPage() {
   const [searchQuery, setSearchQuery] = useState("");
-  const [sortBy, setSortBy] = useState("latest");
+  const [sortBy, setSortBy] = useState<
+    "latest" | "oldest" | "highest" | "lowest" | "a-z" | "z-a"
+  >("latest");
   const [isSortSelectOpen, setIsSortSelectOpen] = useState(false);
 
-  // Process bills
-  const allBills = useMemo(
-    () => processRecurringBills(transactionsData.transactions),
-    []
+  // Process bills (static data, no need for memoization)
+  const allBills = processRecurringBills(
+    transactionsData.transactions as Transaction[]
   );
 
-  // Calculate summary
-  const summary = useMemo(() => {
-    const paidBills = allBills.filter((b) => b.isPaid);
-    const upcomingBills = allBills.filter((b) => !b.isPaid);
-    const dueSoonBills = allBills.filter((b) => b.isDueSoon);
+  // Calculate summary (static data, no need for memoization)
+  const paidBills = allBills.filter((b) => b.isPaid);
+  const upcomingBills = allBills.filter((b) => !b.isPaid);
+  const dueSoonBills = allBills.filter((b) => b.isDueSoon);
 
-    return {
-      total: Math.abs(allBills.reduce((sum, b) => sum + b.amount, 0)),
-      paidCount: paidBills.length,
-      paidAmount: Math.abs(paidBills.reduce((sum, b) => sum + b.amount, 0)),
-      upcomingCount: upcomingBills.length,
-      upcomingAmount: Math.abs(
-        upcomingBills.reduce((sum, b) => sum + b.amount, 0)
-      ),
-      dueSoonCount: dueSoonBills.length,
-      dueSoonAmount: Math.abs(
-        dueSoonBills.reduce((sum, b) => sum + b.amount, 0)
-      ),
-    };
-  }, [allBills]);
+  const summary = {
+    total: Math.abs(allBills.reduce((sum, b) => sum + b.amount, 0)),
+    paidCount: paidBills.length,
+    paidAmount: Math.abs(paidBills.reduce((sum, b) => sum + b.amount, 0)),
+    upcomingCount: upcomingBills.length,
+    upcomingAmount: Math.abs(
+      upcomingBills.reduce((sum, b) => sum + b.amount, 0)
+    ),
+    dueSoonCount: dueSoonBills.length,
+    dueSoonAmount: Math.abs(dueSoonBills.reduce((sum, b) => sum + b.amount, 0)),
+  };
 
   // Filter and sort bills
-  const filteredAndSortedBills = useMemo(() => {
-    let filtered = allBills;
-
-    // Search filter
-    if (searchQuery) {
-      filtered = filtered.filter((bill) =>
-        bill.name.toLowerCase().includes(searchQuery.toLowerCase())
-      );
-    }
-
-    // Sort
-    const sorted = [...filtered];
-    switch (sortBy) {
-      case "latest":
-        sorted.sort((a, b) => a.dayOfMonth - b.dayOfMonth);
-        break;
-      case "oldest":
-        sorted.sort((a, b) => b.dayOfMonth - a.dayOfMonth);
-        break;
-      case "highest":
-        sorted.sort((a, b) => Math.abs(b.amount) - Math.abs(a.amount));
-        break;
-      case "lowest":
-        sorted.sort((a, b) => Math.abs(a.amount) - Math.abs(b.amount));
-        break;
-      case "a-z":
-        sorted.sort((a, b) => a.name.localeCompare(b.name));
-        break;
-      case "z-a":
-        sorted.sort((a, b) => b.name.localeCompare(a.name));
-        break;
-    }
-
-    return sorted;
-  }, [allBills, searchQuery, sortBy]);
+  const filteredAndSortedBills = useBillFilters({
+    bills: allBills,
+    searchQuery,
+    sortBy,
+  });
 
   return (
     <div className="min-h-screen bg-[#F8F4F0] p-8">
@@ -397,7 +162,7 @@ export default function RecurringBillsPage() {
                   <Select
                     value={sortBy}
                     onValueChange={(value) => {
-                      setSortBy(value);
+                      setSortBy(value as typeof sortBy);
                       setIsSortSelectOpen(false);
                     }}
                     open={isSortSelectOpen}
