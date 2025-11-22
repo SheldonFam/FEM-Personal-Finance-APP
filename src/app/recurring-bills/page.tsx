@@ -1,8 +1,9 @@
 "use client";
 
-import React, { useState, useMemo } from "react";
+import React, { useState } from "react";
 import { Card } from "@/components/ui/Card";
 import { Input } from "@/components/ui/Input";
+import { Button } from "@/components/ui/Button";
 import {
   Select,
   SelectContent,
@@ -10,233 +11,50 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import Image from "next/image";
 import transactionsData from "@/../data.json";
-import { normalizeImagePath } from "@/lib/utils";
+import { Transaction, RecurringBill } from "@/lib/types";
+import { SORT_OPTIONS } from "@/lib/constants";
+import { formatCurrency } from "@/lib/formatters";
+import { processRecurringBills } from "@/lib/utils/recurringBills";
+import { useBillFilters } from "@/lib/hooks/useBillFilters";
+import { BillRow } from "@/components/recurring-bills/BillRow";
 
-// Types
-interface Transaction {
-  avatar: string;
-  name: string;
-  category: string;
-  date: string;
-  amount: number;
-  recurring: boolean;
-}
-
-interface RecurringBill extends Transaction {
-  dayOfMonth: number;
-  isPaid: boolean;
-  isDueSoon: boolean;
-}
-
-// Constants
-const SORT_OPTIONS = [
-  { value: "latest", label: "Latest" },
-  { value: "oldest", label: "Oldest" },
-  { value: "highest", label: "Highest" },
-  { value: "lowest", label: "Lowest" },
-  { value: "a-z", label: "A to Z" },
-  { value: "z-a", label: "Z to A" },
-];
-
-// Helper Functions
-const formatCurrency = (amount: number): string => {
-  return new Intl.NumberFormat("en-US", {
-    style: "currency",
-    currency: "USD",
-  }).format(Math.abs(amount));
-};
-
-const getDayOfMonth = (dateString: string): number => {
-  const date = new Date(dateString);
-  return date.getDate();
-};
-
-const getOrdinalSuffix = (day: number): string => {
-  if (day > 3 && day < 21) return "th";
-  switch (day % 10) {
-    case 1:
-      return "st";
-    case 2:
-      return "nd";
-    case 3:
-      return "rd";
-    default:
-      return "th";
-  }
-};
-
-// Process recurring bills from transactions
-const REFERENCE_DATE = new Date("2024-08-18T00:00:00Z");
-
-const processRecurringBills = (
-  transactions: Transaction[]
-): RecurringBill[] => {
-  const recurringTransactions = transactions
-    .filter((t) => t.recurring)
-    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
-
-  const uniqueByName = Array.from(
-    recurringTransactions
-      .reduce((map, transaction) => {
-        if (!map.has(transaction.name)) {
-          map.set(transaction.name, transaction);
-        }
-        return map;
-      }, new Map<string, Transaction>())
-      .values()
-  );
-  const today = REFERENCE_DATE;
-  const currentDay = today.getDate();
-
-  return uniqueByName.map((transaction) => {
-    const dayOfMonth = getDayOfMonth(transaction.date);
-    const isPaid = dayOfMonth < currentDay;
-    const daysUntilDue = dayOfMonth - currentDay;
-    const isDueSoon = daysUntilDue > 0 && daysUntilDue <= 5;
-
-    return {
-      ...transaction,
-      dayOfMonth,
-      isPaid,
-      isDueSoon,
-    };
-  });
-};
-
-// Bill Row Component
-const BillRow = ({ bill }: { bill: RecurringBill }) => {
-  const avatarPath = normalizeImagePath(bill.avatar);
-  const dueLabel = `Monthly - ${bill.dayOfMonth}${getOrdinalSuffix(
-    bill.dayOfMonth
-  )}`;
-  const dueDateColor = bill.isPaid ? "text-[#277C78]" : "text-[#696868]";
-
-  return (
-    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 px-6 py-5 border-b border-gray-100 last:border-0 hover:bg-gray-50/50 transition-colors">
-      {/* Bill Title with Avatar */}
-      <div className="flex items-center gap-4 min-w-0">
-        <div className="w-10 h-10 rounded-full overflow-hidden bg-gray-100 flex-shrink-0">
-          <Image
-            src={avatarPath}
-            alt={bill.name}
-            width={40}
-            height={40}
-            className="w-full h-full object-cover"
-          />
-        </div>
-        <p className="font-bold text-sm text-gray-900 truncate">{bill.name}</p>
-      </div>
-
-      {/* Due Date */}
-      <div
-        className={`flex items-center gap-2 text-sm sm:justify-center sm:text-center ${dueDateColor}`}
-      >
-        <span className="whitespace-nowrap">{dueLabel}</span>
-        {bill.isPaid && (
-          <Image
-            src="/assets/images/icon-bill-paid.svg"
-            alt="Bill paid"
-            width={14}
-            height={14}
-            className="shrink-0"
-          />
-        )}
-        {bill.isDueSoon && !bill.isPaid && (
-          <Image
-            src="/assets/images/icon-bill-due.svg"
-            alt="Bill due soon"
-            width={14}
-            height={14}
-            className="shrink-0"
-          />
-        )}
-      </div>
-
-      {/* Amount */}
-      <div className="sm:text-right">
-        <span
-          className={`font-bold text-sm ${
-            bill.isDueSoon && !bill.isPaid ? "text-[#C94736]" : "text-gray-900"
-          }`}
-        >
-          {formatCurrency(bill.amount)}
-        </span>
-      </div>
-    </div>
-  );
-};
-
-// Main Component
 export default function RecurringBillsPage() {
   const [searchQuery, setSearchQuery] = useState("");
-  const [sortBy, setSortBy] = useState("latest");
+  const [sortBy, setSortBy] = useState<
+    "latest" | "oldest" | "highest" | "lowest" | "a-z" | "z-a"
+  >("latest");
+  const [isSortSelectOpen, setIsSortSelectOpen] = useState(false);
 
-  // Process bills
-  const allBills = useMemo(
-    () => processRecurringBills(transactionsData.transactions),
-    []
+  // Process bills (static data, no need for memoization)
+  const allBills = processRecurringBills(
+    transactionsData.transactions as Transaction[]
   );
 
-  // Calculate summary
-  const summary = useMemo(() => {
-    const paidBills = allBills.filter((b) => b.isPaid);
-    const upcomingBills = allBills.filter((b) => !b.isPaid);
-    const dueSoonBills = allBills.filter((b) => b.isDueSoon);
+  // Calculate summary (static data, no need for memoization)
+  const paidBills = allBills.filter((b) => b.isPaid);
+  const upcomingBills = allBills.filter((b) => !b.isPaid);
+  const dueSoonBills = allBills.filter((b) => b.isDueSoon);
 
-    return {
-      total: Math.abs(allBills.reduce((sum, b) => sum + b.amount, 0)),
-      paidCount: paidBills.length,
-      paidAmount: Math.abs(paidBills.reduce((sum, b) => sum + b.amount, 0)),
-      upcomingCount: upcomingBills.length,
-      upcomingAmount: Math.abs(
-        upcomingBills.reduce((sum, b) => sum + b.amount, 0)
-      ),
-      dueSoonCount: dueSoonBills.length,
-      dueSoonAmount: Math.abs(
-        dueSoonBills.reduce((sum, b) => sum + b.amount, 0)
-      ),
-    };
-  }, [allBills]);
+  const summary = {
+    total: Math.abs(allBills.reduce((sum, b) => sum + b.amount, 0)),
+    paidCount: paidBills.length,
+    paidAmount: Math.abs(paidBills.reduce((sum, b) => sum + b.amount, 0)),
+    upcomingCount: upcomingBills.length,
+    upcomingAmount: Math.abs(
+      upcomingBills.reduce((sum, b) => sum + b.amount, 0)
+    ),
+    dueSoonCount: dueSoonBills.length,
+    dueSoonAmount: Math.abs(dueSoonBills.reduce((sum, b) => sum + b.amount, 0)),
+  };
 
   // Filter and sort bills
-  const filteredAndSortedBills = useMemo(() => {
-    let filtered = allBills;
-
-    // Search filter
-    if (searchQuery) {
-      filtered = filtered.filter((bill) =>
-        bill.name.toLowerCase().includes(searchQuery.toLowerCase())
-      );
-    }
-
-    // Sort
-    const sorted = [...filtered];
-    switch (sortBy) {
-      case "latest":
-        sorted.sort((a, b) => a.dayOfMonth - b.dayOfMonth);
-        break;
-      case "oldest":
-        sorted.sort((a, b) => b.dayOfMonth - a.dayOfMonth);
-        break;
-      case "highest":
-        sorted.sort((a, b) => Math.abs(b.amount) - Math.abs(a.amount));
-        break;
-      case "lowest":
-        sorted.sort((a, b) => Math.abs(a.amount) - Math.abs(b.amount));
-        break;
-      case "a-z":
-        sorted.sort((a, b) => a.name.localeCompare(b.name));
-        break;
-      case "z-a":
-        sorted.sort((a, b) => b.name.localeCompare(a.name));
-        break;
-    }
-
-    return sorted;
-  }, [allBills, searchQuery, sortBy]);
+  const filteredAndSortedBills = useBillFilters({
+    bills: allBills,
+    searchQuery,
+    sortBy,
+  });
 
   return (
     <div className="min-h-screen bg-[#F8F4F0] p-8">
@@ -298,8 +116,8 @@ export default function RecurringBillsPage() {
           {/* Bills List */}
           <Card className="overflow-hidden flex-1 mt-6 lg:mt-0">
             {/* Search and Filter Bar */}
-            <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between p-6 border-b border-gray-200 bg-white">
-              <div className="w-full lg:w-[320px]">
+            <div className="flex flex-wrap items-center gap-4 p-6 bg-white sm:flex-nowrap sm:justify-between">
+              <div className="flex-1 min-w-[200px] sm:max-w-[320px]">
                 <div className="relative">
                   <Input
                     type="text"
@@ -319,29 +137,57 @@ export default function RecurringBillsPage() {
               </div>
 
               <div className="flex flex-row items-center gap-3 md:gap-6">
-                <span className="hidden sm:inline text-xs font-medium text-gray-500">
-                  Sort by
-                </span>
-                <Select value={sortBy} onValueChange={setSortBy}>
-                  <SelectTrigger className="h-[45px] w-[150px] bg-white border border-gray-200 rounded-lg px-4 text-sm font-medium text-gray-700 justify-between shadow-sm hover:bg-gray-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-200 data-[state=open]:border-primary-300">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent
-                    align="end"
-                    className="min-w-[164px] rounded-2xl border border-gray-200 bg-white py-1 shadow-[0px_16px_40px_rgba(15,23,42,0.15)]"
+                <div className="relative flex flex-row items-center gap-2">
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon-sm"
+                    className="sm:hidden size-[45px] rounded-lg bg-transparent p-0 hover:bg-gray-100 focus-visible:ring-0 focus-visible:ring-offset-0"
+                    aria-label="Open sort options"
+                    aria-haspopup="listbox"
+                    aria-expanded={isSortSelectOpen}
+                    onClick={() => setIsSortSelectOpen(true)}
                   >
-                    {SORT_OPTIONS.map((option) => (
-                      <SelectItem
-                        key={option.value}
-                        value={option.value}
-                        showIndicator={false}
-                        className="px-4 py-2 text-sm text-gray-600 border-b border-gray-200 last:border-b-0 data-[state=checked]:font-semibold data-[state=checked]:text-gray-900 data-[highlighted]:bg-gray-100"
-                      >
-                        {option.label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                    <Image
+                      src="/assets/images/icon-sort-mobile.svg"
+                      alt=""
+                      width={16}
+                      height={15}
+                      className="shrink-0"
+                    />
+                  </Button>
+                  <span className="hidden sm:inline text-xs font-medium text-gray-500">
+                    Sort by
+                  </span>
+                  <Select
+                    value={sortBy}
+                    onValueChange={(value) => {
+                      setSortBy(value as typeof sortBy);
+                      setIsSortSelectOpen(false);
+                    }}
+                    open={isSortSelectOpen}
+                    onOpenChange={setIsSortSelectOpen}
+                  >
+                    <SelectTrigger className="absolute inset-0 h-0 w-0 opacity-0 pointer-events-none sm:static sm:h-[45px] sm:w-[150px] sm:opacity-100 sm:pointer-events-auto sm:flex bg-white border border-gray-200 rounded-lg px-4 text-sm font-medium text-gray-700 justify-between shadow-sm hover:bg-gray-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-200 data-[state=open]:border-primary-300">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent
+                      align="end"
+                      className="min-w-[164px] rounded-2xl border border-gray-200 bg-white py-1 shadow-[0px_16px_40px_rgba(15,23,42,0.15)]"
+                    >
+                      {SORT_OPTIONS.map((option) => (
+                        <SelectItem
+                          key={option.value}
+                          value={option.value}
+                          showIndicator={false}
+                          className="px-4 py-2 text-sm text-gray-600 border-b border-gray-200 last:border-b-0 data-[state=checked]:font-semibold data-[state=checked]:text-gray-900 data-[highlighted]:bg-gray-100"
+                        >
+                          {option.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
               </div>
             </div>
 
