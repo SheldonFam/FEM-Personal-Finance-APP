@@ -2,56 +2,48 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
+import { useForm } from "react-hook-form";
 import AuthHeader from "@/components/auth/AuthHeader";
 import { Input } from "@/components/ui/Input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/Button";
 import { Eye, EyeOff } from "lucide-react";
 
-interface PasswordInputProps {
-  value: string;
-  onChange: (value: string) => void;
-  placeholder?: string;
-  required?: boolean;
-  className?: string;
+interface PasswordInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
+  show?: boolean;
+  onToggleVisibility?: () => void;
+  error?: string;
 }
 
-function PasswordInput({
-  value,
-  onChange,
-  placeholder = "Enter your password",
-  required = false,
-  className = "",
-}: PasswordInputProps) {
-  const [show, setShow] = useState(false);
+const PasswordInput = React.forwardRef<HTMLInputElement, PasswordInputProps>(
+  ({ show, onToggleVisibility, className, error, ...props }, ref) => {
+    return (
+      <div className="relative w-full">
+        <Input
+          type={show ? "text" : "password"}
+          ref={ref}
+          placeholder={props.placeholder || "Enter your password"}
+          className={`pr-10 ${className || ""}`}
+          error={error}
+          {...props}
+        />
 
-  const toggleVisibility = () => setShow((prev) => !prev);
-
-  return (
-    <div className="relative w-full">
-      <Input
-        type={show ? "text" : "password"}
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        placeholder={placeholder}
-        required={required}
-        className={`pr-10 ${className}`}
-      />
-
-      <Button
-        type="button"
-        variant="ghost"
-        size="icon"
-        onClick={toggleVisibility}
-        aria-label={show ? "Hide password" : "Show password"}
-        aria-pressed={show}
-        className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
-      >
-        {show ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
-      </Button>
-    </div>
-  );
-}
+        <Button
+          type="button"
+          variant="ghost"
+          size="icon"
+          onClick={onToggleVisibility}
+          aria-label={show ? "Hide password" : "Show password"}
+          aria-pressed={show}
+          className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
+        >
+          {show ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+        </Button>
+      </div>
+    );
+  }
+);
+PasswordInput.displayName = "PasswordInput";
 
 function MarketingPanel() {
   return (
@@ -85,17 +77,37 @@ function MarketingPanel() {
   );
 }
 
-export default function SignUpPage() {
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+interface SignUpFormData {
+  name: string;
+  email: string;
+  password: string;
+}
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    // Handle sign up logic here
-    console.log("Sign up attempt:", { name, email, password });
-    // Redirect to dashboard after successful signup
-    window.location.href = "/dashboard";
+export default function SignUpPage() {
+  const [showPassword, setShowPassword] = useState(false);
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+  } = useForm<SignUpFormData>({
+    defaultValues: {
+      name: "",
+      email: "",
+      password: "",
+    },
+    mode: "onBlur",
+  });
+
+  const onSubmit = async (data: SignUpFormData) => {
+    try {
+      // Handle sign up logic here
+      console.log("Sign up attempt:", data);
+      // Redirect to dashboard after successful signup
+      window.location.href = "/dashboard";
+    } catch (error) {
+      console.error("Sign up failed:", error);
+      // You can add toast notification here
+    }
   };
 
   return (
@@ -115,20 +127,23 @@ export default function SignUpPage() {
                 Sign Up
               </h2>
 
-              <form onSubmit={handleSubmit} className="space-y-6">
+              <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
                 <div className="space-y-2">
                   <Label className="block text-sm font-medium text-gray-700">
                     Name
                   </Label>
                   <Input
                     type="text"
-                    value={name}
-                    onChange={(e) =>
-                      setName((e.target as HTMLInputElement).value)
-                    }
+                    {...register("name", {
+                      required: "Name is required",
+                      minLength: {
+                        value: 2,
+                        message: "Name must be at least 2 characters",
+                      },
+                    })}
                     placeholder="Enter your full name"
                     className="w-full px-3 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#201f24] focus:border-transparent"
-                    required
+                    error={errors.name?.message}
                   />
                 </div>
 
@@ -138,13 +153,16 @@ export default function SignUpPage() {
                   </Label>
                   <Input
                     type="email"
-                    value={email}
-                    onChange={(e) =>
-                      setEmail((e.target as HTMLInputElement).value)
-                    }
+                    {...register("email", {
+                      required: "Email is required",
+                      pattern: {
+                        value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
+                        message: "Invalid email address",
+                      },
+                    })}
                     placeholder="Enter your email"
                     className="w-full px-3 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#201f24] focus:border-transparent"
-                    required
+                    error={errors.email?.message}
                   />
                 </div>
 
@@ -153,10 +171,17 @@ export default function SignUpPage() {
                     Create Password
                   </Label>
                   <PasswordInput
-                    value={password}
-                    onChange={setPassword}
+                    {...register("password", {
+                      required: "Password is required",
+                      minLength: {
+                        value: 8,
+                        message: "Password must be at least 8 characters",
+                      },
+                    })}
                     placeholder="Create a password"
-                    required
+                    show={showPassword}
+                    onToggleVisibility={() => setShowPassword((prev) => !prev)}
+                    error={errors.password?.message}
                   />
                   <p className="text-sm text-gray-500">
                     Passwords must be at least 8 characters
@@ -165,9 +190,10 @@ export default function SignUpPage() {
 
                 <Button
                   type="submit"
+                  disabled={isSubmitting}
                   className="w-full bg-[#201f24] hover:bg-[#2a2930] text-white py-3 px-4 rounded-lg font-medium transition-colors"
                 >
-                  Create Account
+                  {isSubmitting ? "Creating Account..." : "Create Account"}
                 </Button>
               </form>
 

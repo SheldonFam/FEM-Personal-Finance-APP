@@ -6,14 +6,10 @@ import { Button } from "@/components/ui/Button";
 import Image from "next/image";
 import data from "@/../data.json";
 import { Pot } from "@/lib/types";
-import { THEME_COLORS, COLOR_THEMES } from "@/lib/constants";
-import {
-  AddPotModal,
-  EditPotModal,
-  DeletePotModal,
-  AddToPotModal,
-  WithdrawFromPotModal,
-} from "@/components/modals";
+import { getThemeNameFromHex, getHexFromThemeName } from "@/lib/constants";
+import { PotFormModal } from "@/components/modals/PotFormModal";
+import { PotMoneyModal } from "@/components/modals/PotMoneyModal";
+import { DeleteConfirmationModal } from "@/components/modals/DeleteConfirmationModal";
 import { PotCard } from "@/components/pots/PotCard";
 
 export default function PotsPage() {
@@ -33,7 +29,7 @@ export default function PotsPage() {
       name: data.name,
       target: data.target,
       total: 0,
-      theme: COLOR_THEMES[data.theme] || data.theme,
+      theme: getHexFromThemeName(data.theme) || data.theme,
     };
     setPots([...pots, newPot]);
   };
@@ -51,7 +47,7 @@ export default function PotsPage() {
               ...p,
               name: data.name,
               target: data.target,
-              theme: COLOR_THEMES[data.theme] || data.theme,
+              theme: getHexFromThemeName(data.theme) || data.theme,
             }
           : p
       )
@@ -137,40 +133,44 @@ export default function PotsPage() {
       )}
 
       {/* Modals */}
-      <AddPotModal
+      <PotFormModal
+        mode="add"
         open={isAddModalOpen}
         onOpenChange={setIsAddModalOpen}
         onSubmit={handleAddPot}
         existingPots={pots.map((p) => ({
           name: p.name,
-          theme: THEME_COLORS[p.theme] || p.theme,
+          theme: getThemeNameFromHex(p.theme) || p.theme,
         }))}
       />
 
       {editingPot && (
-        <EditPotModal
+        <PotFormModal
+          mode="edit"
           open={!!editingPot}
           onOpenChange={(open) => !open && setEditingPot(null)}
           onSubmit={handleEditPot}
-          pot={{
+          initialData={{
             name: editingPot.name,
             target: editingPot.target,
-            theme: THEME_COLORS[editingPot.theme] || editingPot.theme,
+            theme: getThemeNameFromHex(editingPot.theme) || editingPot.theme,
           }}
         />
       )}
 
       {deletingPot && (
-        <DeletePotModal
+        <DeleteConfirmationModal
           open={!!deletingPot}
           onOpenChange={(open) => !open && setDeletingPot(null)}
           onConfirm={handleDeletePot}
-          potName={deletingPot.name}
+          title="Pot"
+          itemName={deletingPot.name}
         />
       )}
 
       {addMoneyPot && (
-        <AddToPotModal
+        <PotMoneyModal
+          mode="add"
           open={!!addMoneyPot}
           onOpenChange={(open) => !open && setAddMoneyPot(null)}
           onSubmit={handleAddMoney}
@@ -184,7 +184,8 @@ export default function PotsPage() {
       )}
 
       {withdrawPot && (
-        <WithdrawFromPotModal
+        <PotMoneyModal
+          mode="withdraw"
           open={!!withdrawPot}
           onOpenChange={(open) => !open && setWithdrawPot(null)}
           onSubmit={handleWithdraw}

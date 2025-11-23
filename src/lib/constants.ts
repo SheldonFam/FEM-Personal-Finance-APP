@@ -1,27 +1,5 @@
 /**
- * Theme color mappings
- * Maps hex color codes to theme names
- */
-export const THEME_COLORS: Record<string, string> = {
-  "#277C78": "Green",
-  "#F2CDAC": "Yellow",
-  "#82C9D7": "Cyan",
-  "#626070": "Navy",
-  "#C94736": "Red",
-  "#826CB0": "Purple",
-  "#597C7C": "Turquoise",
-  "#93674F": "Brown",
-  "#934F6F": "Magenta",
-  "#3F82B2": "Blue",
-  "#97A0AC": "Navy Grey",
-  "#7F9161": "Army Green",
-  "#AF81BA": "Pink",
-  "#CAB361": "Gold",
-  "#BE6C49": "Orange",
-};
-
-/**
- * Color theme mappings
+ * Color theme mappings (SINGLE SOURCE OF TRUTH)
  * Maps theme names to hex color codes
  */
 export const COLOR_THEMES: Record<string, string> = {
@@ -40,6 +18,24 @@ export const COLOR_THEMES: Record<string, string> = {
   Pink: "#AF81BA",
   Gold: "#CAB361",
   Orange: "#BE6C49",
+};
+
+/**
+ * Helper: Get theme name from hex color code
+ * @param hex - The hex color code (e.g., "#277C78")
+ * @returns The theme name (e.g., "Green") or undefined if not found
+ */
+export const getThemeNameFromHex = (hex: string): string | undefined => {
+  return Object.entries(COLOR_THEMES).find(([_, value]) => value === hex)?.[0];
+};
+
+/**
+ * Helper: Get hex color code from theme name
+ * @param themeName - The theme name (e.g., "Green")
+ * @returns The hex color code (e.g., "#277C78") or undefined if not found
+ */
+export const getHexFromThemeName = (themeName: string): string | undefined => {
+  return COLOR_THEMES[themeName];
 };
 
 /**
@@ -75,4 +71,3 @@ export const TRANSACTION_CATEGORIES = [
  * Pagination constants
  */
 export const ITEMS_PER_PAGE = 10;
-
