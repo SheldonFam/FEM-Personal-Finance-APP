@@ -5,10 +5,9 @@ import { Button } from "@/components/ui/Button";
 import Image from "next/image";
 import budgetData from "@/../data.json";
 import { Budget, Transaction } from "@/lib/types";
-import { THEME_COLORS, COLOR_THEMES } from "@/lib/constants";
-import { AddBudgetModal } from "@/components/modals/AddBudgetModal";
-import { EditBudgetModal } from "@/components/modals/EditBudgetModal";
-import { DeleteBudgetModal } from "@/components/modals/DeleteBudgetModal";
+import { getThemeNameFromHex, getHexFromThemeName } from "@/lib/constants";
+import { BudgetFormModal } from "@/components/modals/BudgetFormModal";
+import { DeleteConfirmationModal } from "@/components/modals/DeleteConfirmationModal";
 import { BudgetCard } from "@/components/budgets/BudgetCard";
 import { SpendingSummary } from "@/components/budgets/SpendingSummary";
 import { Card } from "@/components/ui/Card";
@@ -51,7 +50,7 @@ export default function BudgetsPage() {
     const newBudget: Budget = {
       category: data.category,
       maximum: data.maxSpend,
-      theme: COLOR_THEMES[data.theme] || data.theme, // Convert name to hex
+      theme: getHexFromThemeName(data.theme) || data.theme, // Convert name to hex
     };
     setBudgets([...budgets, newBudget]);
   };
@@ -68,7 +67,7 @@ export default function BudgetsPage() {
           ? {
               ...b,
               maximum: data.maxSpend,
-              theme: COLOR_THEMES[data.theme] || data.theme,
+              theme: getHexFromThemeName(data.theme) || data.theme,
             }
           : b
       )
@@ -139,31 +138,34 @@ export default function BudgetsPage() {
       )}
 
       {/* Modals */}
-      <AddBudgetModal
+      <BudgetFormModal
+        mode="add"
         open={isAddModalOpen}
         onOpenChange={setIsAddModalOpen}
         onSubmit={handleAddBudget}
       />
 
       {editingBudget && (
-        <EditBudgetModal
+        <BudgetFormModal
+          mode="edit"
           open={!!editingBudget}
           onOpenChange={(open) => !open && setEditingBudget(null)}
           onSubmit={handleEditBudget}
-          budget={{
+          initialData={{
             category: editingBudget.category,
             maxSpend: editingBudget.maximum,
-            theme: THEME_COLORS[editingBudget.theme] || editingBudget.theme, // Convert hex to name
+            theme: getThemeNameFromHex(editingBudget.theme) || editingBudget.theme, // Convert hex to name
           }}
         />
       )}
 
       {deletingBudget && (
-        <DeleteBudgetModal
+        <DeleteConfirmationModal
           open={!!deletingBudget}
           onOpenChange={(open) => !open && setDeletingBudget(null)}
           onConfirm={handleDeleteBudget}
-          budgetName={deletingBudget.category}
+          title="Budget"
+          itemName={deletingBudget.category}
         />
       )}
     </div>

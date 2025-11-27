@@ -2,56 +2,49 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
+import { useForm } from "react-hook-form";
 import AuthHeader from "@/components/auth/AuthHeader";
 import { Input } from "@/components/ui/Input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/Button";
 import { Eye, EyeOff } from "lucide-react";
 
-interface PasswordInputProps {
-  value: string;
-  onChange: (value: string) => void;
-  placeholder?: string;
-  required?: boolean;
-  className?: string;
+interface PasswordInputProps
+  extends React.InputHTMLAttributes<HTMLInputElement> {
+  show?: boolean;
+  onToggleVisibility?: () => void;
+  error?: string;
 }
 
-function PasswordInput({
-  value,
-  onChange,
-  placeholder = "Enter your password",
-  required = false,
-  className = "",
-}: PasswordInputProps) {
-  const [show, setShow] = useState(false);
+const PasswordInput = React.forwardRef<HTMLInputElement, PasswordInputProps>(
+  ({ show, onToggleVisibility, className, error, ...props }, ref) => {
+    return (
+      <div className="relative w-full">
+        <Input
+          type={show ? "text" : "password"}
+          ref={ref}
+          placeholder={props.placeholder || "Enter your password"}
+          className={`pr-10 ${className || ""}`}
+          error={error}
+          {...props}
+        />
 
-  const toggleVisibility = () => setShow((prev) => !prev);
-
-  return (
-    <div className="relative w-full">
-      <Input
-        type={show ? "text" : "password"}
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        placeholder={placeholder}
-        required={required}
-        className={`pr-10 ${className}`}
-      />
-
-      <Button
-        type="button"
-        variant="ghost"
-        size="icon"
-        onClick={toggleVisibility}
-        aria-label={show ? "Hide password" : "Show password"}
-        aria-pressed={show}
-        className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
-      >
-        {show ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
-      </Button>
-    </div>
-  );
-}
+        <Button
+          type="button"
+          variant="ghost"
+          size="icon"
+          onClick={onToggleVisibility}
+          aria-label={show ? "Hide password" : "Show password"}
+          aria-pressed={show}
+          className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
+        >
+          {show ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+        </Button>
+      </div>
+    );
+  }
+);
+PasswordInput.displayName = "PasswordInput";
 
 function MarketingPanel() {
   return (
@@ -85,16 +78,35 @@ function MarketingPanel() {
   );
 }
 
-export default function LoginPage() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+interface LoginFormData {
+  email: string;
+  password: string;
+}
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    // Handle login logic here
-    console.log("Login attempt:", { email, password });
-    // Redirect to dashboard after successful login
-    window.location.href = "/dashboard";
+export default function LoginPage() {
+  const [showPassword, setShowPassword] = useState(false);
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+  } = useForm<LoginFormData>({
+    defaultValues: {
+      email: "",
+      password: "",
+    },
+    mode: "onBlur",
+  });
+
+  const onSubmit = async (data: LoginFormData) => {
+    try {
+      // Handle login logic here
+      console.log("Login attempt:", data);
+      // Redirect to dashboard after successful login
+      window.location.href = "/dashboard";
+    } catch (error) {
+      console.error("Login failed:", error);
+      // You can add toast notification here
+    }
   };
 
   return (
@@ -112,20 +124,23 @@ export default function LoginPage() {
             <div className="bg-white rounded-lg shadow-sm p-5 sm:p-8">
               <h2 className="text-2xl font-bold text-[#201f24] mb-8">Login</h2>
 
-              <form onSubmit={handleSubmit} className="space-y-6">
+              <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
                 <div className="space-y-2">
                   <Label className="block text-sm font-medium text-gray-700">
                     Email
                   </Label>
                   <Input
                     type="email"
-                    value={email}
-                    onChange={(e) =>
-                      setEmail((e.target as HTMLInputElement).value)
-                    }
+                    {...register("email", {
+                      required: "Email is required",
+                      pattern: {
+                        value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
+                        message: "Invalid email address",
+                      },
+                    })}
                     placeholder="Enter your email"
                     className="w-full px-3 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#201f24] focus:border-transparent"
-                    required
+                    error={errors.email?.message}
                   />
                 </div>
 
@@ -134,18 +149,26 @@ export default function LoginPage() {
                     Password
                   </Label>
                   <PasswordInput
-                    value={password}
-                    onChange={setPassword}
+                    {...register("password", {
+                      required: "Password is required",
+                      minLength: {
+                        value: 8,
+                        message: "Password must be at least 8 characters",
+                      },
+                    })}
                     placeholder="Enter your password"
-                    required
+                    show={showPassword}
+                    onToggleVisibility={() => setShowPassword((prev) => !prev)}
+                    error={errors.password?.message}
                   />
                 </div>
 
                 <Button
                   type="submit"
+                  disabled={isSubmitting}
                   className="w-full bg-[#201f24] hover:bg-[#2a2930] text-white py-3 px-4 rounded-lg font-medium transition-colors"
                 >
-                  Login
+                  {isSubmitting ? "Logging in..." : "Login"}
                 </Button>
               </form>
 

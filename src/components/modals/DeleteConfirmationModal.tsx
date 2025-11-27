@@ -10,34 +10,39 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/Button";
 
-interface DeletePotModalProps {
+interface DeleteConfirmationModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  potName: string;
+  title: string;
+  description?: string;
+  itemName: string;
   onConfirm: () => void;
 }
 
-export function DeletePotModal({
+export function DeleteConfirmationModal({
   open,
   onOpenChange,
-  potName,
+  title,
+  description,
+  itemName,
   onConfirm,
-}: DeletePotModalProps) {
+}: DeleteConfirmationModalProps) {
   const handleConfirm = () => {
     onConfirm();
     onOpenChange(false);
   };
+
+  const defaultDescription = `Are you sure you want to delete this ${title.toLowerCase()}? This action cannot be reversed, and all the data inside it will be removed forever.`;
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[560px] p-5 sm:p-8">
         <DialogHeader className="space-y-5">
           <DialogTitle className="text-[32px] font-bold text-foreground">
-            Delete '{potName}'?
+            Delete '{itemName}'?
           </DialogTitle>
           <DialogDescription className="text-sm text-muted-foreground">
-            Are you sure you want to delete this pot? This action cannot be
-            reversed, and all the data inside it will be removed forever.
+            {description || defaultDescription}
           </DialogDescription>
         </DialogHeader>
         <div className="space-y-4 mt-8">
@@ -60,3 +65,4 @@ export function DeletePotModal({
     </Dialog>
   );
 }
+
