@@ -4,12 +4,13 @@ import React, { useState } from "react";
 import Link from "next/link";
 import { useForm } from "react-hook-form";
 import AuthHeader from "@/components/auth/AuthHeader";
-import { Input } from "@/components/ui/Input";
+import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Button } from "@/components/ui/Button";
+import { Button } from "@/components/ui/button";
 import { Eye, EyeOff } from "lucide-react";
 
-interface PasswordInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
+interface PasswordInputProps
+  extends React.InputHTMLAttributes<HTMLInputElement> {
   show?: boolean;
   onToggleVisibility?: () => void;
   error?: string;

@@ -1,2 +1,0 @@
-export { PotCard } from "./PotCard";
-

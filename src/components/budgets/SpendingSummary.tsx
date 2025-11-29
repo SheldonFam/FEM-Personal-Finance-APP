@@ -1,6 +1,6 @@
 import { Budget, Transaction } from "@/lib/types";
-import { Card } from "@/components/ui/Card";
-import { BudgetChartWithLegend } from "@/components/charts/BudgetDonutChart";
+import { Card } from "@/components/ui/card";
+import { BudgetChartWithLegend } from "@/components/charts/budgetDonutChart";
 
 interface SpendingSummaryProps {
   budgetsWithSpending: Array<{
@@ -41,4 +41,3 @@ export const SpendingSummary = ({
     </Card>
   );
 };
-
