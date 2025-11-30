@@ -30,5 +30,5 @@ export interface Pot {
   theme: string;
 }
 
-export type SortOption = typeof import("./constants").SORT_OPTIONS[number]["value"];
-
+export type SortOption =
+  typeof import("./constants/constants").SORT_OPTIONS[number]["value"];

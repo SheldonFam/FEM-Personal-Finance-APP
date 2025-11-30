@@ -6,7 +6,10 @@ import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import data from "@/../data.json";
 import { Pot } from "@/lib/types";
-import { getThemeNameFromHex, getHexFromThemeName } from "@/lib/constants";
+import {
+  getThemeNameFromHex,
+  getHexFromThemeName,
+} from "@/lib/constants/constants";
 import { PotFormModal } from "@/components/modals/potFormModal";
 import { PotMoneyModal } from "@/components/modals/potMoneyModal";
 import { DeleteConfirmationModal } from "@/components/modals/deleteConfirmationModal";

@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import { useForm } from "react-hook-form";
-import AuthHeader from "@/components/auth/AuthHeader";
+import AuthHeader from "@/components/auth/authHeader";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
@@ -48,30 +48,31 @@ PasswordInput.displayName = "PasswordInput";
 
 function MarketingPanel() {
   return (
-    <div className="p-5 rounded-lg bg-[#f8f4f0] hidden lg:flex">
-      <div className="w-full h-full bg-[#201f24] flex-col justify-between relative overflow-hidden rounded-lg">
-        <div
-          className="absolute inset-0 bg-cover bg-center bg-no-repeat rounded-lg"
-          style={{
-            backgroundImage:
-              "url('/assets/images/illustration-authentication.svg')",
-            backgroundSize: "contain",
-            backgroundPosition: "center",
-          }}
-        />
-        <div className="relative z-10 flex flex-col justify-between h-full px-10">
-          <div className="pt-10">
-            <h1 className="text-white text-2xl font-bold">finance</h1>
-          </div>
-          <div className="pb-10 max-w-md">
-            <h2 className="text-white text-3xl font-bold mb-6 leading-tight">
-              Keep track of your money and save for your future
-            </h2>
-            <p className="text-white text-base opacity-90 leading-relaxed">
-              Personal finance app puts you in control of your spending. Track
-              transactions, set budgets, and add to savings pots easily.
-            </p>
-          </div>
+    <div className="p-5 rounded-lg bg-[#f8f4f0] hidden lg:flex lg:w-2/5 xl:w-2/5">
+      <div className="w-full h-full bg-[#201f24] relative overflow-hidden rounded-lg">
+        {/* Logo at top */}
+        <div className="absolute top-6 left-6 lg:top-8 lg:left-8 xl:top-10 xl:left-10 z-10">
+          <h1 className="text-white text-xl lg:text-2xl font-bold">finance</h1>
+        </div>
+
+        {/* Illustration - positioned absolutely to fill space */}
+        <div className="flex items-center justify-center">
+          <img
+            src="/assets/images/illustration-authentication.svg"
+            alt="Finance illustration"
+            className="w-full h-full"
+          />
+        </div>
+
+        {/* Text content at bottom */}
+        <div className="absolute bottom-6 left-6 right-6 lg:bottom-8 lg:left-8 lg:right-8 xl:bottom-10 xl:left-10 xl:right-10 z-10 max-w-md">
+          <h2 className="text-white mb-4 lg:mb-6 font-bold text-2xl lg:text-3xl">
+            Keep track of your money and save for your future
+          </h2>
+          <p className="text-white text-sm lg:text-base">
+            Personal finance app puts you in control of your spending. Track
+            transactions, set budgets, and add to savings pots easily.
+          </p>
         </div>
       </div>
     </div>

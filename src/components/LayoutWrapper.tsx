@@ -2,7 +2,7 @@
 
 import { Suspense } from "react";
 import { usePathname } from "next/navigation";
-import Sidebar from "@/components/Sidebar";
+import Sidebar from "@/components/sidebar";
 
 const AUTH_ROUTES = ["/", "/login", "/signup"];
 

@@ -14,7 +14,10 @@ import {
 import Image from "next/image";
 import transactionsData from "@/../data.json";
 import { Transaction } from "@/lib/types";
-import { TRANSACTION_CATEGORIES, SORT_OPTIONS } from "@/lib/constants";
+import {
+  TRANSACTION_CATEGORIES,
+  SORT_OPTIONS,
+} from "@/lib/constants/constants";
 import { useTransactionFilters } from "@/lib/hooks/useTransactionFilters";
 import { usePagination } from "@/lib/hooks/usePagination";
 import { TransactionRow } from "@/components/transactions/transactionRow";

@@ -5,7 +5,10 @@ import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import budgetData from "@/../data.json";
 import { Budget, Transaction } from "@/lib/types";
-import { getThemeNameFromHex, getHexFromThemeName } from "@/lib/constants";
+import {
+  getThemeNameFromHex,
+  getHexFromThemeName,
+} from "@/lib/constants/constants";
 import { BudgetFormModal } from "@/components/modals/budgetFormModal";
 import { DeleteConfirmationModal } from "@/components/modals/deleteConfirmationModal";
 import { BudgetCard } from "@/components/budgets/budgetCard";
