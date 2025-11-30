@@ -1,219 +1,139 @@
 "use client";
 
-import React, { useState } from "react";
+import { useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
-import AuthHeader from "@/components/auth/authHeader";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { AuthLayout } from "@/components/auth/authLayout";
+import { FormField } from "@/components/auth/formField";
+import { FormPasswordField } from "@/components/auth/formPasswordField";
+import { FormConfirmPasswordField } from "@/components/auth/formConfirmPasswordField";
 import { Button } from "@/components/ui/button";
-import { Eye, EyeOff } from "lucide-react";
-
-interface PasswordInputProps
-  extends React.InputHTMLAttributes<HTMLInputElement> {
-  show?: boolean;
-  onToggleVisibility?: () => void;
-  error?: string;
-}
-
-const PasswordInput = React.forwardRef<HTMLInputElement, PasswordInputProps>(
-  ({ show, onToggleVisibility, className, error, ...props }, ref) => {
-    return (
-      <div className="relative w-full">
-        <Input
-          type={show ? "text" : "password"}
-          ref={ref}
-          placeholder={props.placeholder || "Enter your password"}
-          className={`pr-10 ${className || ""}`}
-          error={error}
-          {...props}
-        />
-
-        <Button
-          type="button"
-          variant="ghost"
-          size="icon"
-          onClick={onToggleVisibility}
-          aria-label={show ? "Hide password" : "Show password"}
-          aria-pressed={show}
-          className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
-        >
-          {show ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
-        </Button>
-      </div>
-    );
-  }
-);
-PasswordInput.displayName = "PasswordInput";
-
-function MarketingPanel() {
-  return (
-    <div className="p-5 rounded-lg bg-[#f8f4f0] hidden lg:flex lg:w-2/5 xl:w-2/5">
-      <div className="w-full h-full bg-[#201f24] relative overflow-hidden rounded-lg">
-        {/* Logo at top */}
-        <div className="absolute top-6 left-6 lg:top-8 lg:left-8 xl:top-10 xl:left-10 z-10">
-          <h1 className="text-white text-xl lg:text-2xl font-bold">finance</h1>
-        </div>
-
-        {/* Illustration - positioned absolutely to fill space */}
-        <div className="flex items-center justify-center">
-          <img
-            src="/assets/images/illustration-authentication.svg"
-            alt="Finance illustration"
-            className="w-full h-full"
-          />
-        </div>
-
-        {/* Text content at bottom */}
-        <div className="absolute bottom-6 left-6 right-6 lg:bottom-8 lg:left-8 lg:right-8 xl:bottom-10 xl:left-10 xl:right-10 z-10 max-w-md">
-          <h2 className="text-white mb-4 lg:mb-6 font-bold text-2xl lg:text-3xl">
-            Keep track of your money and save for your future
-          </h2>
-          <p className="text-white text-sm lg:text-base">
-            Personal finance app puts you in control of your spending. Track
-            transactions, set budgets, and add to savings pots easily.
-          </p>
-        </div>
-      </div>
-    </div>
-  );
-}
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import {
+  AUTH_VALIDATION,
+  PASSWORD_MIN_LENGTH,
+  validatePasswordConfirmation,
+} from "@/lib/validations/authValidation";
+import { authService } from "@/services/auth.service";
+import { usePasswordToggle } from "@/hooks/usePasswordToggle";
+import {
+  AUTH_BUTTON_CLASS,
+  AUTH_LINK_CLASS,
+} from "@/lib/constants/auth.constants";
 
 interface SignUpFormData {
   name: string;
   email: string;
   password: string;
+  confirmPassword: string;
 }
 
+/**
+ * SignUpPage Component
+ * Handles user registration and account creation
+ */
 export default function SignUpPage() {
-  const [showPassword, setShowPassword] = useState(false);
+  const router = useRouter();
+  const { show: showPassword, toggle: togglePasswordVisibility } =
+    usePasswordToggle();
+  const { show: showConfirmPassword, toggle: toggleConfirmPasswordVisibility } =
+    usePasswordToggle();
+  const [error, setError] = useState<string | null>(null);
+
   const {
     register,
     handleSubmit,
+    watch,
     formState: { errors, isSubmitting },
   } = useForm<SignUpFormData>({
-    defaultValues: {
-      name: "",
-      email: "",
-      password: "",
-    },
     mode: "onBlur",
   });
 
+  const password = watch("password");
+
   const onSubmit = async (data: SignUpFormData) => {
+    setError(null);
     try {
-      // Handle sign up logic here
-      console.log("Sign up attempt:", data);
-      // Redirect to dashboard after successful signup
-      window.location.href = "/dashboard";
-    } catch (error) {
-      console.error("Sign up failed:", error);
-      // You can add toast notification here
+      const { name, email, password } = data;
+      await authService.signUp({ name, email, password });
+      router.push("/dashboard");
+    } catch (err) {
+      const message =
+        err instanceof Error
+          ? err.message
+          : "Sign up failed. Please try again.";
+      setError(message);
     }
   };
 
   return (
-    <div className="min-h-screen flex flex-col">
-      {/* Header for tablet view only */}
-      <AuthHeader />
+    <AuthLayout>
+      <h2 className="text-2xl font-bold text-[#201f24] mb-8">Sign Up</h2>
 
-      <div className="flex-1 flex">
-        {/* Left Column - Marketing Section - Hidden on tablet and mobile */}
-        <MarketingPanel />
+      {error && (
+        <Alert variant="destructive" className="mb-4">
+          <AlertDescription>{error}</AlertDescription>
+        </Alert>
+      )}
 
-        {/* Right Column - Sign Up Form */}
-        <div className="flex-1 lg:w-3/5 bg-[#f8f4f0] flex items-center justify-center p-4">
-          <div className="w-full max-w-xl">
-            <div className="bg-white rounded-lg shadow-sm p-5 sm:p-8">
-              <h2 className="text-2xl font-bold text-[#201f24] mb-8">
-                Sign Up
-              </h2>
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+        <FormField
+          label="Name"
+          type="text"
+          placeholder="Enter your full name"
+          error={errors.name?.message}
+          register={register("name", AUTH_VALIDATION.name)}
+        />
 
-              <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-                <div className="space-y-2">
-                  <Label className="block text-sm font-medium text-gray-700">
-                    Name
-                  </Label>
-                  <Input
-                    type="text"
-                    {...register("name", {
-                      required: "Name is required",
-                      minLength: {
-                        value: 2,
-                        message: "Name must be at least 2 characters",
-                      },
-                    })}
-                    placeholder="Enter your full name"
-                    className="w-full px-3 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#201f24] focus:border-transparent"
-                    error={errors.name?.message}
-                  />
-                </div>
+        <FormField
+          label="Email"
+          type="email"
+          placeholder="Enter your email"
+          error={errors.email?.message}
+          register={register("email", AUTH_VALIDATION.email)}
+        />
 
-                <div className="space-y-2">
-                  <Label className="block text-sm font-medium text-gray-700">
-                    Email
-                  </Label>
-                  <Input
-                    type="email"
-                    {...register("email", {
-                      required: "Email is required",
-                      pattern: {
-                        value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-                        message: "Invalid email address",
-                      },
-                    })}
-                    placeholder="Enter your email"
-                    className="w-full px-3 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#201f24] focus:border-transparent"
-                    error={errors.email?.message}
-                  />
-                </div>
+        <FormPasswordField
+          label="Create Password"
+          placeholder="Create a password"
+          show={showPassword}
+          onToggleVisibility={togglePasswordVisibility}
+          error={errors.password?.message}
+          register={register("password", AUTH_VALIDATION.password)}
+          helperText={`Passwords must be at least ${PASSWORD_MIN_LENGTH} characters`}
+        />
 
-                <div className="space-y-2">
-                  <Label className="block text-sm font-medium text-gray-700">
-                    Create Password
-                  </Label>
-                  <PasswordInput
-                    {...register("password", {
-                      required: "Password is required",
-                      minLength: {
-                        value: 8,
-                        message: "Password must be at least 8 characters",
-                      },
-                    })}
-                    placeholder="Create a password"
-                    show={showPassword}
-                    onToggleVisibility={() => setShowPassword((prev) => !prev)}
-                    error={errors.password?.message}
-                  />
-                  <p className="text-sm text-gray-500">
-                    Passwords must be at least 8 characters
-                  </p>
-                </div>
+        <FormConfirmPasswordField
+          label="Confirm Password"
+          placeholder="Confirm your password"
+          show={showConfirmPassword}
+          onToggleVisibility={toggleConfirmPasswordVisibility}
+          error={errors.confirmPassword?.message}
+          register={register("confirmPassword", {
+            required: "Please confirm your password",
+            validate: validatePasswordConfirmation(password),
+          })}
+        />
 
-                <Button
-                  type="submit"
-                  disabled={isSubmitting}
-                  className="w-full bg-[#201f24] hover:bg-[#2a2930] text-white py-3 px-4 rounded-lg font-medium transition-colors"
-                >
-                  {isSubmitting ? "Creating Account..." : "Create Account"}
-                </Button>
-              </form>
+        <Button
+          type="submit"
+          disabled={isSubmitting}
+          className={AUTH_BUTTON_CLASS}
+        >
+          {isSubmitting ? "Creating Account..." : "Create Account"}
+        </Button>
+      </form>
 
-              <div className="mt-6 text-center">
-                <p className="text-gray-600 text-sm">
-                  Already have an account?{" "}
-                  <Link
-                    href="/login"
-                    className="text-[#201f24] underline hover:no-underline font-medium"
-                  >
-                    Login
-                  </Link>
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
+      {/* Login Link */}
+      <div className="mt-8 text-center">
+        <p className="text-gray-600 text-sm">
+          Already have an account?{" "}
+          <Link href="/login" className={AUTH_LINK_CLASS}>
+            Login
+          </Link>
+        </p>
       </div>
-    </div>
+    </AuthLayout>
   );
 }
