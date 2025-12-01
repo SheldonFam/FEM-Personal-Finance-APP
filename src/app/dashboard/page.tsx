@@ -1,15 +1,15 @@
 "use client";
 
 import React from "react";
-import { Card } from "@/components/ui/Card";
+import { Card } from "@/components/ui/card";
 import { useSearchParams } from "next/navigation";
-import { StatCard } from "@/components/dashboard/StatCard";
-import { TransactionItem } from "@/components/dashboard/TransactionItem";
-import { PotItem } from "@/components/dashboard/PotItem";
-import { BudgetItem } from "@/components/dashboard/BudgetItem";
-import { RecurringBillCard } from "@/components/dashboard/RecurringBillCard";
-import { SectionHeader } from "@/components/dashboard/SectionHeader";
-import BudgetDonutChart from "@/components/charts/BudgetDonutChart";
+import { StatCard } from "@/components/dashboard/statCard";
+import { TransactionItem } from "@/components/dashboard/transactionItem";
+import { PotItem } from "@/components/dashboard/potItem";
+import { BudgetItem } from "@/components/dashboard/budgetItem";
+import { RecurringBillCard } from "@/components/dashboard/recurringBillCard";
+import { SectionHeader } from "@/components/dashboard/sectionHeader";
+import BudgetDonutChart from "@/components/charts/budgetDonutChart";
 import Image from "next/image";
 
 // Global sidebar is provided in root layout; this page renders content only

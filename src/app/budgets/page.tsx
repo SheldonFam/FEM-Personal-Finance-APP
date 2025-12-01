@@ -1,16 +1,19 @@
 "use client";
 
 import React, { useState, useMemo } from "react";
-import { Button } from "@/components/ui/Button";
+import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import budgetData from "@/../data.json";
 import { Budget, Transaction } from "@/lib/types";
-import { getThemeNameFromHex, getHexFromThemeName } from "@/lib/constants";
-import { BudgetFormModal } from "@/components/modals/BudgetFormModal";
-import { DeleteConfirmationModal } from "@/components/modals/DeleteConfirmationModal";
-import { BudgetCard } from "@/components/budgets/BudgetCard";
-import { SpendingSummary } from "@/components/budgets/SpendingSummary";
-import { Card } from "@/components/ui/Card";
+import {
+  getThemeNameFromHex,
+  getHexFromThemeName,
+} from "@/lib/constants/constants";
+import { BudgetFormModal } from "@/components/modals/budgetFormModal";
+import { DeleteConfirmationModal } from "@/components/modals/deleteConfirmationModal";
+import { BudgetCard } from "@/components/budgets/budgetCard";
+import { SpendingSummary } from "@/components/budgets/spendingSummary";
+import { Card } from "@/components/ui/card";
 
 export default function BudgetsPage() {
   const [budgets, setBudgets] = useState<Budget[]>(
@@ -154,7 +157,8 @@ export default function BudgetsPage() {
           initialData={{
             category: editingBudget.category,
             maxSpend: editingBudget.maximum,
-            theme: getThemeNameFromHex(editingBudget.theme) || editingBudget.theme, // Convert hex to name
+            theme:
+              getThemeNameFromHex(editingBudget.theme) || editingBudget.theme, // Convert hex to name
           }}
         />
       )}

@@ -2,9 +2,9 @@ import { useState } from "react";
 import Image from "next/image";
 import { Pot } from "@/lib/types";
 import { formatCurrency } from "@/lib/formatters";
-import { Card } from "@/components/ui/Card";
+import { Card } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
-import { Button } from "@/components/ui/Button";
+import { Button } from "@/components/ui/button";
 
 interface PotCardProps {
   pot: Pot;
@@ -124,4 +124,3 @@ export const PotCard = ({
     </Card>
   );
 };
-

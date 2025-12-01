@@ -1,16 +1,19 @@
 "use client";
 
 import React, { useState } from "react";
-import { Card } from "@/components/ui/Card";
-import { Button } from "@/components/ui/Button";
+import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import data from "@/../data.json";
 import { Pot } from "@/lib/types";
-import { getThemeNameFromHex, getHexFromThemeName } from "@/lib/constants";
-import { PotFormModal } from "@/components/modals/PotFormModal";
-import { PotMoneyModal } from "@/components/modals/PotMoneyModal";
-import { DeleteConfirmationModal } from "@/components/modals/DeleteConfirmationModal";
-import { PotCard } from "@/components/pots/PotCard";
+import {
+  getThemeNameFromHex,
+  getHexFromThemeName,
+} from "@/lib/constants/constants";
+import { PotFormModal } from "@/components/modals/potFormModal";
+import { PotMoneyModal } from "@/components/modals/potMoneyModal";
+import { DeleteConfirmationModal } from "@/components/modals/deleteConfirmationModal";
+import { PotCard } from "@/components/pots/potCard";
 
 export default function PotsPage() {
   const [pots, setPots] = useState<Pot[]>(data.pots as Pot[]);

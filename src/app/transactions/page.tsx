@@ -1,9 +1,9 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { Card } from "@/components/ui/Card";
-import { Input } from "@/components/ui/Input";
-import { Button } from "@/components/ui/Button";
+import { Card } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 import {
   Select,
   SelectContent,
@@ -14,11 +14,14 @@ import {
 import Image from "next/image";
 import transactionsData from "@/../data.json";
 import { Transaction } from "@/lib/types";
-import { TRANSACTION_CATEGORIES, SORT_OPTIONS } from "@/lib/constants";
+import {
+  TRANSACTION_CATEGORIES,
+  SORT_OPTIONS,
+} from "@/lib/constants/constants";
 import { useTransactionFilters } from "@/lib/hooks/useTransactionFilters";
 import { usePagination } from "@/lib/hooks/usePagination";
-import { TransactionRow } from "@/components/transactions/TransactionRow";
-import { Pagination } from "@/components/ui/Pagination";
+import { TransactionRow } from "@/components/transactions/transactionRow";
+import { Pagination } from "@/components/ui/pagination";
 
 export default function TransactionsPage() {
   const [searchTerm, setSearchTerm] = useState("");

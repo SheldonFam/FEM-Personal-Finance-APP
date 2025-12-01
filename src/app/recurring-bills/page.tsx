@@ -1,9 +1,9 @@
 "use client";
 
 import React, { useState } from "react";
-import { Card } from "@/components/ui/Card";
-import { Input } from "@/components/ui/Input";
-import { Button } from "@/components/ui/Button";
+import { Card } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 import {
   Select,
   SelectContent,
@@ -14,11 +14,11 @@ import {
 import Image from "next/image";
 import transactionsData from "@/../data.json";
 import { Transaction, RecurringBill } from "@/lib/types";
-import { SORT_OPTIONS } from "@/lib/constants";
+import { SORT_OPTIONS } from "@/lib/constants/constants";
 import { formatCurrency } from "@/lib/formatters";
-import { processRecurringBills } from "@/lib/utils/recurringBills";
+import { processRecurringBills } from "@/lib/billing/recurringBills";
 import { useBillFilters } from "@/lib/hooks/useBillFilters";
-import { BillRow } from "@/components/recurring-bills/BillRow";
+import { BillRow } from "@/components/recurring-bills/billRow";
 
 export default function RecurringBillsPage() {
   const [searchQuery, setSearchQuery] = useState("");

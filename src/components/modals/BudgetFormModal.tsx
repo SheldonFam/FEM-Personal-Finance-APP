@@ -16,10 +16,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Input } from "@/components/ui/Input";
+import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Button } from "@/components/ui/Button";
-import { COLOR_THEMES } from "@/lib/constants";
+import { Button } from "@/components/ui/button";
+import { COLOR_THEMES } from "@/lib/constants/constants";
 
 type BudgetFormMode = "add" | "edit";
 
@@ -266,4 +266,3 @@ export function BudgetFormModal({
     </Dialog>
   );
 }
-

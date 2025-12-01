@@ -2,63 +2,72 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { AuthLayout } from "@/components/auth/authLayout";
 import { FormField } from "@/components/auth/formField";
-import { FormPasswordField } from "@/components/auth/formPasswordField";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { AUTH_VALIDATION } from "@/lib/validations/authValidation";
 import { authService } from "@/services/auth.service";
-import { usePasswordToggle } from "@/hooks/usePasswordToggle";
 import {
   AUTH_BUTTON_CLASS,
   AUTH_LINK_CLASS,
 } from "@/lib/constants/auth.constants";
 
-interface LoginFormData {
+interface ForgotPasswordFormData {
   email: string;
-  password: string;
 }
 
 /**
- * LoginPage Component
- * Handles user authentication and login functionality
+ * ForgotPasswordPage Component
+ * Handles password reset requests
  */
-export default function LoginPage() {
-  const router = useRouter();
-  const { show: showPassword, toggle: togglePasswordVisibility } =
-    usePasswordToggle();
+export default function ForgotPasswordPage() {
   const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState(false);
 
   const {
     register,
     handleSubmit,
     formState: { errors, isSubmitting },
-  } = useForm<LoginFormData>({
+  } = useForm<ForgotPasswordFormData>({
     mode: "onBlur",
   });
 
-  const onSubmit = async (data: LoginFormData) => {
+  const onSubmit = async (data: ForgotPasswordFormData) => {
     setError(null);
+    setSuccess(false);
     try {
-      await authService.login(data);
-      router.push("/dashboard");
+      await authService.requestPasswordReset(data.email);
+      setSuccess(true);
     } catch (err) {
       const message =
-        err instanceof Error ? err.message : "Login failed. Please try again.";
+        err instanceof Error ? err.message : "Failed to send reset email.";
       setError(message);
     }
   };
 
   return (
     <AuthLayout>
-      <h2 className="text-2xl font-bold text-[#201f24] mb-8">Login</h2>
+      <h2 className="text-2xl font-bold text-[#201f24] mb-4">
+        Forgot Password
+      </h2>
+      <p className="text-gray-600 text-sm mb-8">
+        Enter your email address and we'll send you a link to reset your
+        password.
+      </p>
 
       {error && (
         <Alert variant="destructive" className="mb-4">
           <AlertDescription>{error}</AlertDescription>
+        </Alert>
+      )}
+
+      {success && (
+        <Alert variant="success" className="mb-4">
+          <AlertDescription>
+            Password reset link sent! Check your email for instructions.
+          </AlertDescription>
         </Alert>
       )}
 
@@ -71,40 +80,21 @@ export default function LoginPage() {
           register={register("email", AUTH_VALIDATION.email)}
         />
 
-        <FormPasswordField
-          label="Password"
-          placeholder="Enter your password"
-          show={showPassword}
-          onToggleVisibility={togglePasswordVisibility}
-          error={errors.password?.message}
-          register={register("password", AUTH_VALIDATION.password)}
-        />
-
-        {/* Forgot Password Link */}
-        <div className="text-right">
-          <Link
-            href="/forgot-password"
-            className="text-sm text-gray-600 hover:text-[#201f24] underline"
-          >
-            Forgot Password?
-          </Link>
-        </div>
-
         <Button
           type="submit"
-          disabled={isSubmitting}
+          disabled={isSubmitting || success}
           className={AUTH_BUTTON_CLASS}
         >
-          {isSubmitting ? "Logging in..." : "Login"}
+          {isSubmitting ? "Sending..." : "Send Reset Link"}
         </Button>
       </form>
 
-      {/* Sign Up Link */}
+      {/* Back to Login Link */}
       <div className="mt-8 text-center">
         <p className="text-gray-600 text-sm">
-          Need to create an account?{" "}
-          <Link href="/signup" className={AUTH_LINK_CLASS}>
-            Sign Up
+          Remember your password?{" "}
+          <Link href="/login" className={AUTH_LINK_CLASS}>
+            Back to Login
           </Link>
         </p>
       </div>

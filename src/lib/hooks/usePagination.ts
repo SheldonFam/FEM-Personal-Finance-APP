@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { ITEMS_PER_PAGE } from "@/lib/constants";
+import { ITEMS_PER_PAGE } from "@/lib/constants/constants";
 
 interface UsePaginationProps<T> {
   items: T[];
@@ -7,7 +7,7 @@ interface UsePaginationProps<T> {
   itemsPerPage?: number;
 }
 
-export const usePagination = <T,>({
+export const usePagination = <T>({
   items,
   currentPage,
   itemsPerPage = ITEMS_PER_PAGE,
@@ -29,4 +29,3 @@ export const usePagination = <T,>({
 
   return paginationData;
 };
-

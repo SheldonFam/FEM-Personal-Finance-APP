@@ -3,8 +3,8 @@ import Image from "next/image";
 import { Budget, Transaction } from "@/lib/types";
 import { formatCurrency, formatDate } from "@/lib/formatters";
 import { normalizeImagePath } from "@/lib/utils";
-import { Card } from "@/components/ui/Card";
 import { Progress } from "@/components/ui/progress";
+import { Card } from "@/components/ui/card";
 
 interface BudgetCardProps {
   budget: Budget;
@@ -188,4 +188,3 @@ export const BudgetCard = ({
     </Card>
   );
 };
-
