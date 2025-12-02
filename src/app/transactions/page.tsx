@@ -18,8 +18,8 @@ import {
   TRANSACTION_CATEGORIES,
   SORT_OPTIONS,
 } from "@/lib/constants/constants";
-import { useTransactionFilters } from "@/lib/hooks/useTransactionFilters";
-import { usePagination } from "@/lib/hooks/usePagination";
+import { useTransactionFilters } from "@/hooks/useTransactionFilters";
+import { usePagination } from "@/hooks/usePagination";
 import { TransactionRow } from "@/components/transactions/transactionRow";
 import { Pagination } from "@/components/ui/pagination";
 
