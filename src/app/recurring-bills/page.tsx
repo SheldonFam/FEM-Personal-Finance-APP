@@ -17,7 +17,7 @@ import { Transaction, RecurringBill } from "@/lib/types";
 import { SORT_OPTIONS } from "@/lib/constants/constants";
 import { formatCurrency } from "@/lib/formatters";
 import { processRecurringBills } from "@/lib/billing/recurringBills";
-import { useBillFilters } from "@/lib/hooks/useBillFilters";
+import { useBillFilters } from "@/hooks/useBillFilters";
 import { BillRow } from "@/components/recurring-bills/billRow";
 
 export default function RecurringBillsPage() {
