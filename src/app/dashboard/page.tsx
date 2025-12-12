@@ -223,7 +223,7 @@ export default function DashboardPage() {
   const pageTitle = titleMap[activeTab] ?? "Overview";
 
   return (
-    <div className="min-h-screen bg-gray-50 p-4 md:p-8">
+    <div className="bg-gray-50 p-4 md:p-8">
       <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-6 md:mb-8">
         {pageTitle}
       </h1>
