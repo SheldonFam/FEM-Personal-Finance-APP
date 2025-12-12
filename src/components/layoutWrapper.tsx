@@ -20,12 +20,11 @@ export default function LayoutWrapper({
     );
   }
 
-  // FIX: Remove outer div, apply flex directly to the wrapper
   return (
-    <div className="flex min-h-screen bg-[var(--primary-light)]">
+    <div className="flex h-screen bg-[var(--primary-light)]">
       <Suspense
         fallback={
-          <div className="w-[88px] lg:w-[300px] bg-gray-800 flex-shrink-0">
+          <div className="w-[88px] lg:w-[300px] bg-gray-800">
             <div className="animate-pulse p-4">
               <div className="h-8 bg-gray-700 rounded mb-6"></div>
               <div className="space-y-2">
@@ -39,7 +38,7 @@ export default function LayoutWrapper({
       >
         <Sidebar />
       </Suspense>
-      <main className="flex-1 pb-16 md:pb-0">{children}</main>
+      <main className="flex-1 pb-16 md:pb-0 overflow-y-auto">{children}</main>
     </div>
   );
 }

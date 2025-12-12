@@ -85,7 +85,7 @@ export default function BudgetsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#F5F5F5] p-6 md:p-8 pb-24 md:pb-8">
+    <div className="bg-[#F5F5F5] p-6 md:p-8 pb-24 md:pb-8">
       {/* Header */}
       <div className="flex items-center justify-between mb-6 md:mb-8">
         <h1 className="text-3xl font-bold text-gray-900">Budgets</h1>

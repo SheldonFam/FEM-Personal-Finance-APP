@@ -87,7 +87,7 @@ export default function PotsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 p-4 md:p-8 pb-24 md:pb-8">
+    <div className="bg-gray-50 p-4 md:p-8 pb-24 md:pb-8">
       {/* Header */}
       <div className="flex items-center justify-between mb-6 md:mb-8">
         <h1 className="text-2xl md:text-3xl font-bold text-gray-900">Pots</h1>

@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 const STORAGE_KEY = "sidebar-collapsed";
 
 export function useSidebarState() {
-  const [collapsed, setCollapsed] = useState(false);
+  const [collapsed, setCollapsed] = useState(true);
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
