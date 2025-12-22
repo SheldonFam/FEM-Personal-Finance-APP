@@ -3,10 +3,10 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useForm } from "react-hook-form";
-import { AuthLayout } from "@/components/auth/authLayout";
-import { FormField } from "@/components/auth/formField";
-import { Button } from "@/components/ui/button";
-import { Alert, AlertDescription } from "@/components/ui/alert";
+import { AuthLayout } from "@/components/Auth/AuthLayout";
+import { FormField } from "@/components/Auth/FormField";
+import { Button } from "@/components/ui/Button";
+import { Alert, AlertDescription } from "@/components/ui/Alert";
 import { AUTH_VALIDATION } from "@/lib/validations/authValidation";
 import { authService } from "@/services/auth.service";
 import {

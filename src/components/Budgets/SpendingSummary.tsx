@@ -1,6 +1,6 @@
 import { Budget, Transaction } from "@/lib/types";
-import { Card } from "@/components/ui/card";
-import { BudgetChartWithLegend } from "@/components/charts/budgetDonutChart";
+import { Card } from "@/components/ui/Card";
+import { BudgetChartWithLegend } from "@/components/Charts/BudgetDonutChart";
 
 interface SpendingSummaryProps {
   budgetsWithSpending: Array<{

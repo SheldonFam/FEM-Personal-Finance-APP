@@ -1,24 +1,31 @@
 import React from "react";
 import { UseFormRegisterReturn } from "react-hook-form";
-import { PasswordInput } from "@/components/auth/passwordInput";
-import { Label } from "@/components/ui/label";
+import { PasswordInput } from "@/components/Auth/PasswordInput";
+import { Label } from "@/components/ui/Label";
 
-interface FormConfirmPasswordFieldProps {
+interface FormPasswordFieldProps {
   label: string;
   placeholder: string;
   error?: string;
   register: UseFormRegisterReturn;
   show: boolean;
   onToggleVisibility: () => void;
+  helperText?: string;
 }
 
 /**
- * FormConfirmPasswordField Component
- * Reusable password confirmation field with label and password input
+ * FormPasswordField Component
+ * Reusable password field with label, password input, and error handling
  */
-export const FormConfirmPasswordField: React.FC<
-  FormConfirmPasswordFieldProps
-> = ({ label, placeholder, error, register, show, onToggleVisibility }) => {
+export const FormPasswordField: React.FC<FormPasswordFieldProps> = ({
+  label,
+  placeholder,
+  error,
+  register,
+  show,
+  onToggleVisibility,
+  helperText,
+}) => {
   return (
     <div className="space-y-1">
       <Label className="block text-sm font-medium text-gray-700">{label}</Label>
@@ -30,7 +37,9 @@ export const FormConfirmPasswordField: React.FC<
         aria-invalid={error ? "true" : "false"}
         {...register}
       />
+      {helperText && (
+        <p className="text-sm text-gray-500 text-right">{helperText}</p>
+      )}
     </div>
   );
 };
-

@@ -2,9 +2,9 @@
 
 import Image from "next/image";
 
-import { NAV_ITEMS } from "./navItems";
 import type { SidebarDesktopProps } from "./types";
-import { SidebarNavItem } from "./sidebarNavItem";
+import { SidebarNavItem } from "@/components/Sidebar/SidebarNavItem";
+import { NAV_ITEMS } from "@/components/Sidebar/nav-items";
 
 export function SidebarDesktop({
   collapsed,

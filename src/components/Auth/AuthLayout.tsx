@@ -1,8 +1,8 @@
 "use client";
 
 import React from "react";
-import AuthHeader from "@/components/auth/authHeader";
-import { MarketingPanel } from "@/components/auth/marketingPanel";
+import AuthHeader from "@/components/Auth/AuthHeader";
+import { MarketingPanel } from "@/components/Auth/MarketingPanel";
 
 interface AuthLayoutProps {
   children: React.ReactNode;

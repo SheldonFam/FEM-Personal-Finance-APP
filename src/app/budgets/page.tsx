@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useMemo } from "react";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/ui/Button";
 import Image from "next/image";
 import budgetData from "@/../data.json";
 import { Budget, Transaction } from "@/lib/types";
@@ -9,11 +9,11 @@ import {
   getThemeNameFromHex,
   getHexFromThemeName,
 } from "@/lib/constants/constants";
-import { BudgetFormModal } from "@/components/modals/budgetFormModal";
-import { DeleteConfirmationModal } from "@/components/modals/deleteConfirmationModal";
-import { BudgetCard } from "@/components/budgets/budgetCard";
-import { SpendingSummary } from "@/components/budgets/spendingSummary";
-import { Card } from "@/components/ui/card";
+import { BudgetFormModal } from "@/components/Modals/BudgetFormModal";
+import { DeleteConfirmationModal } from "@/components/Modals/DeleteConfirmationModal";
+import { BudgetCard } from "@/components/Budgets/BudgetCard";
+import { SpendingSummary } from "@/components/Budgets/SpendingSummary";
+import { Card } from "@/components/ui/Card";
 
 export default function BudgetsPage() {
   const [budgets, setBudgets] = useState<Budget[]>(
