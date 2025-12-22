@@ -1,7 +1,7 @@
 "use client";
 
-import { SidebarNavItem } from "./sidebarNavItem";
-import { NAV_ITEMS } from "./navItems";
+import { NAV_ITEMS } from "./nav-items";
+import { SidebarNavItem } from "./SidebarNavItem";
 import type { SidebarMobileProps } from "./types";
 
 export function SidebarMobile({ isActive }: SidebarMobileProps) {

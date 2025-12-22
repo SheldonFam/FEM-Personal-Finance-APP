@@ -2,9 +2,9 @@ import { useState } from "react";
 import Image from "next/image";
 import { Pot } from "@/lib/types";
 import { formatCurrency } from "@/lib/formatters";
-import { Card } from "@/components/ui/card";
-import { Progress } from "@/components/ui/progress";
-import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/Card";
+import { Progress } from "@/components/ui/Progress";
+import { Button } from "@/components/ui/Button";
 
 interface PotCardProps {
   pot: Pot;

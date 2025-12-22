@@ -4,12 +4,12 @@ import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
-import { AuthLayout } from "@/components/auth/authLayout";
-import { FormField } from "@/components/auth/formField";
-import { FormPasswordField } from "@/components/auth/formPasswordField";
-import { FormConfirmPasswordField } from "@/components/auth/formConfirmPasswordField";
-import { Button } from "@/components/ui/button";
-import { Alert, AlertDescription } from "@/components/ui/alert";
+import { AuthLayout } from "@/components/Auth/AuthLayout";
+import { FormField } from "@/components/Auth/FormField";
+import { FormPasswordField } from "@/components/Auth/FormPasswordField";
+import { FormConfirmPasswordField } from "@/components/Auth/FormConfirmPasswordField";
+import { Button } from "@/components/ui/Button";
+import { Alert, AlertDescription } from "@/components/ui/Alert";
 import {
   AUTH_VALIDATION,
   PASSWORD_MIN_LENGTH,

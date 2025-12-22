@@ -8,52 +8,68 @@ import {
   DialogDescription,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog";
+} from "@/components/ui/Dialog";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Button } from "@/components/ui/button";
+} from "@/components/ui/Select";
+import { Input } from "@/components/ui/Input";
+import { Label } from "@/components/ui/Label";
+import { Button } from "@/components/ui/Button";
 import { COLOR_THEMES } from "@/lib/constants/constants";
 
-type PotFormMode = "add" | "edit";
+type BudgetFormMode = "add" | "edit";
 
-interface PotFormModalProps {
+interface BudgetFormModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  mode: PotFormMode;
+  mode: BudgetFormMode;
   initialData?: {
-    name: string;
-    target: number;
+    category: string;
+    maxSpend: number;
     theme: string;
   } | null;
-  onSubmit: (data: { name: string; target: number; theme: string }) => void;
-  existingPots?: Array<{ name: string; theme: string }>;
+  onSubmit: (data: {
+    category: string;
+    maxSpend: number;
+    theme: string;
+  }) => void;
 }
 
-interface PotFormData {
-  name: string;
-  target: string;
+interface BudgetFormData {
+  category: string;
+  maxSpend: string;
   theme: string;
 }
 
+const BUDGET_CATEGORIES = [
+  "Entertainment",
+  "Bills",
+  "Groceries",
+  "Dining Out",
+  "Transportation",
+  "Personal Care",
+  "Education",
+  "Lifestyle",
+  "Shopping",
+  "General",
+];
+
 const MODAL_CONFIG = {
   add: {
-    title: "Add New Pot",
+    title: "Add New Budget",
     description:
-      "Create a pot to set savings targets. These can help keep you on track as you save for special purchases.",
+      "Choose a category to set a spending budget. These categories can help you monitor spending.",
     buttonLabel: (isSubmitting: boolean) =>
-      isSubmitting ? "Adding..." : "Add Pot",
+      isSubmitting ? "Adding..." : "Add Budget",
   },
   edit: {
-    title: "Edit Pot",
+    title: "Edit Budget",
     description:
-      "If your saving targets change, feel free to update your pots.",
+      "As your budgets change, feel free to update your spending limits.",
     buttonLabel: (isSubmitting: boolean) =>
       isSubmitting ? "Saving..." : "Save Changes",
   },
@@ -65,14 +81,13 @@ const THEME_OPTIONS = Object.entries(COLOR_THEMES).map(([name, color]) => ({
   color,
 }));
 
-export function PotFormModal({
+export function BudgetFormModal({
   open,
   onOpenChange,
   mode,
   initialData,
   onSubmit,
-  existingPots = [],
-}: PotFormModalProps) {
+}: BudgetFormModalProps) {
   const config = MODAL_CONFIG[mode];
 
   const {
@@ -81,52 +96,45 @@ export function PotFormModal({
     control,
     reset,
     formState: { errors, isSubmitting },
-  } = useForm<PotFormData>({
+  } = useForm<BudgetFormData>({
     defaultValues: {
-      name: "",
-      target: "",
+      category: "",
+      maxSpend: "",
       theme: "",
     },
     mode: "onBlur",
   });
 
-  // Filter out already used themes (only for add mode)
-  const usedThemes = mode === "add" ? existingPots.map((pot) => pot.theme) : [];
-  const availableThemes =
-    mode === "add"
-      ? THEME_OPTIONS.filter((t) => !usedThemes.includes(t.name))
-      : THEME_OPTIONS;
-
-  const onFormSubmit = async (data: PotFormData) => {
+  const onFormSubmit = async (data: BudgetFormData) => {
     try {
-      const numValue = parseFloat(data.target);
+      const numValue = parseFloat(data.maxSpend);
       if (isNaN(numValue)) {
         throw new Error("Invalid number");
       }
 
       await onSubmit({
-        name: data.name,
-        target: numValue,
+        category: data.category,
+        maxSpend: numValue,
         theme: data.theme,
       });
       reset();
       onOpenChange(false);
     } catch (error) {
-      console.error(`Failed to ${mode} pot:`, error);
+      console.error(`Failed to ${mode} budget:`, error);
     }
   };
 
   React.useEffect(() => {
     if (initialData && mode === "edit") {
       reset({
-        name: initialData.name,
-        target: initialData.target.toString(),
+        category: initialData.category,
+        maxSpend: initialData.maxSpend.toString(),
         theme: initialData.theme,
       });
     } else if (!open) {
       reset({
-        name: "",
-        target: "",
+        category: "",
+        maxSpend: "",
         theme: "",
       });
     }
@@ -146,39 +154,52 @@ export function PotFormModal({
         <form onSubmit={handleSubmit(onFormSubmit)} className="space-y-5 mt-5">
           <div className="space-y-1">
             <Label className="text-xs font-bold text-muted-foreground">
-              Pot Name
+              Budget Category
             </Label>
-            <Input
-              type="text"
-              placeholder="e.g. Rainy Days"
-              {...register("name", {
-                required: "Pot name is required",
-                minLength: {
-                  value: 1,
-                  message: "Pot name cannot be empty",
-                },
-              })}
-              className="h-[45px]"
-              error={errors.name?.message}
+            <Controller
+              name="category"
+              control={control}
+              rules={{ required: "Category is required" }}
+              render={({ field }) => (
+                <>
+                  <Select value={field.value} onValueChange={field.onChange}>
+                    <SelectTrigger className="w-full h-[45px] text-sm">
+                      <SelectValue placeholder="Select a category" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {BUDGET_CATEGORIES.map((cat) => (
+                        <SelectItem key={cat} value={cat}>
+                          {cat}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  {errors.category && (
+                    <p className="text-xs text-destructive font-medium">
+                      {errors.category.message}
+                    </p>
+                  )}
+                </>
+              )}
             />
           </div>
 
           <div className="space-y-1">
             <Label className="text-xs font-bold text-muted-foreground">
-              Target
+              Maximum Spend
             </Label>
             <Input
               type="number"
               prefix="$"
               placeholder="e.g. 2000"
-              {...register("target", {
-                required: "Target amount is required",
+              {...register("maxSpend", {
+                required: "Maximum spend is required",
                 validate: {
                   positive: (value) => {
                     const num = parseFloat(value);
                     return (
                       (!isNaN(num) && num > 0) ||
-                      "Target must be greater than 0"
+                      "Maximum spend must be greater than 0"
                     );
                   },
                   validNumber: (value) =>
@@ -188,7 +209,7 @@ export function PotFormModal({
               className="h-[45px]"
               min="0"
               step="0.01"
-              error={errors.target?.message}
+              error={errors.maxSpend?.message}
             />
           </div>
 
@@ -207,26 +228,20 @@ export function PotFormModal({
                       <SelectValue placeholder="Select a theme" />
                     </SelectTrigger>
                     <SelectContent>
-                      {availableThemes.length > 0 ? (
-                        availableThemes.map((themeOption) => (
-                          <SelectItem
-                            key={themeOption.name}
-                            value={themeOption.name}
-                          >
-                            <div className="flex items-center gap-3">
-                              <div
-                                className="w-4 h-4 rounded-full"
-                                style={{ backgroundColor: themeOption.color }}
-                              />
-                              {themeOption.name}
-                            </div>
-                          </SelectItem>
-                        ))
-                      ) : (
-                        <SelectItem value="none" disabled>
-                          No themes available
+                      {THEME_OPTIONS.map((themeOption) => (
+                        <SelectItem
+                          key={themeOption.name}
+                          value={themeOption.name}
+                        >
+                          <div className="flex items-center gap-3">
+                            <div
+                              className="w-4 h-4 rounded-full"
+                              style={{ backgroundColor: themeOption.color }}
+                            />
+                            {themeOption.name}
+                          </div>
                         </SelectItem>
-                      )}
+                      ))}
                     </SelectContent>
                   </Select>
                   {errors.theme && (

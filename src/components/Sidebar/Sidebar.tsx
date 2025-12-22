@@ -3,9 +3,9 @@
 import { usePathname, useSearchParams } from "next/navigation";
 import { useSidebarState } from "@/hooks/useSidebarState";
 
-import type { NavItem } from "./types";
-import { SidebarDesktop } from "./sidebarDesktop";
-import { SidebarMobile } from "./sidebarMobile";
+import type { NavItem } from "@/components/Sidebar/types";
+import { SidebarDesktop } from "@/components/Sidebar/SidebarDesktop";
+import { SidebarMobile } from "@/components/Sidebar/SidebarMobile";
 
 export default function Sidebar() {
   const pathname = usePathname();
