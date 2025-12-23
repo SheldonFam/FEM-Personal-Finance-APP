@@ -3,12 +3,12 @@
 import React from "react";
 import { Card } from "@/components/ui/Card";
 import { useSearchParams } from "next/navigation";
-import { StatCard } from "@/components/dashboard/StatCard";
-import { TransactionItem } from "@/components/dashboard/TransactionItem";
-import { PotItem } from "@/components/dashboard/PotItem";
-import { BudgetItem } from "@/components/dashboard/BudgetItem";
-import { RecurringBillCard } from "@/components/dashboard/RecurringBillCard";
-import { SectionHeader } from "@/components/dashboard/SectionHeader";
+import { StatCard } from "@/components/Dashboard/StatCard";
+import { TransactionItem } from "@/components/Dashboard/TransactionItem";
+import { PotItem } from "@/components/Dashboard/PotItem";
+import { BudgetItem } from "@/components/Dashboard/BudgetItem";
+import { RecurringBillCard } from "@/components/Dashboard/RecurringBillCard";
+import { SectionHeader } from "@/components/Dashboard/SectionHeader";
 import BudgetDonutChart from "@/components/Charts/BudgetDonutChart";
 import Image from "next/image";
 
