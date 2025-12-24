@@ -2,7 +2,6 @@
 
 import React from "react";
 import { Card } from "@/components/ui/Card";
-import { useSearchParams } from "next/navigation";
 import { StatCard } from "@/components/Dashboard/StatCard";
 import { TransactionItem } from "@/components/Dashboard/TransactionItem";
 import { PotItem } from "@/components/Dashboard/PotItem";
@@ -211,21 +210,10 @@ const RecurringBillsSection = () => {
 
 // Main Dashboard Component
 export default function DashboardPage() {
-  const searchParams = useSearchParams();
-  const activeTab = searchParams.get("tab") ?? "overview";
-  const titleMap: Record<string, string> = {
-    overview: "Overview",
-    transactions: "Transactions",
-    budgets: "Budgets",
-    pots: "Pots",
-    bills: "Recurring Bills",
-  };
-  const pageTitle = titleMap[activeTab] ?? "Overview";
-
   return (
     <div className="bg-gray-50 p-4 md:p-8">
       <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-6 md:mb-8">
-        {pageTitle}
+        Overview
       </h1>
 
       {/* Summary Cards */}
