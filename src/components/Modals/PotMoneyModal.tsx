@@ -128,7 +128,7 @@ export default function PotMoneyModal({
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[560px] p-5 sm:p-8">
-        <DialogHeader className="space-y-5">
+        <DialogHeader>
           <DialogTitle className="text-[32px] font-bold text-foreground">
             {config.title(pot?.name || "")}
           </DialogTitle>
@@ -137,7 +137,7 @@ export default function PotMoneyModal({
           </DialogDescription>
         </DialogHeader>
 
-        <div className="space-y-5 mt-8">
+        <div>
           {/* New Amount Display */}
           <div className="flex items-center justify-between">
             <span className="text-sm text-muted-foreground">New Amount</span>
@@ -164,7 +164,7 @@ export default function PotMoneyModal({
           </div>
 
           {/* Input Form */}
-          <form onSubmit={handleSubmit(onFormSubmit)} className="space-y-5">
+          <form onSubmit={handleSubmit(onFormSubmit)} className="mt-5">
             <CurrencyInput
               name="amount"
               label={config.label}
@@ -188,7 +188,7 @@ export default function PotMoneyModal({
             <Button
               type="submit"
               disabled={isSubmitting}
-              className="w-full h-[53px] text-sm font-bold"
+              className="w-full h-[53px] text-sm font-bold mt-5"
             >
               {config.buttonLabel(isSubmitting)}
             </Button>

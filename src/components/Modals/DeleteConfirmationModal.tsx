@@ -39,7 +39,7 @@ export function DeleteConfirmationModal({
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[560px] p-5 sm:p-8">
-        <DialogHeader className="space-y-5">
+        <DialogHeader>
           <DialogTitle className="text-[32px] font-bold text-foreground">
             Delete '{itemName}'?
           </DialogTitle>
@@ -47,7 +47,7 @@ export function DeleteConfirmationModal({
             {description || defaultDescription}
           </DialogDescription>
         </DialogHeader>
-        <div className="space-y-4 mt-8">
+        <div>
           <Button
             variant="destructive"
             onClick={handleConfirm}

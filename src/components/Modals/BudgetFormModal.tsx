@@ -148,7 +148,7 @@ export function BudgetFormModal({
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[560px] p-5 sm:p-8">
-        <DialogHeader className="space-y-5">
+        <DialogHeader>
           <DialogTitle className="text-[32px] font-bold text-foreground">
             {config.title}
           </DialogTitle>
@@ -156,7 +156,7 @@ export function BudgetFormModal({
             {config.description}
           </DialogDescription>
         </DialogHeader>
-        <form onSubmit={handleSubmit(onFormSubmit)} className="space-y-5 mt-5">
+        <form onSubmit={handleSubmit(onFormSubmit)} className="space-y-5">
           <div className="space-y-1">
             <Label className="text-xs font-bold text-muted-foreground">
               Budget Category
@@ -207,7 +207,7 @@ export function BudgetFormModal({
           <Button
             type="submit"
             disabled={isSubmitting}
-            className="w-full h-[53px] text-sm font-bold mt-8"
+            className="w-full h-[53px] text-sm font-bold mt-1"
           >
             {config.buttonLabel(isSubmitting)}
           </Button>

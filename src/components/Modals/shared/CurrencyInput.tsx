@@ -24,7 +24,7 @@ export default function CurrencyInput({
   max,
 }: CurrencyInputProps) {
   return (
-    <div className="space-y-1">
+    <div>
       <Label className="text-xs font-bold text-muted-foreground">{label}</Label>
       <Input
         type="number"

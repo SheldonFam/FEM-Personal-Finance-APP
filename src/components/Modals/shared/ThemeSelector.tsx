@@ -34,7 +34,7 @@ export default function ThemeSelector({
     : THEME_OPTIONS;
 
   return (
-    <div className="space-y-1">
+    <div>
       <Label className="text-xs font-bold text-muted-foreground">Theme</Label>
       <Controller
         name={name}
@@ -77,4 +77,3 @@ export default function ThemeSelector({
     </div>
   );
 }
-
