@@ -3,7 +3,7 @@
 import React, { useState, useMemo } from "react";
 import { Button } from "@/components/ui/Button";
 import Image from "next/image";
-import budgetData from "@/../data.json";
+import budgetData from "@/data/data.json";
 import { Budget, Transaction } from "@/lib/types";
 import {
   getThemeNameFromHex,

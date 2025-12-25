@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import Image from "next/image";
-import data from "@/../data.json";
+import transactionsData from "@/data/data.json";
 import { Pot } from "@/lib/types";
 import {
   getThemeNameFromHex,
@@ -16,7 +16,7 @@ import { DeleteConfirmationModal } from "@/components/Modals/DeleteConfirmationM
 import { PotCard } from "@/components/Pots/PotCard";
 
 export default function PotsPage() {
-  const [pots, setPots] = useState<Pot[]>(data.pots as Pot[]);
+  const [pots, setPots] = useState<Pot[]>(transactionsData.pots as Pot[]);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [editingPot, setEditingPot] = useState<Pot | null>(null);
   const [deletingPot, setDeletingPot] = useState<Pot | null>(null);
