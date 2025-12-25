@@ -17,6 +17,7 @@ interface DeleteConfirmationModalProps {
   description?: string;
   itemName: string;
   onConfirm: () => void;
+  isLoading?: boolean;
 }
 
 export function DeleteConfirmationModal({
@@ -26,6 +27,7 @@ export function DeleteConfirmationModal({
   description,
   itemName,
   onConfirm,
+  isLoading = false,
 }: DeleteConfirmationModalProps) {
   const handleConfirm = () => {
     onConfirm();
@@ -37,7 +39,7 @@ export function DeleteConfirmationModal({
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[560px] p-5 sm:p-8">
-        <DialogHeader className="space-y-5">
+        <DialogHeader>
           <DialogTitle className="text-[32px] font-bold text-foreground">
             Delete '{itemName}'?
           </DialogTitle>
@@ -45,21 +47,23 @@ export function DeleteConfirmationModal({
             {description || defaultDescription}
           </DialogDescription>
         </DialogHeader>
-        <div className="space-y-4 mt-8">
+        <div>
           <Button
             variant="destructive"
             onClick={handleConfirm}
             className="w-full h-[53px] text-sm font-bold"
+            disabled={isLoading}
           >
-            Yes, Confirm Deletion
+            {isLoading ? "Deleting..." : "Yes, Confirm Deletion"}
           </Button>
-          <button
-            type="button"
+          <Button
+            variant="ghost"
             onClick={() => onOpenChange(false)}
-            className="w-full text-sm text-muted-foreground hover:text-foreground transition-colors font-medium"
+            className="w-full h-[53px] text-sm font-medium"
+            disabled={isLoading}
           >
             No, Go Back
-          </button>
+          </Button>
         </div>
       </DialogContent>
     </Dialog>

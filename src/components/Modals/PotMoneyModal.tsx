@@ -1,6 +1,6 @@
 "use client";
 
-import * as React from "react";
+import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import {
   Dialog,
@@ -9,10 +9,14 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/Dialog";
-import { Input } from "@/components/ui/Input";
-import { Label } from "@/components/ui/Label";
 import { Button } from "@/components/ui/Button";
 import { Progress } from "@/components/ui/Progress";
+import CurrencyInput from "@/components/Modals/shared/CurrencyInput";
+import FormErrorAlert from "@/components/Modals/shared/FormErrorAlert";
+import {
+  currencyValidationRules,
+  createMaxValidation,
+} from "@/lib/validations/formValidations";
 
 type PotMoneyMode = "add" | "withdraw";
 
@@ -56,7 +60,7 @@ const MODAL_CONFIG = {
   },
 } as const;
 
-export function PotMoneyModal({
+export default function PotMoneyModal({
   open,
   onOpenChange,
   mode,
@@ -65,6 +69,7 @@ export function PotMoneyModal({
 }: PotMoneyModalProps) {
   const config = MODAL_CONFIG[mode];
   const maxWithdraw = mode === "withdraw" ? pot?.currentAmount || 0 : Infinity;
+  const [submitError, setSubmitError] = useState<string | null>(null);
 
   const {
     register,
@@ -93,6 +98,7 @@ export function PotMoneyModal({
   const newPercentage = pot ? (newAmount / pot.targetAmount) * 100 : 0;
 
   const onFormSubmit = async (data: PotMoneyFormData) => {
+    setSubmitError(null);
     try {
       const numValue = parseFloat(data.amount);
       if (isNaN(numValue)) {
@@ -103,20 +109,26 @@ export function PotMoneyModal({
       reset();
       onOpenChange(false);
     } catch (error) {
-      console.error(`Failed to ${mode} pot:`, error);
+      console.error(`Failed to ${mode} money:`, error);
+      setSubmitError(
+        error instanceof Error
+          ? error.message
+          : `Failed to ${mode} money. Please try again.`
+      );
     }
   };
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (!open) {
       reset();
+      setSubmitError(null);
     }
   }, [open, reset]);
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[560px] p-5 sm:p-8">
-        <DialogHeader className="space-y-5">
+        <DialogHeader>
           <DialogTitle className="text-[32px] font-bold text-foreground">
             {config.title(pot?.name || "")}
           </DialogTitle>
@@ -125,7 +137,7 @@ export function PotMoneyModal({
           </DialogDescription>
         </DialogHeader>
 
-        <div className="space-y-5 mt-8">
+        <div>
           {/* New Amount Display */}
           <div className="flex items-center justify-between">
             <span className="text-sm text-muted-foreground">New Amount</span>
@@ -152,54 +164,31 @@ export function PotMoneyModal({
           </div>
 
           {/* Input Form */}
-          <form onSubmit={handleSubmit(onFormSubmit)} className="space-y-5">
-            <div className="space-y-1">
-              <Label className="text-xs font-bold text-muted-foreground">
-                {config.label}
-              </Label>
-              <Input
-                type="number"
-                prefix="$"
-                placeholder={
-                  typeof config.placeholder === "function"
-                    ? config.placeholder(maxWithdraw)
-                    : config.placeholder
-                }
-                {...register("amount", {
-                  required: "Amount is required",
-                  validate: {
-                    positive: (value) => {
-                      const num = parseFloat(value);
-                      return (
-                        (!isNaN(num) && num > 0) ||
-                        "Amount must be greater than 0"
-                      );
-                    },
-                    validNumber: (value) =>
-                      !isNaN(parseFloat(value)) || "Must be a valid number",
-                    ...(mode === "withdraw" && {
-                      notExceed: (value) => {
-                        const num = parseFloat(value);
-                        return (
-                          num <= maxWithdraw ||
-                          `Amount cannot exceed $${maxWithdraw.toFixed(2)}`
-                        );
-                      },
-                    }),
-                  },
-                })}
-                className="h-[45px]"
-                min="0"
-                max={mode === "withdraw" ? maxWithdraw : undefined}
-                step="0.01"
-                error={errors.amount?.message}
-              />
-            </div>
+          <form onSubmit={handleSubmit(onFormSubmit)} className="mt-5">
+            <CurrencyInput
+              name="amount"
+              label={config.label}
+              placeholder={
+                typeof config.placeholder === "function"
+                  ? config.placeholder(maxWithdraw)
+                  : config.placeholder
+              }
+              register={register}
+              errors={errors}
+              validation={
+                mode === "withdraw"
+                  ? createMaxValidation(maxWithdraw, "Amount")
+                  : currencyValidationRules
+              }
+              max={mode === "withdraw" ? maxWithdraw : undefined}
+            />
+
+            <FormErrorAlert error={submitError} />
 
             <Button
               type="submit"
               disabled={isSubmitting}
-              className="w-full h-[53px] text-sm font-bold"
+              className="w-full h-[53px] text-sm font-bold mt-5"
             >
               {config.buttonLabel(isSubmitting)}
             </Button>

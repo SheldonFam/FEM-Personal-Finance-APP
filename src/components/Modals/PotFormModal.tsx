@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { useForm, Controller } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import {
   Dialog,
   DialogContent,
@@ -9,17 +9,18 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/Dialog";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/Select";
 import { Input } from "@/components/ui/Input";
 import { Label } from "@/components/ui/Label";
 import { Button } from "@/components/ui/Button";
+import ThemeSelector from "@/components/Modals/shared/ThemeSelector";
+import CurrencyInput from "@/components/Modals/shared/CurrencyInput";
+import FormErrorAlert from "@/components/Modals/shared/FormErrorAlert";
+import {
+  currencyValidationRules,
+  requiredFieldRules,
+} from "@/lib/validations/formValidations";
 import { COLOR_THEMES } from "@/lib/constants/constants";
+import { useState, useEffect } from "react";
 
 type PotFormMode = "add" | "edit";
 
@@ -59,13 +60,7 @@ const MODAL_CONFIG = {
   },
 } as const;
 
-// Convert COLOR_THEMES to array format for UI
-const THEME_OPTIONS = Object.entries(COLOR_THEMES).map(([name, color]) => ({
-  name,
-  color,
-}));
-
-export function PotFormModal({
+export default function PotFormModal({
   open,
   onOpenChange,
   mode,
@@ -74,6 +69,7 @@ export function PotFormModal({
   existingPots = [],
 }: PotFormModalProps) {
   const config = MODAL_CONFIG[mode];
+  const [submitError, setSubmitError] = useState<string | null>(null);
 
   const {
     register,
@@ -94,10 +90,11 @@ export function PotFormModal({
   const usedThemes = mode === "add" ? existingPots.map((pot) => pot.theme) : [];
   const availableThemes =
     mode === "add"
-      ? THEME_OPTIONS.filter((t) => !usedThemes.includes(t.name))
-      : THEME_OPTIONS;
+      ? Object.keys(COLOR_THEMES).filter((t) => !usedThemes.includes(t))
+      : undefined;
 
   const onFormSubmit = async (data: PotFormData) => {
+    setSubmitError(null);
     try {
       const numValue = parseFloat(data.target);
       if (isNaN(numValue)) {
@@ -113,10 +110,15 @@ export function PotFormModal({
       onOpenChange(false);
     } catch (error) {
       console.error(`Failed to ${mode} pot:`, error);
+      setSubmitError(
+        error instanceof Error
+          ? error.message
+          : "Failed to save pot. Please try again."
+      );
     }
   };
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (initialData && mode === "edit") {
       reset({
         name: initialData.name,
@@ -129,13 +131,14 @@ export function PotFormModal({
         target: "",
         theme: "",
       });
+      setSubmitError(null);
     }
   }, [initialData, mode, open, reset]);
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[560px] p-5 sm:p-8">
-        <DialogHeader className="space-y-5">
+        <DialogHeader>
           <DialogTitle className="text-[32px] font-bold text-foreground">
             {config.title}
           </DialogTitle>
@@ -143,7 +146,7 @@ export function PotFormModal({
             {config.description}
           </DialogDescription>
         </DialogHeader>
-        <form onSubmit={handleSubmit(onFormSubmit)} className="space-y-5 mt-5">
+        <form onSubmit={handleSubmit(onFormSubmit)} className="space-y-4">
           <div className="space-y-1">
             <Label className="text-xs font-bold text-muted-foreground">
               Pot Name
@@ -151,98 +154,32 @@ export function PotFormModal({
             <Input
               type="text"
               placeholder="e.g. Rainy Days"
-              {...register("name", {
-                required: "Pot name is required",
-                minLength: {
-                  value: 1,
-                  message: "Pot name cannot be empty",
-                },
-              })}
+              {...register("name", requiredFieldRules("Pot name"))}
               className="h-[45px]"
               error={errors.name?.message}
             />
           </div>
 
-          <div className="space-y-1">
-            <Label className="text-xs font-bold text-muted-foreground">
-              Target
-            </Label>
-            <Input
-              type="number"
-              prefix="$"
-              placeholder="e.g. 2000"
-              {...register("target", {
-                required: "Target amount is required",
-                validate: {
-                  positive: (value) => {
-                    const num = parseFloat(value);
-                    return (
-                      (!isNaN(num) && num > 0) ||
-                      "Target must be greater than 0"
-                    );
-                  },
-                  validNumber: (value) =>
-                    !isNaN(parseFloat(value)) || "Must be a valid number",
-                },
-              })}
-              className="h-[45px]"
-              min="0"
-              step="0.01"
-              error={errors.target?.message}
-            />
-          </div>
+          <CurrencyInput
+            name="target"
+            label="Target"
+            register={register}
+            errors={errors}
+            validation={currencyValidationRules}
+          />
 
-          <div className="space-y-1">
-            <Label className="text-xs font-bold text-muted-foreground">
-              Theme
-            </Label>
-            <Controller
-              name="theme"
-              control={control}
-              rules={{ required: "Theme is required" }}
-              render={({ field }) => (
-                <>
-                  <Select value={field.value} onValueChange={field.onChange}>
-                    <SelectTrigger className="w-full h-[45px] text-sm">
-                      <SelectValue placeholder="Select a theme" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {availableThemes.length > 0 ? (
-                        availableThemes.map((themeOption) => (
-                          <SelectItem
-                            key={themeOption.name}
-                            value={themeOption.name}
-                          >
-                            <div className="flex items-center gap-3">
-                              <div
-                                className="w-4 h-4 rounded-full"
-                                style={{ backgroundColor: themeOption.color }}
-                              />
-                              {themeOption.name}
-                            </div>
-                          </SelectItem>
-                        ))
-                      ) : (
-                        <SelectItem value="none" disabled>
-                          No themes available
-                        </SelectItem>
-                      )}
-                    </SelectContent>
-                  </Select>
-                  {errors.theme && (
-                    <p className="text-xs text-destructive font-medium">
-                      {errors.theme.message}
-                    </p>
-                  )}
-                </>
-              )}
-            />
-          </div>
+          <ThemeSelector
+            control={control}
+            errors={errors}
+            availableThemes={availableThemes}
+          />
+
+          <FormErrorAlert error={submitError} />
 
           <Button
             type="submit"
             disabled={isSubmitting}
-            className="w-full h-[53px] text-sm font-bold mt-8"
+            className="w-full h-[53px] text-sm font-bold mt-1"
           >
             {config.buttonLabel(isSubmitting)}
           </Button>
