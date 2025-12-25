@@ -10,8 +10,8 @@ import {
   getThemeNameFromHex,
   getHexFromThemeName,
 } from "@/lib/constants/constants";
-import { PotFormModal } from "@/components/Modals/PotFormModal";
-import { PotMoneyModal } from "@/components/Modals/PotMoneyModal";
+import PotFormModal from "@/components/Modals/PotFormModal";
+import PotMoneyModal from "@/components/Modals/PotMoneyModal";
 import { DeleteConfirmationModal } from "@/components/Modals/DeleteConfirmationModal";
 import { PotCard } from "@/components/Pots/PotCard";
 

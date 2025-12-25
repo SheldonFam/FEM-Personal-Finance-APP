@@ -17,6 +17,7 @@ interface DeleteConfirmationModalProps {
   description?: string;
   itemName: string;
   onConfirm: () => void;
+  isLoading?: boolean;
 }
 
 export function DeleteConfirmationModal({
@@ -26,6 +27,7 @@ export function DeleteConfirmationModal({
   description,
   itemName,
   onConfirm,
+  isLoading = false,
 }: DeleteConfirmationModalProps) {
   const handleConfirm = () => {
     onConfirm();
@@ -50,16 +52,18 @@ export function DeleteConfirmationModal({
             variant="destructive"
             onClick={handleConfirm}
             className="w-full h-[53px] text-sm font-bold"
+            disabled={isLoading}
           >
-            Yes, Confirm Deletion
+            {isLoading ? "Deleting..." : "Yes, Confirm Deletion"}
           </Button>
-          <button
-            type="button"
+          <Button
+            variant="ghost"
             onClick={() => onOpenChange(false)}
-            className="w-full text-sm text-muted-foreground hover:text-foreground transition-colors font-medium"
+            className="w-full h-[53px] text-sm font-medium"
+            disabled={isLoading}
           >
             No, Go Back
-          </button>
+          </Button>
         </div>
       </DialogContent>
     </Dialog>

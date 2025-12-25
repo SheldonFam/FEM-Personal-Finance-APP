@@ -16,10 +16,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/Select";
-import { Input } from "@/components/ui/Input";
 import { Label } from "@/components/ui/Label";
 import { Button } from "@/components/ui/Button";
-import { COLOR_THEMES } from "@/lib/constants/constants";
+import ThemeSelector from "@/components/Modals/shared/ThemeSelector";
+import CurrencyInput from "@/components/Modals/shared/CurrencyInput";
+import FormErrorAlert from "@/components/Modals/shared/FormErrorAlert";
+import { currencyValidationRules } from "@/lib/validations/formValidations";
+import { useState, useEffect } from "react";
 
 type BudgetFormMode = "add" | "edit";
 
@@ -75,12 +78,6 @@ const MODAL_CONFIG = {
   },
 } as const;
 
-// Convert COLOR_THEMES to array format for UI
-const THEME_OPTIONS = Object.entries(COLOR_THEMES).map(([name, color]) => ({
-  name,
-  color,
-}));
-
 export function BudgetFormModal({
   open,
   onOpenChange,
@@ -89,6 +86,7 @@ export function BudgetFormModal({
   onSubmit,
 }: BudgetFormModalProps) {
   const config = MODAL_CONFIG[mode];
+  const [submitError, setSubmitError] = useState<string | null>(null);
 
   const {
     register,
@@ -106,6 +104,7 @@ export function BudgetFormModal({
   });
 
   const onFormSubmit = async (data: BudgetFormData) => {
+    setSubmitError(null);
     try {
       const numValue = parseFloat(data.maxSpend);
       if (isNaN(numValue)) {
@@ -121,10 +120,15 @@ export function BudgetFormModal({
       onOpenChange(false);
     } catch (error) {
       console.error(`Failed to ${mode} budget:`, error);
+      setSubmitError(
+        error instanceof Error
+          ? error.message
+          : "Failed to save budget. Please try again."
+      );
     }
   };
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (initialData && mode === "edit") {
       reset({
         category: initialData.category,
@@ -137,6 +141,7 @@ export function BudgetFormModal({
         maxSpend: "",
         theme: "",
       });
+      setSubmitError(null);
     }
   }, [initialData, mode, open, reset]);
 
@@ -175,7 +180,10 @@ export function BudgetFormModal({
                     </SelectContent>
                   </Select>
                   {errors.category && (
-                    <p className="text-xs text-destructive font-medium">
+                    <p
+                      role="alert"
+                      className="text-xs text-destructive font-medium"
+                    >
                       {errors.category.message}
                     </p>
                   )}
@@ -184,75 +192,17 @@ export function BudgetFormModal({
             />
           </div>
 
-          <div className="space-y-1">
-            <Label className="text-xs font-bold text-muted-foreground">
-              Maximum Spend
-            </Label>
-            <Input
-              type="number"
-              prefix="$"
-              placeholder="e.g. 2000"
-              {...register("maxSpend", {
-                required: "Maximum spend is required",
-                validate: {
-                  positive: (value) => {
-                    const num = parseFloat(value);
-                    return (
-                      (!isNaN(num) && num > 0) ||
-                      "Maximum spend must be greater than 0"
-                    );
-                  },
-                  validNumber: (value) =>
-                    !isNaN(parseFloat(value)) || "Must be a valid number",
-                },
-              })}
-              className="h-[45px]"
-              min="0"
-              step="0.01"
-              error={errors.maxSpend?.message}
-            />
-          </div>
+          <CurrencyInput
+            name="maxSpend"
+            label="Maximum Spend"
+            register={register}
+            errors={errors}
+            validation={currencyValidationRules}
+          />
 
-          <div className="space-y-1">
-            <Label className="text-xs font-bold text-muted-foreground">
-              Theme
-            </Label>
-            <Controller
-              name="theme"
-              control={control}
-              rules={{ required: "Theme is required" }}
-              render={({ field }) => (
-                <>
-                  <Select value={field.value} onValueChange={field.onChange}>
-                    <SelectTrigger className="w-full h-[45px] text-sm">
-                      <SelectValue placeholder="Select a theme" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {THEME_OPTIONS.map((themeOption) => (
-                        <SelectItem
-                          key={themeOption.name}
-                          value={themeOption.name}
-                        >
-                          <div className="flex items-center gap-3">
-                            <div
-                              className="w-4 h-4 rounded-full"
-                              style={{ backgroundColor: themeOption.color }}
-                            />
-                            {themeOption.name}
-                          </div>
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  {errors.theme && (
-                    <p className="text-xs text-destructive font-medium">
-                      {errors.theme.message}
-                    </p>
-                  )}
-                </>
-              )}
-            />
-          </div>
+          <ThemeSelector control={control} errors={errors} />
+
+          <FormErrorAlert error={submitError} />
 
           <Button
             type="submit"
