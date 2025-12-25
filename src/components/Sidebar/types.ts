@@ -2,7 +2,6 @@ export type NavItem = {
   label: string;
   href: string;
   icon: string;
-  tab?: string | null;
 };
 
 export type SidebarDesktopProps = {

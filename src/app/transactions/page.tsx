@@ -12,7 +12,7 @@ import {
   SelectValue,
 } from "@/components/ui/Select";
 import Image from "next/image";
-import transactionsData from "@/../data.json";
+import transactionsData from "@/data/data.json";
 import { Transaction } from "@/lib/types";
 import {
   TRANSACTION_CATEGORIES,

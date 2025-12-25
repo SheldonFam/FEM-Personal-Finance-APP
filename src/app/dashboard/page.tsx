@@ -11,8 +11,6 @@ import { SectionHeader } from "@/components/Dashboard/SectionHeader";
 import BudgetDonutChart from "@/components/Charts/BudgetDonutChart";
 import Image from "next/image";
 
-// Global sidebar is provided in root layout; this page renders content only
-
 // Summary Cards Component
 const SummaryCards = () => {
   return (

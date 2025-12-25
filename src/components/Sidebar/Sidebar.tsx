@@ -1,43 +1,22 @@
 "use client";
 
-import { usePathname, useSearchParams } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { useSidebarState } from "@/hooks/useSidebarState";
-
 import type { NavItem } from "@/components/Sidebar/types";
 import { SidebarDesktop } from "@/components/Sidebar/SidebarDesktop";
 import { SidebarMobile } from "@/components/Sidebar/SidebarMobile";
+import { useCallback } from "react";
 
 export default function Sidebar() {
   const pathname = usePathname();
-  const searchParams = useSearchParams();
   const { collapsed, mounted, toggle } = useSidebarState();
 
-  const currentTab = searchParams.get("tab");
-
-  const isActive = (item: NavItem): boolean => {
-    // Direct route match
-    if (pathname === item.href) return true;
-
-    // For dashboard root, check if we're at /dashboard with no tab
-    if (
-      pathname === "/dashboard" &&
-      item.href === "/dashboard" &&
-      currentTab === null
-    ) {
-      return true;
-    }
-
-    // For query param based tabs
-    if (
-      pathname === "/dashboard" &&
-      item.tab !== null &&
-      currentTab === item.tab
-    ) {
-      return true;
-    }
-
-    return false;
-  };
+  const isActive = useCallback(
+    (item: NavItem): boolean => {
+      return pathname === item.href;
+    },
+    [pathname]
+  );
 
   // Prevent hydration mismatch by not rendering until mounted
   if (!mounted) {
@@ -45,7 +24,7 @@ export default function Sidebar() {
       <>
         {/* Desktop Sidebar Skeleton */}
         <aside
-          className="hidden md:flex flex-col justify-between bg-[#201F24] text-zinc-300 rounded-r-2xl w-[300px]"
+          className="hidden md:flex flex-col justify-between bg-[#201F24] text-zinc-300 rounded-r-2xl w-[88px]"
           aria-label="Main navigation"
         />
         {/* Mobile Navigation Skeleton */}
