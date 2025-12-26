@@ -21,6 +21,7 @@ import {
 } from "@/lib/validations/formValidations";
 import { COLOR_THEMES } from "@/lib/constants/constants";
 import { useState, useEffect } from "react";
+import { cn } from "@/lib/utils";
 
 type PotFormMode = "add" | "edit";
 
@@ -76,6 +77,7 @@ export default function PotFormModal({
     handleSubmit,
     control,
     reset,
+    watch,
     formState: { errors, isSubmitting },
   } = useForm<PotFormData>({
     defaultValues: {
@@ -85,6 +87,8 @@ export default function PotFormModal({
     },
     mode: "onBlur",
   });
+
+  const potName = watch("name");
 
   // Filter out already used themes (only for add mode)
   const usedThemes = mode === "add" ? existingPots.map((pot) => pot.theme) : [];
@@ -139,7 +143,7 @@ export default function PotFormModal({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[560px] p-5 sm:p-8">
         <DialogHeader>
-          <DialogTitle className="text-[32px] font-bold text-foreground">
+          <DialogTitle className="text-xl sm:text-[32px] font-bold text-foreground">
             {config.title}
           </DialogTitle>
           <DialogDescription className="text-sm text-muted-foreground">
@@ -154,10 +158,26 @@ export default function PotFormModal({
             <Input
               type="text"
               placeholder="e.g. Rainy Days"
+              maxLength={30}
               {...register("name", requiredFieldRules("Pot name"))}
-              className="h-[45px]"
-              error={errors.name?.message}
+              className={cn(
+                "h-[45px]",
+                errors.name &&
+                  "border-destructive focus-visible:ring-destructive"
+              )}
             />
+            <div className="flex items-center justify-between">
+              {errors.name?.message ? (
+                <p className="text-xs text-destructive font-medium">
+                  {errors.name.message}
+                </p>
+              ) : (
+                <span />
+              )}
+              <span className="text-xs text-muted-foreground">
+                {30 - potName?.length} characters left
+              </span>
+            </div>
           </div>
 
           <CurrencyInput
