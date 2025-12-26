@@ -149,7 +149,7 @@ export function BudgetFormModal({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[560px] p-5 sm:p-8">
         <DialogHeader>
-          <DialogTitle className="text-[32px] font-bold text-foreground">
+          <DialogTitle className="text-xl sm:text-[32px] font-bold text-foreground">
             {config.title}
           </DialogTitle>
           <DialogDescription className="text-sm text-muted-foreground">
