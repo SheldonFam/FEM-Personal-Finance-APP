@@ -46,6 +46,10 @@ export function useFormModal<
   const defaultValuesRef = useRef(defaultValues);
   defaultValuesRef.current = defaultValues;
 
+  // Store initialData in ref to track when it actually changes
+  const initialDataRef = useRef(initialData);
+  const prevOpenRef = useRef(false);
+
   const form = useForm<TFormData>({
     defaultValues,
     mode: "onBlur",
@@ -70,6 +74,9 @@ export function useFormModal<
 
   // Handle form reset when modal opens/closes
   useEffect(() => {
+    const prevOpen = prevOpenRef.current;
+    prevOpenRef.current = open;
+
     if (!open) {
       // Reset to defaults when modal closes
       reset(defaultValuesRef.current);
@@ -77,14 +84,17 @@ export function useFormModal<
       return;
     }
 
-    // When modal opens, populate with initialData if in edit mode
-    if (initialData && mode === "edit") {
-      reset(initialData as DefaultValues<TFormData>);
-    } else {
-      // Reset to defaults when opening in add/action mode
-      reset(defaultValuesRef.current);
+    // Only reset when opening (transitioning from closed to open)
+    if (!prevOpen && open) {
+      // When modal opens, populate with initialData if in edit mode
+      if (initialDataRef.current && mode === "edit") {
+        reset(initialDataRef.current as DefaultValues<TFormData>);
+      } else {
+        // Reset to defaults when opening in add/action mode
+        reset(defaultValuesRef.current);
+      }
     }
-  }, [open, initialData, mode, reset]); // Removed defaultValues from deps
+  }, [open, mode, reset]); // Removed defaultValues from deps
 
   return {
     form,
