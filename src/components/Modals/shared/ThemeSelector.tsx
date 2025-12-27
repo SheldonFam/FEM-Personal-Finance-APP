@@ -1,14 +1,7 @@
 "use client";
 
-import { Controller, Control, FieldErrors } from "react-hook-form";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/Select";
-import { Label } from "@/components/ui/Label";
+import { Control, FieldErrors } from "react-hook-form";
+import FormSelect from "@/components/Modals/shared/FormSelect";
 import { COLOR_THEMES } from "@/lib/constants/constants";
 
 interface ThemeSelectorProps {
@@ -33,47 +26,32 @@ export default function ThemeSelector({
     ? THEME_OPTIONS.filter((t) => availableThemes.includes(t.name))
     : THEME_OPTIONS;
 
+  const options =
+    themes.length > 0
+      ? themes.map((theme) => ({
+          value: theme.name,
+          label: theme.name,
+          renderContent: () => (
+            <div className="flex items-center gap-3">
+              <div
+                className="w-4 h-4 rounded-full"
+                style={{ backgroundColor: theme.color }}
+              />
+              {theme.name}
+            </div>
+          ),
+        }))
+      : [{ value: "none", label: "No themes available", disabled: true }];
+
   return (
-    <div>
-      <Label className="text-xs font-bold text-muted-foreground">Theme</Label>
-      <Controller
-        name={name}
-        control={control}
-        rules={{ required: "Theme is required" }}
-        render={({ field }) => (
-          <>
-            <Select value={field.value} onValueChange={field.onChange}>
-              <SelectTrigger className="w-full h-[45px] text-sm">
-                <SelectValue placeholder="Select a theme" />
-              </SelectTrigger>
-              <SelectContent>
-                {themes.length > 0 ? (
-                  themes.map((themeOption) => (
-                    <SelectItem key={themeOption.name} value={themeOption.name}>
-                      <div className="flex items-center gap-3">
-                        <div
-                          className="w-4 h-4 rounded-full"
-                          style={{ backgroundColor: themeOption.color }}
-                        />
-                        {themeOption.name}
-                      </div>
-                    </SelectItem>
-                  ))
-                ) : (
-                  <SelectItem value="none" disabled>
-                    No themes available
-                  </SelectItem>
-                )}
-              </SelectContent>
-            </Select>
-            {errors[name] && (
-              <p role="alert" className="text-xs text-destructive font-medium">
-                {errors[name]?.message as string}
-              </p>
-            )}
-          </>
-        )}
-      />
-    </div>
+    <FormSelect
+      control={control}
+      errors={errors}
+      name={name}
+      label="Theme"
+      placeholder="Select a theme"
+      options={options}
+      requiredMessage="Theme is required"
+    />
   );
 }
