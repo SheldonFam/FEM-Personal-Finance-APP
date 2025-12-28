@@ -138,16 +138,16 @@ export default function PotFormModal({
           )}
         />
         <div className="flex items-center justify-between">
-          {errors.name?.message ? (
-            <p className="text-xs text-destructive font-medium">
-              {errors.name.message}
-            </p>
-          ) : (
-            <span />
-          )}
-          <span className="text-xs text-muted-foreground">
-            {30 - potName?.length} characters left
-          </span>
+          <p
+            className={`text-xs font-medium ${
+              errors.name?.message ? "text-destructive" : "invisible"
+            }`}
+          >
+            {errors.name?.message || "placeholder"}
+          </p>
+          <p className="text-xs text-muted-foreground">
+            {30 - (potName?.length || 0)} characters left
+          </p>
         </div>
       </div>
 

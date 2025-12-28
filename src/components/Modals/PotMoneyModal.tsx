@@ -94,10 +94,6 @@ export default function PotMoneyModal({
   } = form;
   const amount = watch("amount");
 
-  const currentPercentage = pot
-    ? (pot.currentAmount / pot.targetAmount) * 100
-    : 0;
-
   const newAmount = pot
     ? mode === "add"
       ? pot.currentAmount + (parseFloat(amount) || 0)
