@@ -5,6 +5,7 @@ import Image from "next/image";
 import type { SidebarDesktopProps } from "./types";
 import { SidebarNavItem } from "@/components/Sidebar/SidebarNavItem";
 import { NAV_ITEMS } from "@/components/Sidebar/nav-items";
+import { Button } from "@/components/ui/Button";
 
 export function SidebarDesktop({
   collapsed,
@@ -45,7 +46,7 @@ export function SidebarDesktop({
 
       {/* Navigation */}
       <nav
-        className={collapsed ? "flex-1 flex flex-col px-4" : "flex-1 px-6"}
+        className={collapsed ? "flex-1 flex flex-col px-4" : "flex-1 pr-6"}
         aria-label="Dashboard navigation"
       >
         <ul
@@ -63,12 +64,13 @@ export function SidebarDesktop({
       </nav>
 
       {/* Minimize Button */}
-      <div className={collapsed ? "pb-10 flex justify-center" : "px-6 pb-10"}>
-        <button
+      <div className={collapsed ? "pb-10 flex justify-center" : "pb-10"}>
+        <Button
           onClick={toggle}
-          className={`flex items-center rounded-r-xl py-4 transition-colors cursor-pointer focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white/20 ${
+          variant="ghost"
+          className={`transition-colors hover:bg-transparent w-full justify-start cursor-pointer ${
             collapsed ? "p-4 justify-center" : "px-8 gap-4"
-          } text-[#B3B3B3] hover:text-white hover:bg-white/5`}
+          } text-[#B3B3B3] hover:text-[#F2F2F2] focus:ring-2 focus:ring-inset focus:ring-white/20`}
           aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
           aria-expanded={!collapsed}
         >
@@ -77,7 +79,7 @@ export function SidebarDesktop({
             alt=""
             width={24}
             height={24}
-            className={`flex-shrink-0 transition-transform duration-300 opacity-80 hover:opacity-100 ${
+            className={`flex-shrink-0 transition-all duration-300 opacity-80 group-hover:opacity-100 group-hover:brightness-[2.5] ${
               collapsed ? "rotate-180" : ""
             }`}
           />
@@ -86,7 +88,7 @@ export function SidebarDesktop({
               Minimize Menu
             </span>
           )}
-        </button>
+        </Button>
       </div>
     </aside>
   );

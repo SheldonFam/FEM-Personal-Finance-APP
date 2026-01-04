@@ -15,7 +15,7 @@ import {
   PASSWORD_MIN_LENGTH,
   validatePasswordConfirmation,
 } from "@/lib/validations/authValidation";
-import { authService } from "@/services/auth.service";
+import { signUp } from "@/services/auth.service";
 import { usePasswordToggle } from "@/hooks/usePasswordToggle";
 import {
   AUTH_BUTTON_CLASS,
@@ -56,7 +56,7 @@ export default function SignUpPage() {
     setError(null);
     try {
       const { name, email, password } = data;
-      await authService.signUp({ name, email, password });
+      await signUp({ name, email, password });
       router.push("/dashboard");
     } catch (err) {
       const message =
