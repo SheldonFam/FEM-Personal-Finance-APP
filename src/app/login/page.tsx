@@ -10,7 +10,7 @@ import { FormPasswordField } from "@/components/Auth/FormPasswordField";
 import { Button } from "@/components/ui/Button";
 import { Alert, AlertDescription } from "@/components/ui/Alert";
 import { AUTH_VALIDATION } from "@/lib/validations/authValidation";
-import { authService } from "@/services/auth.service";
+import { login } from "@/services/auth.service";
 import { usePasswordToggle } from "@/hooks/usePasswordToggle";
 import {
   AUTH_BUTTON_CLASS,
@@ -43,7 +43,7 @@ export default function LoginPage() {
   const onSubmit = async (data: LoginFormData) => {
     setError(null);
     try {
-      await authService.login(data);
+      await login(data);
       router.push("/dashboard");
     } catch (err) {
       const message =

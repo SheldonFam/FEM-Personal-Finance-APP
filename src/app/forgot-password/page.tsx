@@ -8,7 +8,7 @@ import { FormField } from "@/components/Auth/FormField";
 import { Button } from "@/components/ui/Button";
 import { Alert, AlertDescription } from "@/components/ui/Alert";
 import { AUTH_VALIDATION } from "@/lib/validations/authValidation";
-import { authService } from "@/services/auth.service";
+import { requestPasswordReset } from "@/services/auth.service";
 import {
   AUTH_BUTTON_CLASS,
   AUTH_LINK_CLASS,
@@ -38,7 +38,7 @@ export default function ForgotPasswordPage() {
     setError(null);
     setSuccess(false);
     try {
-      await authService.requestPasswordReset(data.email);
+      await requestPasswordReset(data.email);
       setSuccess(true);
     } catch (err) {
       const message =

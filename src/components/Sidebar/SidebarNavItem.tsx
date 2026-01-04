@@ -13,7 +13,7 @@ export function SidebarNavItem({
 }: SidebarNavItemProps) {
   const linkClasses = cn(
     // Base
-    "flex items-center transition-colors rounded-lg",
+    "flex items-center transition-colors group",
     "focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white/20",
 
     // Layout variants
@@ -22,18 +22,21 @@ export function SidebarNavItem({
     !isMobile && !collapsed && "gap-4 w-full rounded-r-lg py-4 px-8",
 
     // State
-    active && "bg-white text-[#201F24] border-l-4 border-[#277C78]",
-    !active && "text-[#B3B3B3] hover:text-white hover:bg-white/5"
+    active &&
+      `bg-white text-[#201F24] border-[#277C78] ${
+        isMobile ? "border-b-4" : "border-l-4"
+      }`,
+    !active && "text-[#B3B3B3] hover:text-[#F2F2F2]"
   );
 
   const iconClasses = cn(
-    "flex-shrink-0",
-    active ? "brightness-0" : "opacity-80"
+    "flex-shrink-0 transition-all",
+    !active && "opacity-80 group-hover:opacity-100 group-hover:brightness-[2.5]"
   );
 
   const labelClasses = cn(
     "font-bold",
-    isMobile && "text-[10px]",
+    isMobile && "hidden sm:block",
     !isMobile && collapsed && "sr-only",
     !isMobile && !collapsed && "text-base"
   );
@@ -50,6 +53,14 @@ export function SidebarNavItem({
           width={isMobile ? 20 : 24}
           height={isMobile ? 20 : 24}
           className={iconClasses}
+          style={
+            active
+              ? {
+                  filter:
+                    "brightness(0) saturate(100%) invert(28%) sepia(68%) saturate(1070%) hue-rotate(142deg) brightness(93%) contrast(88%)",
+                }
+              : undefined
+          }
         />
         <span className={labelClasses}>{item.label}</span>
       </Link>
