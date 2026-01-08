@@ -29,7 +29,7 @@ export default function Sidebar() {
         />
         {/* Mobile Navigation Skeleton */}
         <nav
-          className="md:hidden fixed bottom-0 left-0 right-0 bg-[#201F24] border-t border-zinc-800 z-50 h-[72px]"
+          className="md:hidden fixed bottom-0 left-0 right-0 bg-[#201F24] border-t border-zinc-800 z-50 h-20"
           aria-label="Mobile navigation"
         />
       </>

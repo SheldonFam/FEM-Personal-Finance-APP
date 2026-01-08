@@ -87,10 +87,11 @@ export default function PotsPage() {
   };
 
   return (
-    <div className="bg-gray-50 p-4 md:p-8 pb-24 md:pb-8">
-      {/* Header */}
-      <div className="flex items-center justify-between mb-6 md:mb-8">
-        <h1 className="text-2xl md:text-3xl font-bold text-gray-900">Pots</h1>
+    <div className="bg-[#F8F4F0] p-4 md:p-8 pb-[68px] sm:pb-[90px] md:pb-8">
+      <div className="max-w-[1440px] mx-auto">
+        {/* Header */}
+        <div className="flex items-center justify-between mb-6 md:mb-8">
+          <h1 className="text-2xl md:text-3xl font-bold text-gray-900">Pots</h1>
         <Button onClick={() => setIsAddModalOpen(true)}>+ Add New Pot</Button>
       </div>
 
@@ -200,6 +201,7 @@ export default function PotsPage() {
           }}
         />
       )}
+      </div>
     </div>
   );
 }

@@ -1,10 +1,11 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Image from "next/image";
 import { Budget, Transaction } from "@/lib/types";
 import { formatCurrency, formatDate } from "@/lib/formatters";
 import { normalizeImagePath } from "@/lib/utils";
 import { Progress } from "@/components/ui/Progress";
 import { Card } from "@/components/ui/Card";
+import { Button } from "@/components/ui/Button";
 
 interface BudgetCardProps {
   budget: Budget;
@@ -30,6 +31,20 @@ export const BudgetCard = ({
     .filter((t) => t.category === budget.category)
     .slice(0, 3);
 
+  // Close menu on Escape key
+  useEffect(() => {
+    if (!showMenu) return;
+
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        setShowMenu(false);
+      }
+    };
+
+    document.addEventListener("keydown", handleEscape);
+    return () => document.removeEventListener("keydown", handleEscape);
+  }, [showMenu]);
+
   return (
     <Card className="p-6 bg-white">
       {/* Header */}
@@ -42,9 +57,12 @@ export const BudgetCard = ({
           <h3 className="text-xl font-bold text-gray-900">{budget.category}</h3>
         </div>
         <div className="relative">
-          <button
-            className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+          <Button
+            variant="ghost"
+            size="icon-sm"
+            className="p-2 hover:bg-gray-100 rounded-lg"
             onClick={() => setShowMenu(!showMenu)}
+            aria-label="Options"
           >
             <Image
               src="/assets/images/icon-ellipsis.svg"
@@ -52,28 +70,37 @@ export const BudgetCard = ({
               width={16}
               height={4}
             />
-          </button>
+          </Button>
           {showMenu && (
-            <div className="absolute right-0 top-full mt-2 w-36 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-10">
-              <button
-                onClick={() => {
-                  onEdit();
-                  setShowMenu(false);
-                }}
-                className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 transition-colors"
-              >
-                Edit Budget
-              </button>
-              <button
-                onClick={() => {
-                  onDelete();
-                  setShowMenu(false);
-                }}
-                className="w-full px-4 py-2 text-left text-sm text-red-600 hover:bg-red-50 transition-colors"
-              >
-                Delete Budget
-              </button>
-            </div>
+            <>
+              <div
+                className="fixed inset-0 z-10"
+                onClick={() => setShowMenu(false)}
+                aria-hidden="true"
+              />
+              <div className="absolute right-0 top-full mt-2 w-36 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-20">
+                <Button
+                  variant="ghost"
+                  onClick={() => {
+                    onEdit();
+                    setShowMenu(false);
+                  }}
+                  className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 justify-start h-auto"
+                >
+                  Edit Budget
+                </Button>
+                <Button
+                  variant="ghost"
+                  onClick={() => {
+                    onDelete();
+                    setShowMenu(false);
+                  }}
+                  className="w-full px-4 py-2 text-left text-sm text-red-600 hover:text-red-700 hover:bg-red-50 justify-start h-auto"
+                >
+                  Delete Budget
+                </Button>
+              </div>
+            </>
           )}
         </div>
       </div>
@@ -129,7 +156,10 @@ export const BudgetCard = ({
           <div className="flex items-center justify-between mb-4">
             <h4 className="text-sm font-bold text-gray-900">Latest Spending</h4>
             {latestTransactions.length > 0 && (
-              <button className="flex items-center gap-3 text-sm text-gray-600 hover:text-gray-900 transition-colors font-medium">
+              <Button
+                variant="ghost"
+                className="flex items-center gap-3 text-sm text-gray-600 hover:text-gray-900 font-medium h-auto p-0"
+              >
                 See All
                 <Image
                   src="/assets/images/icon-caret-right.svg"
@@ -139,7 +169,7 @@ export const BudgetCard = ({
                   aria-hidden="true"
                   className="h-3 w-auto"
                 />
-              </button>
+              </Button>
             )}
           </div>
 
@@ -152,7 +182,7 @@ export const BudgetCard = ({
                     key={index}
                     className="flex items-center justify-between py-3 border-b border-gray-200 last:border-0"
                   >
-                    <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-3 min-w-0 flex-1">
                       <div className="w-8 h-8 rounded-full overflow-hidden bg-gray-100 flex-shrink-0">
                         <Image
                           src={avatarPath}
@@ -162,7 +192,7 @@ export const BudgetCard = ({
                           className="w-full h-full object-cover"
                         />
                       </div>
-                      <p className="text-sm text-gray-900">
+                      <p className="text-sm text-gray-900 truncate">
                         {transaction.name}
                       </p>
                     </div>

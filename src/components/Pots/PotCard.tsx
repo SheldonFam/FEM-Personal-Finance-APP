@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Image from "next/image";
 import { Pot } from "@/lib/types";
 import { formatCurrency } from "@/lib/formatters";
@@ -24,6 +24,20 @@ export const PotCard = ({
   const [showMenu, setShowMenu] = useState(false);
   const percentage = Math.min((pot.total / pot.target) * 100, 100);
 
+  // Close menu on Escape key
+  useEffect(() => {
+    if (!showMenu) return;
+
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        setShowMenu(false);
+      }
+    };
+
+    document.addEventListener("keydown", handleEscape);
+    return () => document.removeEventListener("keydown", handleEscape);
+  }, [showMenu]);
+
   return (
     <Card className="p-5 md:p-6 bg-white">
       {/* Header */}
@@ -36,8 +50,10 @@ export const PotCard = ({
           <h3 className="text-xl font-bold text-gray-900">{pot.name}</h3>
         </div>
         <div className="relative">
-          <button
-            className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+          <Button
+            variant="ghost"
+            size="icon-sm"
+            className="p-2 hover:bg-gray-100 rounded-lg"
             onClick={() => setShowMenu(!showMenu)}
             aria-label="Options"
           >
@@ -47,7 +63,7 @@ export const PotCard = ({
               width={16}
               height={4}
             />
-          </button>
+          </Button>
           {showMenu && (
             <>
               <div
@@ -55,24 +71,26 @@ export const PotCard = ({
                 onClick={() => setShowMenu(false)}
               />
               <div className="absolute right-0 top-full mt-2 w-36 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-20">
-                <button
+                <Button
+                  variant="ghost"
                   onClick={() => {
                     onEdit();
                     setShowMenu(false);
                   }}
-                  className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                  className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 justify-start h-auto"
                 >
                   Edit Pot
-                </button>
-                <button
+                </Button>
+                <Button
+                  variant="ghost"
                   onClick={() => {
                     onDelete();
                     setShowMenu(false);
                   }}
-                  className="w-full px-4 py-2 text-left text-sm text-red-600 hover:bg-red-50 transition-colors"
+                  className="w-full px-4 py-2 text-left text-sm text-red-600 hover:text-red-700 hover:bg-red-50 justify-start h-auto"
                 >
                   Delete Pot
-                </button>
+                </Button>
               </div>
             </>
           )}

@@ -13,11 +13,11 @@ export function SidebarNavItem({
 }: SidebarNavItemProps) {
   const linkClasses = cn(
     // Base
-    "flex items-center transition-colors group",
+    "flex items-center transition-colors group cursor-pointer",
     "focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white/20",
 
     // Layout variants
-    isMobile && "flex-col justify-center gap-1 py-2 px-3",
+    isMobile && "flex-col justify-center gap-1 py-2 px-3 rounded-t-lg",
     !isMobile && collapsed && "justify-center w-full rounded-r-lg py-4",
     !isMobile && !collapsed && "gap-4 w-full rounded-r-lg py-4 px-8",
 

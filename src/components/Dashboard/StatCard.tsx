@@ -17,16 +17,16 @@ export function StatCard({
 
   return (
     <Card
-      className={`px-5 md:px-6 ${
+      className={`p-5 md:p-6 min-w-0 ${
         isDark ? "bg-[#201F24] text-white" : ""
       } ${className}`}
     >
       <p
-        className={`text-sm mb-3 ${isDark ? "text-gray-300" : "text-gray-500"}`}
+        className={`text-xs sm:text-sm mb-2 md:mb-3 ${isDark ? "text-gray-300" : "text-gray-500"}`}
       >
         {label}
       </p>
-      <p className="text-3xl font-bold">
+      <p className="text-xl sm:text-2xl md:text-3xl font-bold truncate">
         $
         {amount.toLocaleString("en-US", {
           minimumFractionDigits: 2,
