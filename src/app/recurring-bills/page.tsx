@@ -56,11 +56,12 @@ export default function RecurringBillsPage() {
   });
 
   return (
-    <div className="bg-[#F8F4F0] p-8">
-      {/* Page Title */}
-      <h1 className="text-3xl font-bold text-gray-900 mb-8">Recurring Bills</h1>
+    <div className="bg-[#F8F4F0] p-4 md:p-8 pb-[68px] sm:pb-[90px] md:pb-8">
+      <div className="max-w-[1440px] mx-auto">
+        {/* Page Title */}
+        <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-6 md:mb-8">Recurring Bills</h1>
 
-      <div className="flex flex-col lg:flex-row lg:items-start gap-6 mb-8">
+        <div className="flex flex-col lg:flex-row lg:items-start gap-6 mb-8">
         <div className="space-y-6 lg:w-80 flex-shrink-0">
           {/* Total Bills Card */}
           <Card className="bg-[#201F24] text-white p-6 border-0">
@@ -211,6 +212,7 @@ export default function RecurringBillsPage() {
             )}
           </div>
         </Card>
+      </div>
       </div>
     </div>
   );

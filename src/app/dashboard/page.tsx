@@ -14,7 +14,7 @@ import Image from "next/image";
 // Summary Cards Component
 const SummaryCards = () => {
   return (
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 mb-6 md:mb-8">
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 mb-6 md:mb-8">
       <StatCard label="Current Balance" amount={4836.0} variant="dark" />
       <StatCard label="Income" amount={3814.25} variant="light" />
       <StatCard label="Expenses" amount={1700.5} variant="light" />
@@ -35,9 +35,9 @@ const PotsSection = () => {
     <Card className="p-8">
       <SectionHeader title="Pots" href="/pots" linkText="See Details" />
 
-      <div className="flex items-start gap-5 flex-col md:flex-row">
+      <div className="flex items-start gap-5 flex-col lg:flex-row">
         {/* Total Saved */}
-        <div className="bg-[#F8F4F0] rounded-xl p-5 flex items-center gap-4 w-full md:flex-1">
+        <div className="bg-[#F8F4F0] rounded-xl p-5 flex items-center gap-4 w-full lg:flex-1">
           <div className="w-10 h-10 rounded-full flex items-center justify-center">
             <Image
               src="/assets/images/icon-pot.svg"
@@ -55,7 +55,7 @@ const PotsSection = () => {
         </div>
 
         {/* Individual Pots */}
-        <div className="w-full md:flex-1 grid grid-cols-2 gap-4">
+        <div className="w-full lg:flex-1 grid grid-cols-1 sm:grid-cols-2 gap-4">
           {pots.map((pot, index) => (
             <PotItem
               key={index}
@@ -150,9 +150,9 @@ const BudgetsSection = () => {
     <Card className="p-8">
       <SectionHeader title="Budgets" href="/budgets" linkText="See Details" />
 
-      <div className="flex items-center gap-4 flex-col md:flex-row">
+      <div className="flex items-center gap-4 flex-col lg:flex-row">
         {/* Donut Chart */}
-        <div className="flex-shrink-0 w-[240px]">
+        <div className="flex-shrink-0 w-full sm:w-[240px] lg:w-[200px] xl:w-[240px]">
           <BudgetDonutChart
             categories={budgetCategories}
             totalSpent={totalSpent}
@@ -161,7 +161,7 @@ const BudgetsSection = () => {
         </div>
 
         {/* Budget Categories */}
-        <div className="flex-1 py-2 min-w-0 grid grid-cols-2 md:grid-cols-1 gap-4 w-full h-full">
+        <div className="flex-1 py-2 min-w-0 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-4 w-full h-full">
           {budgetCategories.map((category, index) => (
             <BudgetItem
               key={index}
@@ -209,35 +209,29 @@ const RecurringBillsSection = () => {
 // Main Dashboard Component
 export default function DashboardPage() {
   return (
-    <div className="bg-gray-50 p-4 md:p-8">
-      <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-6 md:mb-8">
-        Overview
-      </h1>
+    <div className="bg-[#F8F4F0] p-4 md:p-8 pb-[68px] sm:pb-[90px] md:pb-8">
+      <div className="max-w-[1440px] mx-auto">
+        <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-6 md:mb-8">
+          Overview
+        </h1>
 
-      {/* Summary Cards */}
-      <div className="w-full">
+        {/* Summary Cards */}
         <SummaryCards />
-      </div>
 
       {/* Main Content Grid */}
-      <div className="w-full">
-        <div className="flex flex-col lg:flex-row gap-6 items-stretch">
-          {/* Left Column - 608px */}
-          <div className="flex flex-col gap-4 md:gap-6 w-full">
-            <PotsSection />
-            <div className="flex-1">
-              <TransactionsSection />
-            </div>
-          </div>
-
-          {/* Right Column - 428px */}
-          <div className="flex flex-col gap-4 md:gap-6 w-full">
-            <BudgetsSection />
-            <div className="flex-1">
-              <RecurringBillsSection />
-            </div>
-          </div>
+      <div className="grid grid-cols-1 xl:grid-cols-2 2xl:grid-cols-[minmax(500px,1fr)_minmax(400px,600px)] gap-6">
+        {/* Left Column - Flexible width */}
+        <div className="flex flex-col gap-4 md:gap-6">
+          <PotsSection />
+          <TransactionsSection />
         </div>
+
+        {/* Right Column - Flexible width */}
+        <div className="flex flex-col gap-4 md:gap-6">
+          <BudgetsSection />
+          <RecurringBillsSection />
+        </div>
+      </div>
       </div>
     </div>
   );

@@ -55,18 +55,19 @@ export default function TransactionsPage() {
   }, [searchTerm, selectedCategory, sortBy]);
 
   return (
-    <div className="bg-gray-50 p-4 md:p-8 pb-24 md:pb-8">
-      <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-6 md:mb-8">
-        Transactions
-      </h1>
+    <div className="bg-[#F8F4F0] p-4 md:p-8 pb-[68px] sm:pb-[90px] md:pb-8">
+      <div className="max-w-[1440px] mx-auto">
+        <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-6 md:mb-8">
+          Transactions
+        </h1>
 
-      {/* Transactions Card */}
-      <Card className="p-5 md:p-8">
+        {/* Transactions Card */}
+        <Card className="p-5 md:p-8">
         {/* Search and Filters */}
-        <div className="mb-6 w-full">
-          <div className="w-full flex flex-row items-center justify-between gap-4">
+        <div className="mb-6 w-full overflow-hidden">
+          <div className="w-full flex flex-row items-stretch sm:items-center gap-4 justify-between">
             {/* Search Input */}
-            <div className="w-full lg:w-[320px]">
+            <div className="w-full sm:flex-1 lg:max-w-[320px]">
               <div className="relative">
                 <Input
                   type="text"
@@ -86,59 +87,7 @@ export default function TransactionsPage() {
             </div>
 
             {/* Category Filter and Sort */}
-            <div className="flex gap-6 flex-row w-auto md:w-full lg:justify-end">
-              <div className="relative flex flex-row gap-2 items-center">
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="icon-sm"
-                  className="sm:hidden size-[45px] rounded-lg bg-transparent p-0 hover:bg-gray-100 focus-visible:ring-0 focus-visible:ring-offset-0"
-                  aria-label="Open sort options"
-                  aria-haspopup="listbox"
-                  aria-expanded={isSortSelectOpen}
-                  onClick={() => setIsSortSelectOpen(true)}
-                >
-                  <Image
-                    src="/assets/images/icon-sort-mobile.svg"
-                    alt=""
-                    width={16}
-                    height={15}
-                    className="shrink-0"
-                  />
-                </Button>
-                <span className="hidden sm:inline text-xs font-medium text-gray-500">
-                  Category
-                </span>
-                <Select
-                  value={selectedCategory}
-                  onValueChange={(value) => {
-                    setSelectedCategory(value);
-                    setIsCategorySelectOpen(false);
-                  }}
-                  open={isCategorySelectOpen}
-                  onOpenChange={setIsCategorySelectOpen}
-                >
-                  <SelectTrigger
-                    aria-label="Category"
-                    className="absolute inset-0 h-0 w-0 opacity-0 pointer-events-none sm:static sm:h-[45px] sm:w-[180px] sm:opacity-100 sm:pointer-events-auto sm:flex bg-white border border-gray-200 rounded-lg px-4 text-sm font-medium text-gray-700 justify-between shadow-sm hover:bg-gray-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-200 data-[state=open]:border-primary-300"
-                  >
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {TRANSACTION_CATEGORIES.map((category) => (
-                      <SelectItem
-                        key={category}
-                        value={category}
-                        showIndicator={false}
-                        className="px-4 py-2 text-sm text-gray-600 border-b border-gray-200 last:border-b-0 data-[state=checked]:font-semibold data-[state=checked]:text-gray-900 data-[highlighted]:bg-gray-100"
-                      >
-                        {category}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-
+            <div className="flex gap-3 sm:gap-6 flex-row flex-shrink-0 min-w-0">
               {/* Sort By */}
               <div className="relative flex flex-row gap-2 items-center">
                 <Button
@@ -174,7 +123,7 @@ export default function TransactionsPage() {
                 >
                   <SelectTrigger
                     aria-label="Sort by"
-                    className="absolute inset-0 h-0 w-0 opacity-0 pointer-events-none sm:static sm:h-[45px] sm:w-[150px] sm:opacity-100 sm:pointer-events-auto sm:flex bg-white border border-gray-200 rounded-lg px-4 text-sm font-medium text-gray-700 justify-between shadow-sm hover:bg-gray-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-200 data-[state=open]:border-primary-300"
+                    className="absolute inset-0 h-0 w-0 opacity-0 pointer-events-none sm:static sm:h-[45px] sm:w-[115px] md:w-[130px] lg:w-[150px] sm:opacity-100 sm:pointer-events-auto sm:flex bg-white border border-gray-200 rounded-lg px-4 text-sm font-medium text-gray-700 justify-between shadow-sm hover:bg-gray-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-200 data-[state=open]:border-primary-300"
                   >
                     <SelectValue />
                   </SelectTrigger>
@@ -190,6 +139,57 @@ export default function TransactionsPage() {
                         className="px-4 py-2 text-sm text-gray-600 border-b border-gray-200 last:border-b-0 data-[state=checked]:font-semibold data-[state=checked]:text-gray-900 data-[highlighted]:bg-gray-100"
                       >
                         {option.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="relative flex flex-row gap-2 items-center">
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon-sm"
+                  className="sm:hidden size-[45px] rounded-lg bg-transparent p-0 hover:bg-gray-100 focus-visible:ring-0 focus-visible:ring-offset-0"
+                  aria-label="Open sort options"
+                  aria-haspopup="listbox"
+                  aria-expanded={isSortSelectOpen}
+                  onClick={() => setIsSortSelectOpen(true)}
+                >
+                  <Image
+                    src="/assets/images/icon-sort-mobile.svg"
+                    alt=""
+                    width={16}
+                    height={15}
+                    className="shrink-0"
+                  />
+                </Button>
+                <span className="hidden sm:inline text-xs font-medium text-gray-500">
+                  Category
+                </span>
+                <Select
+                  value={selectedCategory}
+                  onValueChange={(value) => {
+                    setSelectedCategory(value);
+                    setIsCategorySelectOpen(false);
+                  }}
+                  open={isCategorySelectOpen}
+                  onOpenChange={setIsCategorySelectOpen}
+                >
+                  <SelectTrigger
+                    aria-label="Category"
+                    className="absolute inset-0 h-0 w-0 opacity-0 pointer-events-none sm:static sm:h-[45px] sm:w-[140px] md:w-[160px] lg:w-[180px] sm:opacity-100 sm:pointer-events-auto sm:flex bg-white border border-gray-200 rounded-lg px-4 text-sm font-medium text-gray-700 justify-between shadow-sm hover:bg-gray-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-200 data-[state=open]:border-primary-300"
+                  >
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {TRANSACTION_CATEGORIES.map((category) => (
+                      <SelectItem
+                        key={category}
+                        value={category}
+                        showIndicator={false}
+                        className="px-4 py-2 text-sm text-gray-600 border-b border-gray-200 last:border-b-0 data-[state=checked]:font-semibold data-[state=checked]:text-gray-900 data-[highlighted]:bg-gray-100"
+                      >
+                        {category}
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -242,6 +242,7 @@ export default function TransactionsPage() {
           )}
         </div>
       </Card>
+      </div>
     </div>
   );
 }

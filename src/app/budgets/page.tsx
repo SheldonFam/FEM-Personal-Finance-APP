@@ -85,10 +85,11 @@ export default function BudgetsPage() {
   };
 
   return (
-    <div className="bg-[#F5F5F5] p-6 md:p-8 pb-24 md:pb-8">
-      {/* Header */}
-      <div className="flex items-center justify-between mb-6 md:mb-8">
-        <h1 className="text-3xl font-bold text-gray-900">Budgets</h1>
+    <div className="bg-[#F8F4F0] p-4 md:p-8 pb-[68px] sm:pb-[90px] md:pb-8">
+      <div className="max-w-[1440px] mx-auto">
+        {/* Header */}
+        <div className="flex items-center justify-between mb-6 md:mb-8">
+          <h1 className="text-3xl font-bold text-gray-900">Budgets</h1>
         <Button onClick={() => setIsAddModalOpen(true)}>
           + Add New Budget
         </Button>
@@ -96,7 +97,7 @@ export default function BudgetsPage() {
 
       {/* Main Content Layout */}
       {budgetsWithSpending.length > 0 ? (
-        <div className="grid grid-cols-1 xl:grid-cols-[400px_1fr] gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-[minmax(320px,400px)_1fr] xl:grid-cols-[400px_1fr] gap-6 lg:gap-8">
           {/* Left: Spending Summary */}
           <div className="h-fit">
             <SpendingSummary budgetsWithSpending={budgetsWithSpending} />
@@ -172,6 +173,7 @@ export default function BudgetsPage() {
           itemName={deletingBudget.category}
         />
       )}
+      </div>
     </div>
   );
 }

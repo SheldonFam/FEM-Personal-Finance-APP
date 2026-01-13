@@ -24,21 +24,27 @@ export default function LayoutWrapper({
     <div className="flex h-screen bg-[var(--primary-light)]">
       <Suspense
         fallback={
-          <div className="w-[88px] lg:w-[300px] bg-gray-800">
+          <aside
+            className="hidden md:block w-[88px] bg-[#201F24] rounded-r-2xl"
+            aria-label="Loading navigation"
+          >
             <div className="animate-pulse p-4">
-              <div className="h-8 bg-gray-700 rounded mb-6"></div>
+              <div className="h-8 bg-gray-700/50 rounded mb-6" />
               <div className="space-y-2">
-                <div className="h-12 bg-gray-700 rounded"></div>
-                <div className="h-12 bg-gray-700 rounded"></div>
-                <div className="h-12 bg-gray-700 rounded"></div>
+                <div className="h-12 bg-gray-700/50 rounded" />
+                <div className="h-12 bg-gray-700/50 rounded" />
+                <div className="h-12 bg-gray-700/50 rounded" />
+                <div className="h-12 bg-gray-700/50 rounded" />
               </div>
             </div>
-          </div>
+          </aside>
         }
       >
         <Sidebar />
       </Suspense>
-      <main className="flex-1 pb-16 md:pb-0 overflow-y-auto">{children}</main>
+      <main className="flex-1 pb-16 md:pb-0 overflow-y-auto">
+        <div className="max-w-[1600px] mx-auto">{children}</div>
+      </main>
     </div>
   );
 }
