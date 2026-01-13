@@ -53,6 +53,8 @@ export const BudgetCard = ({
           <div
             className="w-4 h-4 rounded-full"
             style={{ backgroundColor: budget.theme }}
+            role="img"
+            aria-label={`${budget.category} theme color`}
           />
           <h3 className="text-xl font-bold text-gray-900">{budget.category}</h3>
         </div>
@@ -62,13 +64,16 @@ export const BudgetCard = ({
             size="icon-sm"
             className="p-2 hover:bg-gray-100 rounded-lg"
             onClick={() => setShowMenu(!showMenu)}
-            aria-label="Options"
+            aria-label={`Options for ${budget.category} budget`}
+            aria-haspopup="menu"
+            aria-expanded={showMenu}
           >
             <Image
               src="/assets/images/icon-ellipsis.svg"
-              alt="Options"
+              alt=""
               width={16}
               height={4}
+              aria-hidden="true"
             />
           </Button>
           {showMenu && (
@@ -78,7 +83,11 @@ export const BudgetCard = ({
                 onClick={() => setShowMenu(false)}
                 aria-hidden="true"
               />
-              <div className="absolute right-0 top-full mt-2 w-36 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-20">
+              <div
+                className="absolute right-0 top-full mt-2 w-36 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-20"
+                role="menu"
+                aria-label={`Actions for ${budget.category} budget`}
+              >
                 <Button
                   variant="ghost"
                   onClick={() => {
@@ -86,6 +95,7 @@ export const BudgetCard = ({
                     setShowMenu(false);
                   }}
                   className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 justify-start h-auto"
+                  role="menuitem"
                 >
                   Edit Budget
                 </Button>
@@ -96,6 +106,7 @@ export const BudgetCard = ({
                     setShowMenu(false);
                   }}
                   className="w-full px-4 py-2 text-left text-sm text-red-600 hover:text-red-700 hover:bg-red-50 justify-start h-auto"
+                  role="menuitem"
                 >
                   Delete Budget
                 </Button>
@@ -116,6 +127,7 @@ export const BudgetCard = ({
           value={percentage}
           className="h-8 mb-3"
           color={budget.theme}
+          aria-label={`${percentage.toFixed(1)}% of budget spent`}
         />
 
         {/* Spending info below progress bar */}

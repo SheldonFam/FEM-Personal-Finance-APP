@@ -5,11 +5,21 @@ import { useSidebarState } from "@/hooks/useSidebarState";
 import type { NavItem } from "@/components/Sidebar/types";
 import { SidebarDesktop } from "@/components/Sidebar/SidebarDesktop";
 import { SidebarMobile } from "@/components/Sidebar/SidebarMobile";
-import { useCallback } from "react";
+import { useCallback, useEffect, useState } from "react";
+import { getInitialSidebarState } from "@/lib/sidebarState";
 
 export default function Sidebar() {
   const pathname = usePathname();
-  const { collapsed, mounted, toggle } = useSidebarState();
+
+  // Get initial state from localStorage (only runs on client)
+  const [initialCollapsed, setInitialCollapsed] = useState(true);
+
+  useEffect(() => {
+    // Sync with localStorage after mount to avoid hydration mismatch
+    setInitialCollapsed(getInitialSidebarState());
+  }, []);
+
+  const { collapsed, toggle } = useSidebarState(initialCollapsed);
 
   const isActive = useCallback(
     (item: NavItem): boolean => {
@@ -17,24 +27,6 @@ export default function Sidebar() {
     },
     [pathname]
   );
-
-  // Prevent hydration mismatch by not rendering until mounted
-  if (!mounted) {
-    return (
-      <>
-        {/* Desktop Sidebar Skeleton */}
-        <aside
-          className="hidden md:flex flex-col justify-between bg-[#201F24] text-zinc-300 rounded-r-2xl w-[88px]"
-          aria-label="Main navigation"
-        />
-        {/* Mobile Navigation Skeleton */}
-        <nav
-          className="md:hidden fixed bottom-0 left-0 right-0 bg-[#201F24] border-t border-zinc-800 z-50 h-20"
-          aria-label="Mobile navigation"
-        />
-      </>
-    );
-  }
 
   return (
     <>

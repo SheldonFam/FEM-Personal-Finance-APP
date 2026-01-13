@@ -1,20 +1,19 @@
 "use client";
 
-import { UseFormRegister, FieldErrors } from "react-hook-form";
+import { UseFormRegister, FieldErrors, FieldValues, RegisterOptions, Path } from "react-hook-form";
 import { Input } from "@/components/ui/Input";
-import { Label } from "@/components/ui/Label";
 
-interface CurrencyInputProps {
-  name: string;
+interface CurrencyInputProps<TFieldValues extends FieldValues = FieldValues> {
+  name: Path<TFieldValues>;
   label: string;
   placeholder?: string;
-  register: UseFormRegister<any>;
-  errors: FieldErrors;
-  validation: any;
+  register: UseFormRegister<TFieldValues>;
+  errors: FieldErrors<TFieldValues>;
+  validation?: RegisterOptions<TFieldValues>;
   max?: number;
 }
 
-export default function CurrencyInput({
+export default function CurrencyInput<TFieldValues extends FieldValues = FieldValues>({
   name,
   label,
   placeholder = "e.g. 2000",
@@ -22,12 +21,17 @@ export default function CurrencyInput({
   errors,
   validation,
   max,
-}: CurrencyInputProps) {
+}: CurrencyInputProps<TFieldValues>) {
+  const errorMessage = errors[name]?.message;
+  const errorString = typeof errorMessage === 'string'
+    ? errorMessage
+    : errorMessage?.toString();
+
   return (
     <div>
-      <Label className="text-xs font-bold text-muted-foreground">{label}</Label>
       <Input
         type="number"
+        label={label}
         prefix="$"
         placeholder={placeholder}
         {...register(name, validation)}
@@ -35,7 +39,7 @@ export default function CurrencyInput({
         min="0"
         max={max}
         step="0.01"
-        error={errors[name]?.message as string}
+        error={errorString}
       />
     </div>
   );

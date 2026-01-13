@@ -46,6 +46,8 @@ export const PotCard = ({
           <div
             className="w-4 h-4 rounded-full flex-shrink-0"
             style={{ backgroundColor: pot.theme }}
+            role="img"
+            aria-label={`${pot.name} theme color`}
           />
           <h3 className="text-xl font-bold text-gray-900">{pot.name}</h3>
         </div>
@@ -55,13 +57,16 @@ export const PotCard = ({
             size="icon-sm"
             className="p-2 hover:bg-gray-100 rounded-lg"
             onClick={() => setShowMenu(!showMenu)}
-            aria-label="Options"
+            aria-label={`Options for ${pot.name}`}
+            aria-haspopup="menu"
+            aria-expanded={showMenu}
           >
             <Image
               src="/assets/images/icon-ellipsis.svg"
-              alt="Options"
+              alt=""
               width={16}
               height={4}
+              aria-hidden="true"
             />
           </Button>
           {showMenu && (
@@ -69,8 +74,13 @@ export const PotCard = ({
               <div
                 className="fixed inset-0 z-10"
                 onClick={() => setShowMenu(false)}
+                aria-hidden="true"
               />
-              <div className="absolute right-0 top-full mt-2 w-36 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-20">
+              <div
+                className="absolute right-0 top-full mt-2 w-36 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-20"
+                role="menu"
+                aria-label={`Actions for ${pot.name}`}
+              >
                 <Button
                   variant="ghost"
                   onClick={() => {
@@ -78,6 +88,7 @@ export const PotCard = ({
                     setShowMenu(false);
                   }}
                   className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 justify-start h-auto"
+                  role="menuitem"
                 >
                   Edit Pot
                 </Button>
@@ -88,6 +99,7 @@ export const PotCard = ({
                     setShowMenu(false);
                   }}
                   className="w-full px-4 py-2 text-left text-sm text-red-600 hover:text-red-700 hover:bg-red-50 justify-start h-auto"
+                  role="menuitem"
                 >
                   Delete Pot
                 </Button>
@@ -111,9 +123,10 @@ export const PotCard = ({
           value={percentage}
           className="h-2 rounded-full mb-3"
           color={pot.theme}
+          aria-label={`${percentage.toFixed(1)}% of target saved`}
         />
         <div className="flex items-center justify-between text-xs">
-          <span className="font-bold text-gray-900">
+          <span className="font-bold text-gray-900" aria-label={`${percentage.toFixed(1)} percent complete`}>
             {percentage.toFixed(1)}%
           </span>
           <span className="text-gray-500">

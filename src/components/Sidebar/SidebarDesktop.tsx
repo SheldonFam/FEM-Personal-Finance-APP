@@ -70,7 +70,7 @@ export function SidebarDesktop({
           variant="ghost"
           className={`transition-colors hover:bg-transparent w-full justify-start cursor-pointer ${
             collapsed ? "p-4 justify-center" : "px-8 gap-4"
-          } text-[#B3B3B3] hover:text-[#F2F2F2] focus:ring-2 focus:ring-inset focus:ring-white/20`}
+          } text-[#B3B3B3] hover:text-[#F2F2F2]`}
           aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
           aria-expanded={!collapsed}
         >
