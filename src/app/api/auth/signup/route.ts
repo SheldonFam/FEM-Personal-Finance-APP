@@ -25,14 +25,29 @@ export async function POST(request: NextRequest) {
 
     // Mock successful response for development
     if (name && email && password) {
-      return NextResponse.json({
+      const token = "mock-jwt-token-" + Date.now(); // Mock token
+
+      const response = NextResponse.json({
         user: {
           id: "1",
           name: name,
           email: email,
         },
-        token: "mock-jwt-token",
+        token: token,
       });
+
+      // Set httpOnly cookie for middleware authentication
+      response.cookies.set({
+        name: "auth_token",
+        value: token,
+        httpOnly: true, // Prevents JavaScript access (XSS protection)
+        secure: process.env.NODE_ENV === "production", // HTTPS only in production
+        sameSite: "lax", // CSRF protection
+        maxAge: 60 * 60 * 24 * 7, // 7 days
+        path: "/", // Available across entire site
+      });
+
+      return response;
     }
 
     return NextResponse.json(

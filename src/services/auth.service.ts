@@ -74,6 +74,7 @@ export async function logout(): Promise<void> {
   await fetch(`${BASE_URL}/logout`, {
     method: "POST",
   });
+  window.location.href = "/login";
 }
 
 /**

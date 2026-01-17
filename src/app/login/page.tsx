@@ -1,8 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, Suspense } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { AuthLayout } from "@/components/Auth/AuthLayout";
 import { FormField } from "@/components/Auth/FormField";
@@ -23,14 +23,19 @@ interface LoginFormData {
 }
 
 /**
- * LoginPage Component
+ * LoginForm Component
  * Handles user authentication and login functionality
+ * Separated to allow Suspense boundary for useSearchParams
  */
-export default function LoginPage() {
+function LoginForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { show: showPassword, toggle: togglePasswordVisibility } =
     usePasswordToggle();
   const [error, setError] = useState<string | null>(null);
+
+  // Get the callback URL from query params (set by middleware when redirecting from protected routes)
+  const callbackUrl = searchParams.get("callbackUrl") ?? "/dashboard";
 
   const {
     register,
@@ -44,7 +49,9 @@ export default function LoginPage() {
     setError(null);
     try {
       await login(data);
-      router.push("/dashboard");
+      // Redirect to original destination or dashboard
+      router.push(callbackUrl);
+      router.refresh(); // Refresh to revalidate session in middleware
     } catch (err) {
       const message =
         err instanceof Error ? err.message : "Login failed. Please try again.";
@@ -109,5 +116,28 @@ export default function LoginPage() {
         </p>
       </div>
     </AuthLayout>
+  );
+}
+
+/**
+ * LoginPage Component
+ * Wraps LoginForm in Suspense boundary for useSearchParams compatibility
+ */
+export default function LoginPage() {
+  return (
+    <Suspense
+      fallback={
+        <AuthLayout>
+          <h2 className="text-2xl font-bold text-[#201f24] mb-8">Login</h2>
+          <div className="animate-pulse space-y-4">
+            <div className="h-12 bg-gray-200 rounded" />
+            <div className="h-12 bg-gray-200 rounded" />
+            <div className="h-10 bg-gray-200 rounded" />
+          </div>
+        </AuthLayout>
+      }
+    >
+      <LoginForm />
+    </Suspense>
   );
 }
