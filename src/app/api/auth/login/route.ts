@@ -1,34 +1,46 @@
+import { createClient } from "@/lib/supabase/server";
 import { NextRequest, NextResponse } from "next/server";
 
 /**
  * POST /api/auth/login
- * Login endpoint - Replace with your actual authentication logic
+ * Server-side login endpoint using Supabase
  */
 export async function POST(request: NextRequest) {
   try {
     const { email, password } = await request.json();
 
-    // TODO: Replace with actual authentication logic
-    // Example: Check credentials against database
-    // const user = await db.user.findUnique({ where: { email } });
-    // const isValid = await bcrypt.compare(password, user.password);
-
-    // Mock successful response for development
-    if (email && password) {
-      return NextResponse.json({
-        user: {
-          id: "1",
-          name: "John Doe",
-          email: email,
-        },
-        token: "mock-jwt-token",
-      });
+    if (!email || !password) {
+      return NextResponse.json(
+        { message: "Email and password are required" },
+        { status: 400 }
+      );
     }
 
-    return NextResponse.json(
-      { message: "Invalid credentials" },
-      { status: 401 }
-    );
+    const supabase = await createClient();
+
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+
+    if (error) {
+      return NextResponse.json({ message: error.message }, { status: 401 });
+    }
+
+    if (!data.user) {
+      return NextResponse.json(
+        { message: "Login failed. Please try again." },
+        { status: 401 }
+      );
+    }
+
+    return NextResponse.json({
+      user: {
+        id: data.user.id,
+        name: data.user.user_metadata?.name || data.user.email?.split("@")[0] || "",
+        email: data.user.email,
+      },
+    });
   } catch (error) {
     console.error("Login error:", error);
     return NextResponse.json(
@@ -37,4 +49,3 @@ export async function POST(request: NextRequest) {
     );
   }
 }
-

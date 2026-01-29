@@ -1,16 +1,18 @@
-import { NextRequest, NextResponse } from "next/server";
+import { createClient } from "@/lib/supabase/server";
+import { NextResponse } from "next/server";
 
 /**
  * POST /api/auth/logout
- * Logout endpoint - Clear session/cookies
+ * Server-side logout endpoint using Supabase
  */
-export async function POST(request: NextRequest) {
+export async function POST() {
   try {
-    // TODO: Replace with actual logout logic
-    // Example:
-    // 1. Clear session cookie
-    // 2. Invalidate token in database
-    // 3. Clear any server-side session data
+    const supabase = await createClient();
+    const { error } = await supabase.auth.signOut();
+
+    if (error) {
+      return NextResponse.json({ message: error.message }, { status: 400 });
+    }
 
     return NextResponse.json({ message: "Logged out successfully" });
   } catch (error) {
