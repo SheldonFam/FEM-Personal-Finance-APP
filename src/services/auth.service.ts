@@ -27,7 +27,9 @@ export interface AuthResponse {
 /**
  * Login user with email and password
  */
-export async function login(credentials: LoginCredentials): Promise<AuthResponse> {
+export async function login(
+  credentials: LoginCredentials,
+): Promise<AuthResponse> {
   const supabase = createClient();
 
   const { data, error } = await supabase.auth.signInWithPassword({
@@ -46,7 +48,10 @@ export async function login(credentials: LoginCredentials): Promise<AuthResponse
   return {
     user: {
       id: data.user.id,
-      name: data.user.user_metadata?.name || data.user.email?.split("@")[0] || "",
+      name:
+        data.user.user_metadata?.name ||
+        data.user.email?.split("@")[0] ||
+        "",
       email: data.user.email || "",
     },
   };
@@ -117,7 +122,10 @@ export async function requestPasswordReset(email: string): Promise<void> {
  */
 export async function getCurrentUser() {
   const supabase = createClient();
-  const { data: { user }, error } = await supabase.auth.getUser();
+  const {
+    data: { user },
+    error,
+  } = await supabase.auth.getUser();
 
   if (error || !user) {
     return null;

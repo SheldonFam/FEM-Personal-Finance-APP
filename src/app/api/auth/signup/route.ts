@@ -12,7 +12,7 @@ export async function POST(request: NextRequest) {
     if (!name || !email || !password) {
       return NextResponse.json(
         { message: "Name, email and password are required" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -35,7 +35,7 @@ export async function POST(request: NextRequest) {
     if (!data.user) {
       return NextResponse.json(
         { message: "Sign up failed. Please try again." },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -50,7 +50,7 @@ export async function POST(request: NextRequest) {
     console.error("Signup error:", error);
     return NextResponse.json(
       { message: "Internal server error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

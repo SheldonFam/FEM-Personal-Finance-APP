@@ -12,7 +12,7 @@ export async function POST(request: NextRequest) {
     if (!email || !password) {
       return NextResponse.json(
         { message: "Email and password are required" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -30,14 +30,17 @@ export async function POST(request: NextRequest) {
     if (!data.user) {
       return NextResponse.json(
         { message: "Login failed. Please try again." },
-        { status: 401 }
+        { status: 401 },
       );
     }
 
     return NextResponse.json({
       user: {
         id: data.user.id,
-        name: data.user.user_metadata?.name || data.user.email?.split("@")[0] || "",
+        name:
+          data.user.user_metadata?.name ||
+          data.user.email?.split("@")[0] ||
+          "",
         email: data.user.email,
       },
     });
@@ -45,7 +48,7 @@ export async function POST(request: NextRequest) {
     console.error("Login error:", error);
     return NextResponse.json(
       { message: "Internal server error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

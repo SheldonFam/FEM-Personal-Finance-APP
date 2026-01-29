@@ -19,7 +19,7 @@ export async function POST() {
     console.error("Logout error:", error);
     return NextResponse.json(
       { message: "Internal server error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
