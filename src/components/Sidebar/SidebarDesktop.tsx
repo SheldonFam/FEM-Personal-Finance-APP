@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { LogOut } from "lucide-react";
 
@@ -17,10 +18,17 @@ export function SidebarDesktop({
   isActive,
 }: SidebarDesktopProps) {
   const [isLoggingOut, setIsLoggingOut] = useState(false);
+  const router = useRouter();
 
   const handleLogout = async () => {
     setIsLoggingOut(true);
-    await logout();
+    try {
+      await logout();
+      router.push("/login");
+    } catch (error) {
+      console.error("Logout failed:", error);
+      setIsLoggingOut(false);
+    }
   };
 
   return (
