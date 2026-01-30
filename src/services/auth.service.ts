@@ -137,3 +137,18 @@ export async function getCurrentUser() {
     email: user.email || "",
   };
 }
+
+/**
+ * Update user password (used after clicking reset link)
+ */
+export async function updatePassword(newPassword: string): Promise<void> {
+  const supabase = createClient();
+
+  const { error } = await supabase.auth.updateUser({
+    password: newPassword,
+  });
+
+  if (error) {
+    throw new Error(error.message);
+  }
+}

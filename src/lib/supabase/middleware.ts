@@ -35,8 +35,19 @@ export async function updateSession(request: NextRequest) {
   } = await supabase.auth.getUser();
 
   // Define public routes that don't require authentication
-  const publicRoutes = ["/", "/login", "/signup", "/forgot-password"];
+  const publicRoutes = ["/", "/login", "/signup", "/forgot-password", "/reset-password"];
   const isPublicRoute = publicRoutes.includes(request.nextUrl.pathname);
+
+  // Routes where authenticated users should NOT be redirected to dashboard
+  const authFlowRoutes = ["/reset-password"];
+  const isAuthFlowRoute = authFlowRoutes.includes(request.nextUrl.pathname);
+
+  // Handle root path - redirect based on auth status
+  if (request.nextUrl.pathname === "/") {
+    const url = request.nextUrl.clone();
+    url.pathname = user ? "/dashboard" : "/login";
+    return NextResponse.redirect(url);
+  }
 
   // Redirect unauthenticated users to login
   if (!user && !isPublicRoute) {
@@ -45,8 +56,8 @@ export async function updateSession(request: NextRequest) {
     return NextResponse.redirect(url);
   }
 
-  // Redirect authenticated users away from auth pages
-  if (user && isPublicRoute && request.nextUrl.pathname !== "/") {
+  // Redirect authenticated users away from auth pages (except auth flow routes like reset-password)
+  if (user && isPublicRoute && !isAuthFlowRoute) {
     const url = request.nextUrl.clone();
     url.pathname = "/dashboard";
     return NextResponse.redirect(url);
