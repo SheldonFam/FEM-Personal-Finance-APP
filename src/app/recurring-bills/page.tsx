@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import { Card } from "@/components/ui/Card";
 import { Input } from "@/components/ui/Input";
 import { Button } from "@/components/ui/Button";
@@ -12,12 +12,11 @@ import {
   SelectValue,
 } from "@/components/ui/Select";
 import Image from "next/image";
-import transactionsData from "@/data/data.json";
-import { Transaction } from "@/lib/types";
 import { SORT_OPTIONS } from "@/lib/constants/constants";
 import { processRecurringBills } from "@/lib/billing/recurringBills";
 import { useBillFilters } from "@/hooks/useBillFilters";
 import { BillRow } from "@/components/RecurringBills/BillRow";
+import { useRecurringBills } from "@/hooks/useFinanceData";
 
 export default function RecurringBillsPage() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -26,9 +25,12 @@ export default function RecurringBillsPage() {
   >("latest");
   const [isSortSelectOpen, setIsSortSelectOpen] = useState(false);
 
-  // Process bills (static data, no need for memoization)
-  const allBills = processRecurringBills(
-    transactionsData.transactions as Transaction[]
+  const { data: recurringTransactions = [], isLoading } = useRecurringBills();
+
+  // Process bills
+  const allBills = useMemo(
+    () => processRecurringBills(recurringTransactions),
+    [recurringTransactions]
   );
 
   // Calculate summary (static data, no need for memoization)
@@ -197,7 +199,13 @@ export default function RecurringBillsPage() {
 
           {/* Bills List */}
           <div className="bg-white">
-            {filteredAndSortedBills.length > 0 ? (
+            {isLoading ? (
+              <div className="space-y-4 p-6">
+                {[1, 2, 3, 4, 5].map((i) => (
+                  <div key={i} className="h-[60px] animate-pulse bg-gray-200 rounded" />
+                ))}
+              </div>
+            ) : filteredAndSortedBills.length > 0 ? (
               filteredAndSortedBills.map((bill, index) => (
                 <BillRow key={`${bill.name}-${index}`} bill={bill} />
               ))

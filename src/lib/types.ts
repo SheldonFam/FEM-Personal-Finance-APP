@@ -2,7 +2,14 @@
  * Shared type definitions
  */
 
+export interface Balance {
+  current: number;
+  income: number;
+  expenses: number;
+}
+
 export interface Transaction {
+  id?: string;
   avatar: string;
   name: string;
   category: string;
@@ -18,12 +25,14 @@ export interface RecurringBill extends Transaction {
 }
 
 export interface Budget {
+  id?: string;
   category: string;
   maximum: number;
   theme: string;
 }
 
 export interface Pot {
+  id?: string;
   name: string;
   target: number;
   total: number;

@@ -4,7 +4,6 @@ import React, { useState } from "react";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import Image from "next/image";
-import transactionsData from "@/data/data.json";
 import { Pot } from "@/lib/types";
 import {
   getThemeNameFromHex,
@@ -14,9 +13,24 @@ import PotFormModal from "@/components/Modals/PotFormModal";
 import PotMoneyModal from "@/components/Modals/PotMoneyModal";
 import { DeleteConfirmationModal } from "@/components/Modals/DeleteConfirmationModal";
 import { PotCard } from "@/components/Pots/PotCard";
+import {
+  usePots,
+  useCreatePot,
+  useUpdatePot,
+  useDeletePot,
+  useAddMoneyToPot,
+  useWithdrawFromPot,
+} from "@/hooks/useFinanceData";
 
 export default function PotsPage() {
-  const [pots, setPots] = useState<Pot[]>(transactionsData.pots as Pot[]);
+  const { data: pots = [], isLoading } = usePots();
+
+  const createPot = useCreatePot();
+  const updatePot = useUpdatePot();
+  const deletePot = useDeletePot();
+  const addMoneyToPot = useAddMoneyToPot();
+  const withdrawFromPot = useWithdrawFromPot();
+
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [editingPot, setEditingPot] = useState<Pot | null>(null);
   const [deletingPot, setDeletingPot] = useState<Pot | null>(null);
@@ -28,13 +42,19 @@ export default function PotsPage() {
     target: number;
     theme: string;
   }) => {
-    const newPot: Pot = {
-      name: data.name,
-      target: data.target,
-      total: 0,
-      theme: getHexFromThemeName(data.theme) || data.theme,
-    };
-    setPots([...pots, newPot]);
+    createPot.mutate(
+      {
+        name: data.name,
+        target: data.target,
+        total: 0,
+        theme: getHexFromThemeName(data.theme) || data.theme,
+      },
+      {
+        onSuccess: () => {
+          setIsAddModalOpen(false);
+        },
+      }
+    );
   };
 
   const handleEditPot = (data: {
@@ -42,48 +62,53 @@ export default function PotsPage() {
     target: number;
     theme: string;
   }) => {
-    if (!editingPot) return;
-    setPots(
-      pots.map((p) =>
-        p.name === editingPot.name
-          ? {
-              ...p,
-              name: data.name,
-              target: data.target,
-              theme: getHexFromThemeName(data.theme) || data.theme,
-            }
-          : p
-      )
+    if (!editingPot || !editingPot.id) return;
+    updatePot.mutate(
+      {
+        id: editingPot.id,
+        name: data.name,
+        target: data.target,
+        theme: getHexFromThemeName(data.theme) || data.theme,
+      },
+      {
+        onSuccess: () => {
+          setEditingPot(null);
+        },
+      }
     );
-    setEditingPot(null);
   };
 
   const handleDeletePot = () => {
-    if (!deletingPot) return;
-    setPots(pots.filter((p) => p.name !== deletingPot.name));
-    setDeletingPot(null);
+    if (!deletingPot || !deletingPot.id) return;
+    deletePot.mutate(deletingPot.id, {
+      onSuccess: () => {
+        setDeletingPot(null);
+      },
+    });
   };
 
   const handleAddMoney = (amount: number) => {
-    if (!addMoneyPot) return;
-    setPots(
-      pots.map((p) =>
-        p.name === addMoneyPot.name ? { ...p, total: p.total + amount } : p
-      )
+    if (!addMoneyPot || !addMoneyPot.id) return;
+    addMoneyToPot.mutate(
+      { id: addMoneyPot.id, amount },
+      {
+        onSuccess: () => {
+          setAddMoneyPot(null);
+        },
+      }
     );
-    setAddMoneyPot(null);
   };
 
   const handleWithdraw = (amount: number) => {
-    if (!withdrawPot) return;
-    setPots(
-      pots.map((p) =>
-        p.name === withdrawPot.name
-          ? { ...p, total: Math.max(0, p.total - amount) }
-          : p
-      )
+    if (!withdrawPot || !withdrawPot.id) return;
+    withdrawFromPot.mutate(
+      { id: withdrawPot.id, amount },
+      {
+        onSuccess: () => {
+          setWithdrawPot(null);
+        },
+      }
     );
-    setWithdrawPot(null);
   };
 
   return (
@@ -96,7 +121,13 @@ export default function PotsPage() {
       </div>
 
       {/* Pots Grid */}
-      {pots.length > 0 ? (
+      {isLoading ? (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {[1, 2, 3, 4].map((i) => (
+            <div key={i} className="h-[200px] animate-pulse bg-gray-200 rounded-lg" />
+          ))}
+        </div>
+      ) : pots.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {pots.map((pot) => (
             <PotCard

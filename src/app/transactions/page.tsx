@@ -12,8 +12,7 @@ import {
   SelectValue,
 } from "@/components/ui/Select";
 import Image from "next/image";
-import transactionsData from "@/data/data.json";
-import { Transaction } from "@/lib/types";
+import { useTransactions } from "@/hooks/useFinanceData";
 import {
   TRANSACTION_CATEGORIES,
   SORT_OPTIONS,
@@ -33,7 +32,7 @@ export default function TransactionsPage() {
   const [isCategorySelectOpen, setIsCategorySelectOpen] = useState(false);
   const [isSortSelectOpen, setIsSortSelectOpen] = useState(false);
 
-  const transactions = transactionsData.transactions as Transaction[];
+  const { data: transactions = [], isLoading } = useTransactions();
 
   // Filter and sort transactions
   const filteredAndSortedTransactions = useTransactionFilters({
@@ -210,7 +209,16 @@ export default function TransactionsPage() {
 
           {/* Transactions List */}
           <div>
-            {paginatedTransactions.length > 0 ? (
+            {isLoading ? (
+              <div className="space-y-4 py-4">
+                {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((i) => (
+                  <div
+                    key={i}
+                    className="animate-pulse h-[60px] bg-gray-200 rounded"
+                  />
+                ))}
+              </div>
+            ) : paginatedTransactions.length > 0 ? (
               paginatedTransactions.map((transaction, index) => (
                 <TransactionRow key={index} transaction={transaction} />
               ))
