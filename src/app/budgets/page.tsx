@@ -3,8 +3,7 @@
 import React, { useState, useMemo } from "react";
 import { Button } from "@/components/ui/Button";
 import Image from "next/image";
-import budgetData from "@/data/data.json";
-import { Budget, Transaction } from "@/lib/types";
+import { Budget } from "@/lib/types";
 import {
   getThemeNameFromHex,
   getHexFromThemeName,
@@ -14,16 +13,27 @@ import { DeleteConfirmationModal } from "@/components/Modals/DeleteConfirmationM
 import { BudgetCard } from "@/components/Budgets/BudgetCard";
 import { SpendingSummary } from "@/components/Budgets/SpendingSummary";
 import { Card } from "@/components/ui/Card";
+import {
+  useBudgets,
+  useTransactions,
+  useCreateBudget,
+  useUpdateBudget,
+  useDeleteBudget,
+} from "@/hooks/useFinanceData";
 
 export default function BudgetsPage() {
-  const [budgets, setBudgets] = useState<Budget[]>(
-    budgetData.budgets as Budget[]
-  );
+  const { data: budgets = [], isLoading: isLoadingBudgets } = useBudgets();
+  const { data: transactions = [], isLoading: isLoadingTransactions } = useTransactions();
+
+  const createBudget = useCreateBudget();
+  const updateBudget = useUpdateBudget();
+  const deleteBudget = useDeleteBudget();
+
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [editingBudget, setEditingBudget] = useState<Budget | null>(null);
   const [deletingBudget, setDeletingBudget] = useState<Budget | null>(null);
 
-  const transactions = budgetData.transactions as Transaction[];
+  const isLoading = isLoadingBudgets || isLoadingTransactions;
 
   // Calculate spending per budget
   const budgetsWithSpending = useMemo(() => {
@@ -50,12 +60,18 @@ export default function BudgetsPage() {
     maxSpend: number;
     theme: string;
   }) => {
-    const newBudget: Budget = {
-      category: data.category,
-      maximum: data.maxSpend,
-      theme: getHexFromThemeName(data.theme) || data.theme, // Convert name to hex
-    };
-    setBudgets([...budgets, newBudget]);
+    createBudget.mutate(
+      {
+        category: data.category,
+        maximum: data.maxSpend,
+        theme: getHexFromThemeName(data.theme) || data.theme,
+      },
+      {
+        onSuccess: () => {
+          setIsAddModalOpen(false);
+        },
+      }
+    );
   };
 
   const handleEditBudget = (data: {
@@ -63,25 +79,28 @@ export default function BudgetsPage() {
     maxSpend: number;
     theme: string;
   }) => {
-    if (!editingBudget) return;
-    setBudgets(
-      budgets.map((b) =>
-        b.category === editingBudget.category
-          ? {
-              ...b,
-              maximum: data.maxSpend,
-              theme: getHexFromThemeName(data.theme) || data.theme,
-            }
-          : b
-      )
+    if (!editingBudget || !editingBudget.id) return;
+    updateBudget.mutate(
+      {
+        id: editingBudget.id,
+        maximum: data.maxSpend,
+        theme: getHexFromThemeName(data.theme) || data.theme,
+      },
+      {
+        onSuccess: () => {
+          setEditingBudget(null);
+        },
+      }
     );
-    setEditingBudget(null);
   };
 
   const handleDeleteBudget = () => {
-    if (!deletingBudget) return;
-    setBudgets(budgets.filter((b) => b.category !== deletingBudget.category));
-    setDeletingBudget(null);
+    if (!deletingBudget || !deletingBudget.id) return;
+    deleteBudget.mutate(deletingBudget.id, {
+      onSuccess: () => {
+        setDeletingBudget(null);
+      },
+    });
   };
 
   return (
@@ -96,7 +115,15 @@ export default function BudgetsPage() {
       </div>
 
       {/* Main Content Layout */}
-      {budgetsWithSpending.length > 0 ? (
+      {isLoading ? (
+        <div className="grid grid-cols-1 lg:grid-cols-[minmax(320px,400px)_1fr] xl:grid-cols-[400px_1fr] gap-6 lg:gap-8">
+          <div className="h-[400px] animate-pulse bg-gray-200 rounded-lg" />
+          <div className="space-y-6">
+            <div className="h-[300px] animate-pulse bg-gray-200 rounded-lg" />
+            <div className="h-[300px] animate-pulse bg-gray-200 rounded-lg" />
+          </div>
+        </div>
+      ) : budgetsWithSpending.length > 0 ? (
         <div className="grid grid-cols-1 lg:grid-cols-[minmax(320px,400px)_1fr] xl:grid-cols-[400px_1fr] gap-6 lg:gap-8">
           {/* Left: Spending Summary */}
           <div className="h-fit">

@@ -1,39 +1,34 @@
+import { createClient } from "@/lib/supabase/server";
 import { NextRequest, NextResponse } from "next/server";
 
 /**
  * POST /api/auth/forgot-password
- * Send password reset email
+ * Server-side password reset request using Supabase
  */
 export async function POST(request: NextRequest) {
   try {
     const { email } = await request.json();
 
-    // TODO: Replace with actual password reset logic
-    // Example:
-    // 1. Check if user exists
-    // const user = await db.user.findUnique({ where: { email } });
-    // if (!user) return error (or success to prevent email enumeration)
-    //
-    // 2. Generate reset token
-    // const resetToken = crypto.randomBytes(32).toString('hex');
-    // const hashedToken = await bcrypt.hash(resetToken, 10);
-    //
-    // 3. Save token to database with expiry
-    // await db.passwordReset.create({
-    //   data: { userId: user.id, token: hashedToken, expiresAt: Date.now() + 3600000 }
-    // });
-    //
-    // 4. Send email with reset link
-    // await sendEmail(email, resetLink);
-
-    // Mock successful response for development
-    if (email) {
-      return NextResponse.json({
-        message: "Password reset email sent",
-      });
+    if (!email) {
+      return NextResponse.json(
+        { message: "Email is required" },
+        { status: 400 }
+      );
     }
 
-    return NextResponse.json({ message: "Email is required" }, { status: 400 });
+    const supabase = await createClient();
+
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `${request.nextUrl.origin}/reset-password`,
+    });
+
+    if (error) {
+      return NextResponse.json({ message: error.message }, { status: 400 });
+    }
+
+    return NextResponse.json({
+      message: "Password reset email sent. Please check your inbox.",
+    });
   } catch (error) {
     console.error("Forgot password error:", error);
     return NextResponse.json(

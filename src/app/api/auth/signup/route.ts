@@ -1,64 +1,56 @@
+import { createClient } from "@/lib/supabase/server";
 import { NextRequest, NextResponse } from "next/server";
 
 /**
  * POST /api/auth/signup
- * Sign up endpoint - Replace with your actual user creation logic
+ * Server-side signup endpoint using Supabase
  */
 export async function POST(request: NextRequest) {
   try {
     const { name, email, password } = await request.json();
 
-    // TODO: Replace with actual user creation logic
-    // Example:
-    // 1. Check if user already exists
-    // const existingUser = await db.user.findUnique({ where: { email } });
-    // if (existingUser) return error
-    //
-    // 2. Hash password
-    // const hashedPassword = await bcrypt.hash(password, 10);
-    //
-    // 3. Create user
-    // const user = await db.user.create({ data: { name, email, password: hashedPassword } });
-    //
-    // 4. Generate JWT token
-    // const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET);
-
-    // Mock successful response for development
-    if (name && email && password) {
-      const token = "mock-jwt-token-" + Date.now(); // Mock token
-
-      const response = NextResponse.json({
-        user: {
-          id: "1",
-          name: name,
-          email: email,
-        },
-        token: token,
-      });
-
-      // Set httpOnly cookie for middleware authentication
-      response.cookies.set({
-        name: "auth_token",
-        value: token,
-        httpOnly: true, // Prevents JavaScript access (XSS protection)
-        secure: process.env.NODE_ENV === "production", // HTTPS only in production
-        sameSite: "lax", // CSRF protection
-        maxAge: 60 * 60 * 24 * 7, // 7 days
-        path: "/", // Available across entire site
-      });
-
-      return response;
+    if (!name || !email || !password) {
+      return NextResponse.json(
+        { message: "Name, email and password are required" },
+        { status: 400 },
+      );
     }
 
-    return NextResponse.json(
-      { message: "Missing required fields" },
-      { status: 400 }
-    );
+    const supabase = await createClient();
+
+    const { data, error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        data: {
+          name,
+        },
+      },
+    });
+
+    if (error) {
+      return NextResponse.json({ message: error.message }, { status: 400 });
+    }
+
+    if (!data.user) {
+      return NextResponse.json(
+        { message: "Sign up failed. Please try again." },
+        { status: 400 },
+      );
+    }
+
+    return NextResponse.json({
+      user: {
+        id: data.user.id,
+        name: name,
+        email: data.user.email,
+      },
+    });
   } catch (error) {
     console.error("Signup error:", error);
     return NextResponse.json(
       { message: "Internal server error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

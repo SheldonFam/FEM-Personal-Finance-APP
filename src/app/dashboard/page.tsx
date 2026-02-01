@@ -10,26 +10,72 @@ import { RecurringBillCard } from "@/components/Dashboard/RecurringBillCard";
 import { SectionHeader } from "@/components/Dashboard/SectionHeader";
 import BudgetDonutChart from "@/components/Charts/BudgetDonutChart";
 import Image from "next/image";
+import { useFinanceData, useRecurringBills } from "@/hooks/useFinanceData";
+import type { Transaction, Budget, Pot } from "@/lib/types";
+
+// Loading Skeleton Component
+const LoadingSkeleton = ({ className = "" }: { className?: string }) => (
+  <div className={`animate-pulse bg-gray-200 rounded ${className}`} />
+);
 
 // Summary Cards Component
-const SummaryCards = () => {
+const SummaryCards = ({
+  current,
+  income,
+  expenses,
+  isLoading,
+}: {
+  current: number;
+  income: number;
+  expenses: number;
+  isLoading: boolean;
+}) => {
+  if (isLoading) {
+    return (
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 mb-6 md:mb-8">
+        <LoadingSkeleton className="h-[120px]" />
+        <LoadingSkeleton className="h-[120px]" />
+        <LoadingSkeleton className="h-[120px]" />
+      </div>
+    );
+  }
+
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 mb-6 md:mb-8">
-      <StatCard label="Current Balance" amount={4836.0} variant="dark" />
-      <StatCard label="Income" amount={3814.25} variant="light" />
-      <StatCard label="Expenses" amount={1700.5} variant="light" />
+      <StatCard label="Current Balance" amount={current} variant="dark" />
+      <StatCard label="Income" amount={income} variant="light" />
+      <StatCard label="Expenses" amount={expenses} variant="light" />
     </div>
   );
 };
 
 // Pots Component
-const PotsSection = () => {
-  const pots = [
-    { name: "Savings", amount: 159, color: "#277C78" },
-    { name: "Gift", amount: 40, color: "#82C9D7" },
-    { name: "Concert Ticket", amount: 110, color: "#626070" },
-    { name: "New Laptop", amount: 10, color: "#F2CDAC" },
-  ];
+const PotsSection = ({
+  pots,
+  isLoading,
+}: {
+  pots: Pot[];
+  isLoading: boolean;
+}) => {
+  if (isLoading) {
+    return (
+      <Card className="p-8">
+        <SectionHeader title="Pots" href="/pots" linkText="See Details" />
+        <div className="flex items-start gap-5 flex-col lg:flex-row">
+          <LoadingSkeleton className="h-[100px] w-full lg:flex-1" />
+          <div className="w-full lg:flex-1 grid grid-cols-2 gap-4">
+            <LoadingSkeleton className="h-[50px]" />
+            <LoadingSkeleton className="h-[50px]" />
+            <LoadingSkeleton className="h-[50px]" />
+            <LoadingSkeleton className="h-[50px]" />
+          </div>
+        </div>
+      </Card>
+    );
+  }
+
+  const totalSaved = pots.reduce((sum, pot) => sum + pot.total, 0);
+  const displayPots = pots.slice(0, 4);
 
   return (
     <Card className="p-8">
@@ -49,19 +95,19 @@ const PotsSection = () => {
           <div>
             <p className="text-sm text-[#696868] mb-1">Total Saved</p>
             <p className="text-[32px] leading-[1.2] font-bold text-[#201F24]">
-              $850
+              ${totalSaved.toLocaleString()}
             </p>
           </div>
         </div>
 
         {/* Individual Pots */}
         <div className="w-full lg:flex-1 grid grid-cols-1 sm:grid-cols-2 gap-4">
-          {pots.map((pot, index) => (
+          {displayPots.map((pot, index) => (
             <PotItem
               key={index}
               label={pot.name}
-              amount={pot.amount}
-              color={pot.color}
+              amount={pot.total}
+              color={pot.theme}
             />
           ))}
         </div>
@@ -71,44 +117,40 @@ const PotsSection = () => {
 };
 
 // Transactions Component
-const TransactionsSection = () => {
-  const transactions = [
-    {
-      name: "Emma Richardson",
-      amount: 75.5,
-      date: "19 Aug 2024",
-      avatar: "./assets/images/avatars/emma-richardson.jpg",
-      isPositive: true,
-    },
-    {
-      name: "Savory Bites Bistro",
-      amount: 55.5,
-      date: "19 Aug 2024",
-      avatar: "./assets/images/avatars/savory-bites-bistro.jpg",
-      isPositive: false,
-    },
-    {
-      name: "Daniel Carter",
-      amount: 42.3,
-      date: "18 Aug 2024",
-      avatar: "./assets/images/avatars/daniel-carter.jpg",
-      isPositive: false,
-    },
-    {
-      name: "Sun Park",
-      amount: 120.0,
-      date: "17 Aug 2024",
-      avatar: "./assets/images/avatars/sun-park.jpg",
-      isPositive: true,
-    },
-    {
-      name: "Urban Services Hub",
-      amount: 65.0,
-      date: "17 Aug 2024",
-      avatar: "./assets/images/avatars/urban-services-hub.jpg",
-      isPositive: false,
-    },
-  ];
+const TransactionsSection = ({
+  transactions,
+  isLoading,
+}: {
+  transactions: Transaction[];
+  isLoading: boolean;
+}) => {
+  if (isLoading) {
+    return (
+      <Card className="p-8">
+        <SectionHeader
+          title="Transactions"
+          href="/transactions"
+          linkText="View All"
+        />
+        <div className="space-y-4">
+          {[1, 2, 3, 4, 5].map((i) => (
+            <LoadingSkeleton key={i} className="h-[60px]" />
+          ))}
+        </div>
+      </Card>
+    );
+  }
+
+  const recentTransactions = transactions.slice(0, 5);
+
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString("en-US", {
+      day: "numeric",
+      month: "short",
+      year: "numeric",
+    });
+  };
 
   return (
     <Card className="p-8">
@@ -119,14 +161,14 @@ const TransactionsSection = () => {
       />
 
       <div className="space-y-1">
-        {transactions.map((transaction, index) => (
+        {recentTransactions.map((transaction, index) => (
           <TransactionItem
             key={index}
             name={transaction.name}
-            amount={transaction.amount}
-            date={transaction.date}
+            amount={Math.abs(transaction.amount)}
+            date={formatDate(transaction.date)}
             avatar={transaction.avatar}
-            isPositive={transaction.isPositive}
+            isPositive={transaction.amount > 0}
           />
         ))}
       </div>
@@ -135,16 +177,48 @@ const TransactionsSection = () => {
 };
 
 // Budgets Component
-const BudgetsSection = () => {
-  const budgetCategories = [
-    { name: "Entertainment", spent: 50.0, limit: 50.0, color: "#277C78" },
-    { name: "Bills", spent: 750.0, limit: 750.0, color: "#82C9D7" },
-    { name: "Dining Out", spent: 75.0, limit: 75.0, color: "#F2CDAC" },
-    { name: "Personal Care", spent: 100.0, limit: 100.0, color: "#626070" },
-  ];
+const BudgetsSection = ({
+  budgets,
+  transactions,
+  isLoading,
+}: {
+  budgets: Budget[];
+  transactions: Transaction[];
+  isLoading: boolean;
+}) => {
+  if (isLoading) {
+    return (
+      <Card className="p-8">
+        <SectionHeader title="Budgets" href="/budgets" linkText="See Details" />
+        <div className="flex items-center gap-4 flex-col lg:flex-row">
+          <LoadingSkeleton className="w-[240px] h-[240px] rounded-full" />
+          <div className="flex-1 space-y-4 w-full">
+            <LoadingSkeleton className="h-[40px]" />
+            <LoadingSkeleton className="h-[40px]" />
+            <LoadingSkeleton className="h-[40px]" />
+            <LoadingSkeleton className="h-[40px]" />
+          </div>
+        </div>
+      </Card>
+    );
+  }
 
-  const totalSpent = 338;
-  const totalLimit = 975;
+  // Calculate spent amount for each budget category
+  const budgetCategories = budgets.map((budget) => {
+    const spent = transactions
+      .filter((t) => t.category === budget.category && t.amount < 0)
+      .reduce((sum, t) => sum + Math.abs(t.amount), 0);
+
+    return {
+      name: budget.category,
+      spent: Math.min(spent, budget.maximum),
+      limit: budget.maximum,
+      color: budget.theme,
+    };
+  });
+
+  const totalSpent = budgetCategories.reduce((sum, cat) => sum + cat.spent, 0);
+  const totalLimit = budgetCategories.reduce((sum, cat) => sum + cat.limit, 0);
 
   return (
     <Card className="p-8">
@@ -177,11 +251,67 @@ const BudgetsSection = () => {
 };
 
 // Recurring Bills Component
-const RecurringBillsSection = () => {
+const RecurringBillsSection = ({
+  recurringBills,
+  isLoading,
+}: {
+  recurringBills: Transaction[];
+  isLoading: boolean;
+}) => {
+  if (isLoading) {
+    return (
+      <Card className="h-full p-8">
+        <SectionHeader
+          title="Recurring Bills"
+          href="/recurring-bills"
+          linkText="See Details"
+        />
+        <div className="space-y-3">
+          <LoadingSkeleton className="h-[60px]" />
+          <LoadingSkeleton className="h-[60px]" />
+          <LoadingSkeleton className="h-[60px]" />
+        </div>
+      </Card>
+    );
+  }
+
+  // Calculate bill summaries
+  const now = new Date();
+  const currentDay = now.getDate();
+
+  const paidBills = recurringBills.filter((bill) => {
+    const billDate = new Date(bill.date);
+    return billDate.getDate() < currentDay;
+  });
+
+  const upcomingBills = recurringBills.filter((bill) => {
+    const billDate = new Date(bill.date);
+    return billDate.getDate() >= currentDay;
+  });
+
+  const dueSoonBills = recurringBills.filter((bill) => {
+    const billDate = new Date(bill.date);
+    const dayOfMonth = billDate.getDate();
+    return dayOfMonth >= currentDay && dayOfMonth <= currentDay + 5;
+  });
+
+  const paidAmount = paidBills.reduce(
+    (sum, bill) => sum + Math.abs(bill.amount),
+    0
+  );
+  const upcomingAmount = upcomingBills.reduce(
+    (sum, bill) => sum + Math.abs(bill.amount),
+    0
+  );
+  const dueSoonAmount = dueSoonBills.reduce(
+    (sum, bill) => sum + Math.abs(bill.amount),
+    0
+  );
+
   const bills = [
-    { label: "Paid Bills", amount: 190.0, borderColor: "#277C78" },
-    { label: "Total Upcoming", amount: 194.98, borderColor: "#F2CDAC" },
-    { label: "Due Soon", amount: 59.98, borderColor: "#82C9D7" },
+    { label: "Paid Bills", amount: paidAmount, borderColor: "#277C78" },
+    { label: "Total Upcoming", amount: upcomingAmount, borderColor: "#F2CDAC" },
+    { label: "Due Soon", amount: dueSoonAmount, borderColor: "#82C9D7" },
   ];
 
   return (
@@ -208,6 +338,10 @@ const RecurringBillsSection = () => {
 
 // Main Dashboard Component
 export default function DashboardPage() {
+  const { balance, transactions, budgets, pots, isLoading } = useFinanceData();
+  const { data: recurringBills, isLoading: isLoadingBills } =
+    useRecurringBills();
+
   return (
     <div className="bg-[#F8F4F0] p-4 md:p-8 pb-[68px] sm:pb-[90px] md:pb-8">
       <div className="max-w-[1440px] mx-auto">
@@ -216,22 +350,37 @@ export default function DashboardPage() {
         </h1>
 
         {/* Summary Cards */}
-        <SummaryCards />
+        <SummaryCards
+          current={balance.data?.current ?? 0}
+          income={balance.data?.income ?? 0}
+          expenses={balance.data?.expenses ?? 0}
+          isLoading={balance.isLoading}
+        />
 
-      {/* Main Content Grid */}
-      <div className="grid grid-cols-1 xl:grid-cols-2 2xl:grid-cols-[minmax(500px,1fr)_minmax(400px,600px)] gap-6">
-        {/* Left Column - Flexible width */}
-        <div className="flex flex-col gap-4 md:gap-6">
-          <PotsSection />
-          <TransactionsSection />
-        </div>
+        {/* Main Content Grid */}
+        <div className="grid grid-cols-1 xl:grid-cols-2 2xl:grid-cols-[minmax(500px,1fr)_minmax(400px,600px)] gap-6">
+          {/* Left Column - Flexible width */}
+          <div className="flex flex-col gap-4 md:gap-6">
+            <PotsSection pots={pots.data ?? []} isLoading={pots.isLoading} />
+            <TransactionsSection
+              transactions={transactions.data ?? []}
+              isLoading={transactions.isLoading}
+            />
+          </div>
 
-        {/* Right Column - Flexible width */}
-        <div className="flex flex-col gap-4 md:gap-6">
-          <BudgetsSection />
-          <RecurringBillsSection />
+          {/* Right Column - Flexible width */}
+          <div className="flex flex-col gap-4 md:gap-6">
+            <BudgetsSection
+              budgets={budgets.data ?? []}
+              transactions={transactions.data ?? []}
+              isLoading={isLoading}
+            />
+            <RecurringBillsSection
+              recurringBills={recurringBills ?? []}
+              isLoading={isLoadingBills}
+            />
+          </div>
         </div>
-      </div>
       </div>
     </div>
   );

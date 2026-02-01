@@ -1,9 +1,9 @@
 /**
  * Authentication Service
- * Handles all authentication-related API calls
+ * Handles all authentication using Supabase
  */
 
-const BASE_URL = "/api/auth";
+import { createClient } from "@/lib/supabase/client";
 
 export interface LoginCredentials {
   email: string;
@@ -22,77 +22,133 @@ export interface AuthResponse {
     name: string;
     email: string;
   };
-  token: string;
 }
 
 /**
  * Login user with email and password
  */
 export async function login(
-  credentials: LoginCredentials
+  credentials: LoginCredentials,
 ): Promise<AuthResponse> {
-  const response = await fetch(`${BASE_URL}/login`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(credentials),
+  const supabase = createClient();
+
+  const { data, error } = await supabase.auth.signInWithPassword({
+    email: credentials.email,
+    password: credentials.password,
   });
 
-  if (!response.ok) {
-    const error = await response.json().catch(() => ({}));
-    throw new Error(error.message || "Login failed. Please try again.");
+  if (error) {
+    throw new Error(error.message);
   }
 
-  return response.json();
+  if (!data.user) {
+    throw new Error("Login failed. Please try again.");
+  }
+
+  return {
+    user: {
+      id: data.user.id,
+      name:
+        data.user.user_metadata?.name ||
+        data.user.email?.split("@")[0] ||
+        "",
+      email: data.user.email || "",
+    },
+  };
 }
 
 /**
  * Register a new user
  */
 export async function signUp(data: SignUpData): Promise<AuthResponse> {
-  const response = await fetch(`${BASE_URL}/signup`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
+  const supabase = createClient();
+
+  const { data: authData, error } = await supabase.auth.signUp({
+    email: data.email,
+    password: data.password,
+    options: {
+      data: {
+        name: data.name,
+      },
     },
-    body: JSON.stringify(data),
   });
 
-  if (!response.ok) {
-    const error = await response.json().catch(() => ({}));
-    throw new Error(error.message || "Sign up failed. Please try again.");
+  if (error) {
+    throw new Error(error.message);
   }
 
-  return response.json();
+  if (!authData.user) {
+    throw new Error("Sign up failed. Please try again.");
+  }
+
+  return {
+    user: {
+      id: authData.user.id,
+      name: data.name,
+      email: authData.user.email || "",
+    },
+  };
 }
 
 /**
  * Logout current user
  */
 export async function logout(): Promise<void> {
-  await fetch(`${BASE_URL}/logout`, {
-    method: "POST",
-  });
-  window.location.href = "/login";
+  const supabase = createClient();
+  const { error } = await supabase.auth.signOut();
+
+  if (error) {
+    throw new Error(error.message);
+  }
 }
 
 /**
  * Request password reset
  */
 export async function requestPasswordReset(email: string): Promise<void> {
-  const response = await fetch(`${BASE_URL}/forgot-password`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({ email }),
+  const supabase = createClient();
+
+  const { error } = await supabase.auth.resetPasswordForEmail(email, {
+    redirectTo: `${window.location.origin}/reset-password`,
   });
 
-  if (!response.ok) {
-    const error = await response.json().catch(() => ({}));
-    throw new Error(
-      error.message || "Failed to send reset email. Please try again."
-    );
+  if (error) {
+    throw new Error(error.message);
+  }
+}
+
+/**
+ * Get current user session
+ */
+export async function getCurrentUser() {
+  const supabase = createClient();
+  const {
+    data: { user },
+    error,
+  } = await supabase.auth.getUser();
+
+  if (error || !user) {
+    return null;
+  }
+
+  return {
+    id: user.id,
+    name: user.user_metadata?.name || user.email?.split("@")[0] || "",
+    email: user.email || "",
+  };
+}
+
+/**
+ * Update user password (used after clicking reset link)
+ */
+export async function updatePassword(newPassword: string): Promise<void> {
+  const supabase = createClient();
+
+  const { error } = await supabase.auth.updateUser({
+    password: newPassword,
+  });
+
+  if (error) {
+    throw new Error(error.message);
   }
 }

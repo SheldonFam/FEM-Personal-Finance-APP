@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { LogOut } from "lucide-react";
 import { NAV_ITEMS } from "./nav-items";
 import { SidebarNavItem } from "./SidebarNavItem";
@@ -11,10 +12,17 @@ import { cn } from "@/lib/utils";
 
 export function SidebarMobile({ isActive }: SidebarMobileProps) {
   const [isLoggingOut, setIsLoggingOut] = useState(false);
+  const router = useRouter();
 
   const handleLogout = async () => {
     setIsLoggingOut(true);
-    await logout();
+    try {
+      await logout();
+      router.push("/login");
+    } catch (error) {
+      console.error("Logout failed:", error);
+      setIsLoggingOut(false);
+    }
   };
 
   return (

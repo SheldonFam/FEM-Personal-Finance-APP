@@ -12,8 +12,7 @@ import {
   SelectValue,
 } from "@/components/ui/Select";
 import Image from "next/image";
-import transactionsData from "@/data/data.json";
-import { Transaction } from "@/lib/types";
+import { useTransactions } from "@/hooks/useFinanceData";
 import {
   TRANSACTION_CATEGORIES,
   SORT_OPTIONS,
@@ -33,7 +32,7 @@ export default function TransactionsPage() {
   const [isCategorySelectOpen, setIsCategorySelectOpen] = useState(false);
   const [isSortSelectOpen, setIsSortSelectOpen] = useState(false);
 
-  const transactions = transactionsData.transactions as Transaction[];
+  const { data: transactions = [], isLoading } = useTransactions();
 
   // Filter and sort transactions
   const filteredAndSortedTransactions = useTransactionFilters({
@@ -63,185 +62,183 @@ export default function TransactionsPage() {
 
         {/* Transactions Card */}
         <Card className="p-5 md:p-8">
-        {/* Search and Filters */}
-        <div className="mb-6 w-full overflow-hidden">
-          <div className="w-full flex flex-row items-stretch sm:items-center gap-4 justify-between">
-            {/* Search Input */}
-            <div className="w-full sm:flex-1 lg:max-w-[320px]">
-              <div className="relative">
-                <Input
-                  type="text"
-                  placeholder="Search transaction"
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pr-12 h-[45px]"
-                />
-                <Image
-                  src="/assets/images/icon-search.svg"
-                  alt="Search"
-                  width={14}
-                  height={14}
-                  className="absolute right-5 top-1/2 -translate-y-1/2 opacity-50 pointer-events-none"
-                />
-              </div>
-            </div>
-
-            {/* Category Filter and Sort */}
-            <div className="flex gap-3 sm:gap-6 flex-row flex-shrink-0 min-w-0">
-              {/* Sort By */}
-              <div className="relative flex flex-row gap-2 items-center">
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="icon-sm"
-                  className="sm:hidden size-[45px] rounded-lg bg-transparent p-0 hover:bg-gray-100 focus-visible:ring-0 focus-visible:ring-offset-0"
-                  aria-label="Open category filter"
-                  aria-haspopup="listbox"
-                  aria-expanded={isCategorySelectOpen}
-                  onClick={() => setIsCategorySelectOpen(true)}
-                >
-                  <Image
-                    src="/assets/images/icon-filter-mobile.svg"
-                    alt=""
-                    width={18}
-                    height={16}
-                    className="shrink-0"
+          {/* Search and Filters */}
+          <div className="mb-6 w-full overflow-hidden">
+            <div className="w-full flex flex-row items-stretch sm:items-center gap-4 justify-between">
+              {/* Search Input */}
+              <div className="w-full sm:flex-1 lg:max-w-[320px]">
+                <div className="relative">
+                  <Input
+                    type="text"
+                    placeholder="Search transaction"
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="pr-12 h-[45px]"
                   />
-                </Button>
-
-                <span className="hidden sm:inline text-xs font-medium text-gray-500">
-                  Sort by
-                </span>
-                <Select
-                  value={sortBy}
-                  onValueChange={(value) => {
-                    setSortBy(value as typeof sortBy);
-                    setIsSortSelectOpen(false);
-                  }}
-                  open={isSortSelectOpen}
-                  onOpenChange={setIsSortSelectOpen}
-                >
-                  <SelectTrigger
-                    aria-label="Sort by"
-                    className="absolute inset-0 h-0 w-0 opacity-0 pointer-events-none sm:static sm:h-[45px] sm:w-[115px] md:w-[130px] lg:w-[150px] sm:opacity-100 sm:pointer-events-auto sm:flex bg-white border border-gray-200 rounded-lg px-4 text-sm font-medium text-gray-700 justify-between shadow-sm hover:bg-gray-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-200 data-[state=open]:border-primary-300"
-                  >
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent
-                    align="end"
-                    className="min-w-[164px] rounded-2xl border border-gray-200 bg-white py-1 shadow-[0px_16px_40px_rgba(15,23,42,0.15)]"
-                  >
-                    {SORT_OPTIONS.map((option) => (
-                      <SelectItem
-                        key={option.value}
-                        value={option.value}
-                        showIndicator={false}
-                        className="px-4 py-2 text-sm text-gray-600 border-b border-gray-200 last:border-b-0 data-[state=checked]:font-semibold data-[state=checked]:text-gray-900 data-[highlighted]:bg-gray-100"
-                      >
-                        {option.label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className="relative flex flex-row gap-2 items-center">
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="icon-sm"
-                  className="sm:hidden size-[45px] rounded-lg bg-transparent p-0 hover:bg-gray-100 focus-visible:ring-0 focus-visible:ring-offset-0"
-                  aria-label="Open sort options"
-                  aria-haspopup="listbox"
-                  aria-expanded={isSortSelectOpen}
-                  onClick={() => setIsSortSelectOpen(true)}
-                >
                   <Image
-                    src="/assets/images/icon-sort-mobile.svg"
-                    alt=""
-                    width={16}
-                    height={15}
-                    className="shrink-0"
+                    src="/assets/images/icon-search.svg"
+                    alt="Search"
+                    width={14}
+                    height={14}
+                    className="absolute right-5 top-1/2 -translate-y-1/2 opacity-50 pointer-events-none"
                   />
-                </Button>
-                <span className="hidden sm:inline text-xs font-medium text-gray-500">
-                  Category
-                </span>
-                <Select
-                  value={selectedCategory}
-                  onValueChange={(value) => {
-                    setSelectedCategory(value);
-                    setIsCategorySelectOpen(false);
-                  }}
-                  open={isCategorySelectOpen}
-                  onOpenChange={setIsCategorySelectOpen}
-                >
-                  <SelectTrigger
-                    aria-label="Category"
-                    className="absolute inset-0 h-0 w-0 opacity-0 pointer-events-none sm:static sm:h-[45px] sm:w-[140px] md:w-[160px] lg:w-[180px] sm:opacity-100 sm:pointer-events-auto sm:flex bg-white border border-gray-200 rounded-lg px-4 text-sm font-medium text-gray-700 justify-between shadow-sm hover:bg-gray-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-200 data-[state=open]:border-primary-300"
+                </div>
+              </div>
+
+              {/* Category Filter and Sort */}
+              <div className="flex gap-3 sm:gap-6 flex-row flex-shrink-0 min-w-0">
+                {/* Sort By */}
+                <div className="relative flex flex-row gap-2 items-center">
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon-sm"
+                    className="sm:hidden size-[45px] rounded-lg bg-transparent p-0 hover:bg-gray-100 focus-visible:ring-0 focus-visible:ring-offset-0"
+                    aria-label="Open category filter"
+                    aria-haspopup="listbox"
+                    aria-expanded={isCategorySelectOpen}
+                    onClick={() => setIsCategorySelectOpen(true)}
                   >
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {TRANSACTION_CATEGORIES.map((category) => (
-                      <SelectItem
-                        key={category}
-                        value={category}
-                        showIndicator={false}
-                        className="px-4 py-2 text-sm text-gray-600 border-b border-gray-200 last:border-b-0 data-[state=checked]:font-semibold data-[state=checked]:text-gray-900 data-[highlighted]:bg-gray-100"
-                      >
-                        {category}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                    <Image
+                      src="/assets/images/icon-filter-mobile.svg"
+                      alt=""
+                      width={18}
+                      height={16}
+                      className="shrink-0"
+                    />
+                  </Button>
+
+                  <span className="hidden sm:inline text-xs font-medium text-gray-500">
+                    Sort by
+                  </span>
+                  <Select
+                    value={sortBy}
+                    onValueChange={(value) => {
+                      setSortBy(value as typeof sortBy);
+                      setIsSortSelectOpen(false);
+                    }}
+                    open={isSortSelectOpen}
+                    onOpenChange={setIsSortSelectOpen}
+                  >
+                    <SelectTrigger
+                      aria-label="Sort by"
+                      className="absolute inset-0 h-0 w-0 opacity-0 pointer-events-none sm:static sm:h-[45px] sm:w-[115px] md:w-[130px] lg:w-[150px] sm:opacity-100 sm:pointer-events-auto sm:flex bg-white border border-gray-200 rounded-lg px-4 text-sm font-medium text-gray-700 justify-between shadow-sm hover:bg-gray-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-200 data-[state=open]:border-primary-300"
+                    >
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent
+                      align="end"
+                      className="min-w-[164px] rounded-2xl border border-gray-200 bg-white py-1 shadow-[0px_16px_40px_rgba(15,23,42,0.15)]"
+                    >
+                      {SORT_OPTIONS.map((option) => (
+                        <SelectItem
+                          key={option.value}
+                          value={option.value}
+                          showIndicator={false}
+                          className="px-4 py-2 text-sm text-gray-600 border-b border-gray-200 last:border-b-0 data-[state=checked]:font-semibold data-[state=checked]:text-gray-900 data-[highlighted]:bg-gray-100"
+                        >
+                          {option.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="relative flex flex-row gap-2 items-center">
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon-sm"
+                    className="sm:hidden size-[45px] rounded-lg bg-transparent p-0 hover:bg-gray-100 focus-visible:ring-0 focus-visible:ring-offset-0"
+                    aria-label="Open sort options"
+                    aria-haspopup="listbox"
+                    aria-expanded={isSortSelectOpen}
+                    onClick={() => setIsSortSelectOpen(true)}
+                  >
+                    <Image
+                      src="/assets/images/icon-sort-mobile.svg"
+                      alt=""
+                      width={16}
+                      height={15}
+                      className="shrink-0"
+                    />
+                  </Button>
+                  <span className="hidden sm:inline text-xs font-medium text-gray-500">
+                    Category
+                  </span>
+                  <Select
+                    value={selectedCategory}
+                    onValueChange={(value) => {
+                      setSelectedCategory(value);
+                      setIsCategorySelectOpen(false);
+                    }}
+                    open={isCategorySelectOpen}
+                    onOpenChange={setIsCategorySelectOpen}
+                  >
+                    <SelectTrigger
+                      aria-label="Category"
+                      className="absolute inset-0 h-0 w-0 opacity-0 pointer-events-none sm:static sm:h-[45px] sm:w-[140px] md:w-[160px] lg:w-[180px] sm:opacity-100 sm:pointer-events-auto sm:flex bg-white border border-gray-200 rounded-lg px-4 text-sm font-medium text-gray-700 justify-between shadow-sm hover:bg-gray-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-200 data-[state=open]:border-primary-300"
+                    >
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {TRANSACTION_CATEGORIES.map((category) => (
+                        <SelectItem
+                          key={category}
+                          value={category}
+                          showIndicator={false}
+                          className="px-4 py-2 text-sm text-gray-600 border-b border-gray-200 last:border-b-0 data-[state=checked]:font-semibold data-[state=checked]:text-gray-900 data-[highlighted]:bg-gray-100"
+                        >
+                          {category}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
               </div>
             </div>
           </div>
-        </div>
 
-        <div className="w-full">
-          {/* Table Header */}
-          <div className="hidden grid-cols-4 text-xs text-gray-500 px-0 pt-2 pb-3 border-b border-gray-200 sm:grid">
-            <div>Recipient / Sender</div>
-            <div>Category</div>
-            <div>Transaction Date</div>
-            <div className="text-right">Amount</div>
-          </div>
+          <div className="w-full">
+            {/* Table Header */}
+            <div className="hidden grid-cols-4 text-xs text-gray-500 px-0 pt-2 pb-3 border-b border-gray-200 sm:grid">
+              <div>Recipient / Sender</div>
+              <div>Category</div>
+              <div>Transaction Date</div>
+              <div className="text-right">Amount</div>
+            </div>
 
-          {/* Transactions List */}
-          <div>
-            {paginatedTransactions.length > 0 ? (
-              paginatedTransactions.map((transaction, index) => (
-                <TransactionRow key={index} transaction={transaction} />
-              ))
-            ) : (
-              <div className="text-center py-12">
-                <p className="text-gray-500">No transactions found</p>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => {
-                    setSearchTerm("");
-                    setSelectedCategory("All Transactions");
-                  }}
-                  className="mt-4"
-                >
-                  Clear filters
-                </Button>
-              </div>
+            {/* Transactions List */}
+            <div>
+              {isLoading ? (
+                <div className="space-y-4 py-4">
+                  {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((i) => (
+                    <div
+                      key={i}
+                      className="animate-pulse h-[60px] bg-gray-200 rounded"
+                    />
+                  ))}
+                </div>
+              ) : paginatedTransactions.length > 0 ? (
+                paginatedTransactions.map((transaction, index) => (
+                  <TransactionRow key={index} transaction={transaction} />
+                ))
+              ) : (
+                <div className="text-center py-12">
+                  <p className="text-gray-500">No transactions found</p>
+                </div>
+              )}
+            </div>
+
+            {/* Pagination */}
+            {totalPages > 1 && (
+              <Pagination
+                currentPage={currentPage}
+                totalPages={totalPages}
+                onPageChange={setCurrentPage}
+              />
             )}
           </div>
-
-          {/* Pagination */}
-          {totalPages > 1 && (
-            <Pagination
-              currentPage={currentPage}
-              totalPages={totalPages}
-              onPageChange={setCurrentPage}
-            />
-          )}
-        </div>
-      </Card>
+        </Card>
       </div>
     </div>
   );
