@@ -194,12 +194,12 @@ src/
 
 ## API Routes
 
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| POST | `/api/auth/login` | User login |
-| POST | `/api/auth/signup` | User registration |
-| POST | `/api/auth/logout` | User logout |
-| POST | `/api/auth/forgot-password` | Request password reset |
+| Method | Endpoint                    | Description            |
+| ------ | --------------------------- | ---------------------- |
+| POST   | `/api/auth/login`           | User login             |
+| POST   | `/api/auth/signup`          | User registration      |
+| POST   | `/api/auth/logout`          | User logout            |
+| POST   | `/api/auth/forgot-password` | Request password reset |
 
 ## Available Scripts
 
@@ -221,10 +221,12 @@ pnpm start    # Start production server
 ### Other Platforms
 
 The app can be deployed to any platform that supports Next.js. Make sure to:
+
 1. Set the environment variables
 2. Run `pnpm build` to create the production build
 3. Run `pnpm start` to start the server
 
-## License
+### Credential
 
-This project is for educational purposes.
+demo@finance.app
+demo123456
