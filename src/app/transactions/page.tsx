@@ -13,6 +13,8 @@ import {
 } from "@/components/ui/Select";
 import Image from "next/image";
 import { useTransactions } from "@/hooks/useFinanceData";
+import { DataErrorAlert } from "@/components/DataErrorAlert";
+import { PageLayout } from "@/components/PageLayout";
 import {
   TRANSACTION_CATEGORIES,
   SORT_OPTIONS,
@@ -32,7 +34,7 @@ export default function TransactionsPage() {
   const [isCategorySelectOpen, setIsCategorySelectOpen] = useState(false);
   const [isSortSelectOpen, setIsSortSelectOpen] = useState(false);
 
-  const { data: transactions = [], isLoading } = useTransactions();
+  const { data: transactions = [], isLoading, isError } = useTransactions();
 
   // Filter and sort transactions
   const filteredAndSortedTransactions = useTransactionFilters({
@@ -54,14 +56,11 @@ export default function TransactionsPage() {
   }, [searchTerm, selectedCategory, sortBy]);
 
   return (
-    <div className="bg-[#F8F4F0] p-4 md:p-8 pb-[68px] sm:pb-[90px] md:pb-8">
-      <div className="max-w-[1440px] mx-auto">
-        <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-6 md:mb-8">
-          Transactions
-        </h1>
+    <PageLayout title="Transactions">
+      {isError && <DataErrorAlert />}
 
-        {/* Transactions Card */}
-        <Card className="p-5 md:p-8">
+      {/* Transactions Card */}
+      <Card className="p-5 md:p-8">
           {/* Search and Filters */}
           <div className="mb-6 w-full overflow-hidden">
             <div className="w-full flex flex-row items-stretch sm:items-center gap-4 justify-between">
@@ -238,8 +237,7 @@ export default function TransactionsPage() {
               />
             )}
           </div>
-        </Card>
-      </div>
-    </div>
+      </Card>
+    </PageLayout>
   );
 }

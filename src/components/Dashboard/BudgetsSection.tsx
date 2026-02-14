@@ -66,9 +66,9 @@ export function BudgetsSection({
 
         {/* Budget Categories */}
         <div className="flex-1 py-2 min-w-0 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-4 w-full h-full">
-          {budgetCategories.map((category, index) => (
+          {budgetCategories.map((category) => (
             <BudgetItem
-              key={index}
+              key={category.name}
               category={category.name}
               amount={category.limit}
               color={category.color}

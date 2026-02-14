@@ -6,18 +6,21 @@ import { PotsSection } from "@/components/Dashboard/PotsSection";
 import { TransactionsSection } from "@/components/Dashboard/TransactionsSection";
 import { BudgetsSection } from "@/components/Dashboard/BudgetsSection";
 import { RecurringBillsSection } from "@/components/Dashboard/RecurringBillsSection";
+import { DataErrorAlert } from "@/components/DataErrorAlert";
+import { PageLayout } from "@/components/PageLayout";
 
 export default function DashboardPage() {
-  const { balance, transactions, budgets, pots, isLoading } = useFinanceData();
-  const { data: recurringBills, isLoading: isLoadingBills } =
-    useRecurringBills();
+  const { balance, transactions, budgets, pots, isLoading, isError } =
+    useFinanceData();
+  const {
+    data: recurringBills,
+    isLoading: isLoadingBills,
+    isError: isBillsError,
+  } = useRecurringBills();
 
   return (
-    <div className="bg-[#F8F4F0] p-4 md:p-8 pb-[68px] sm:pb-[90px] md:pb-8">
-      <div className="max-w-[1440px] mx-auto">
-        <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-6 md:mb-8">
-          Overview
-        </h1>
+    <PageLayout title="Overview">
+      {(isError || isBillsError) && <DataErrorAlert />}
 
         {/* Summary Cards */}
         <SummaryCards
@@ -51,7 +54,6 @@ export default function DashboardPage() {
             />
           </div>
         </div>
-      </div>
-    </div>
+    </PageLayout>
   );
 }

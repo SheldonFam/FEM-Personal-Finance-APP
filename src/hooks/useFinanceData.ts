@@ -8,207 +8,147 @@ export type TransactionInput = Omit<Transaction, "id">;
 export type BudgetInput = Omit<Budget, "id">;
 export type PotInput = Omit<Pot, "id">;
 
-/**
- * Check if Supabase is properly configured
- */
-function isSupabaseConfigured(): boolean {
-  return !!(
+const isSupabaseConfigured = (): boolean =>
+  !!(
     process.env.NEXT_PUBLIC_SUPABASE_URL &&
     process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY
   );
-}
 
 /**
- * Fetch balance data
- * Uses Supabase if configured, otherwise falls back to local data
+ * Factory for creating authenticated Supabase query functions.
+ * Handles config check, auth check, and fallback to local data.
  */
+function createSupabaseQueryFn<T>(options: {
+  localFallback: () => T;
+  queryFn: (
+    supabase: ReturnType<typeof createClient>,
+    userId: string,
+  ) => Promise<T>;
+}): () => Promise<T> {
+  return async () => {
+    if (!isSupabaseConfigured()) {
+      return options.localFallback();
+    }
+
+    const supabase = createClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user) {
+      return options.localFallback();
+    }
+
+    return await options.queryFn(supabase, user.id);
+  };
+}
+
+// =============================================
+// QUERIES
+// =============================================
+
 export function useBalance() {
   return useQuery({
     queryKey: ["balance"],
-    queryFn: async (): Promise<Balance> => {
-      // If Supabase is not configured, use local data
-      if (!isSupabaseConfigured()) {
-        return localData.balance as Balance;
-      }
+    queryFn: createSupabaseQueryFn<Balance>({
+      localFallback: () => localData.balance as Balance,
 
-      const supabase = createClient();
+      queryFn: async (supabase, userId) => {
+        const { data, error } = await supabase
+          .from("balance")
+          .select("current, income, expenses")
+          .eq("user_id", userId)
+          .single();
 
-      // Check if user is authenticated
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
-
-      if (!user) {
-        // Not logged in, use local data for demo
-        return localData.balance as Balance;
-      }
-
-      // Fetch from Supabase
-      const { data, error } = await supabase
-        .from("balance")
-        .select("current, income, expenses")
-        .single();
-
-      if (error) {
-        console.error("Balance fetch error:", error.message);
-        // Return empty balance if no data exists yet
-        return { current: 0, income: 0, expenses: 0 };
-      }
-
-      return data as Balance;
-    },
+        if (error) throw error;
+        return data as Balance;
+      },
+    }),
   });
 }
 
-/**
- * Fetch all transactions
- */
 export function useTransactions() {
   return useQuery({
     queryKey: ["transactions"],
-    queryFn: async (): Promise<Transaction[]> => {
-      if (!isSupabaseConfigured()) {
-        return localData.transactions as Transaction[];
-      }
+    queryFn: createSupabaseQueryFn<Transaction[]>({
+      localFallback: () => localData.transactions as Transaction[],
 
-      const supabase = createClient();
+      queryFn: async (supabase, userId) => {
+        const { data, error } = await supabase
+          .from("transactions")
+          .select("id, avatar, name, category, date, amount, recurring")
+          .eq("user_id", userId)
+          .order("date", { ascending: false });
 
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
-
-      if (!user) {
-        return localData.transactions as Transaction[];
-      }
-
-      const { data, error } = await supabase
-        .from("transactions")
-        .select("id, avatar, name, category, date, amount, recurring")
-        .order("date", { ascending: false });
-
-      if (error) {
-        console.error("Transactions fetch error:", error.message);
-        return [];
-      }
-
-      return (data as Transaction[]) || [];
-    },
+        if (error) throw error;
+        return (data as Transaction[]) || [];
+      },
+    }),
   });
 }
 
-/**
- * Fetch all budgets
- */
 export function useBudgets() {
   return useQuery({
     queryKey: ["budgets"],
-    queryFn: async (): Promise<Budget[]> => {
-      if (!isSupabaseConfigured()) {
-        return localData.budgets as Budget[];
-      }
+    queryFn: createSupabaseQueryFn<Budget[]>({
+      localFallback: () => localData.budgets as Budget[],
 
-      const supabase = createClient();
+      queryFn: async (supabase, userId) => {
+        const { data, error } = await supabase
+          .from("budgets")
+          .select("id, category, maximum, theme")
+          .eq("user_id", userId);
 
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
-
-      if (!user) {
-        return localData.budgets as Budget[];
-      }
-
-      const { data, error } = await supabase
-        .from("budgets")
-        .select("id, category, maximum, theme");
-
-      if (error) {
-        console.error("Budgets fetch error:", error.message);
-        return [];
-      }
-
-      return (data as Budget[]) || [];
-    },
+        if (error) throw error;
+        return (data as Budget[]) || [];
+      },
+    }),
   });
 }
 
-/**
- * Fetch all pots
- */
 export function usePots() {
   return useQuery({
     queryKey: ["pots"],
-    queryFn: async (): Promise<Pot[]> => {
-      if (!isSupabaseConfigured()) {
-        return localData.pots as Pot[];
-      }
+    queryFn: createSupabaseQueryFn<Pot[]>({
+      localFallback: () => localData.pots as Pot[],
 
-      const supabase = createClient();
+      queryFn: async (supabase, userId) => {
+        const { data, error } = await supabase
+          .from("pots")
+          .select("id, name, target, total, theme")
+          .eq("user_id", userId);
 
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
-
-      if (!user) {
-        return localData.pots as Pot[];
-      }
-
-      const { data, error } = await supabase
-        .from("pots")
-        .select("id, name, target, total, theme");
-
-      if (error) {
-        console.error("Pots fetch error:", error.message);
-        return [];
-      }
-
-      return (data as Pot[]) || [];
-    },
+        if (error) throw error;
+        return (data as Pot[]) || [];
+      },
+    }),
   });
 }
 
-/**
- * Fetch recurring bills (transactions with recurring: true)
- */
 export function useRecurringBills() {
   return useQuery({
     queryKey: ["recurring-bills"],
-    queryFn: async (): Promise<Transaction[]> => {
-      if (!isSupabaseConfigured()) {
-        return (localData.transactions as Transaction[]).filter(
-          (t) => t.recurring
-        );
-      }
+    queryFn: createSupabaseQueryFn<Transaction[]>({
+      localFallback: () =>
+        (localData.transactions as Transaction[]).filter((t) => t.recurring),
 
-      const supabase = createClient();
+      queryFn: async (supabase, userId) => {
+        const { data, error } = await supabase
+          .from("transactions")
+          .select("id, avatar, name, category, date, amount, recurring")
+          .eq("user_id", userId)
+          .eq("recurring", true)
+          .order("date", { ascending: false });
 
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
-
-      if (!user) {
-        return (localData.transactions as Transaction[]).filter(
-          (t) => t.recurring
-        );
-      }
-
-      const { data, error } = await supabase
-        .from("transactions")
-        .select("id, avatar, name, category, date, amount, recurring")
-        .eq("recurring", true)
-        .order("date", { ascending: false });
-
-      if (error) {
-        console.error("Recurring bills fetch error:", error.message);
-        return [];
-      }
-
-      return (data as Transaction[]) || [];
-    },
+        if (error) throw error;
+        return (data as Transaction[]) || [];
+      },
+    }),
   });
 }
 
 /**
- * Fetch all finance data at once (for dashboard)
+ * Aggregated hook for dashboard — combines all finance queries.
  */
 export function useFinanceData() {
   const balance = useBalance();
@@ -235,30 +175,33 @@ export function useFinanceData() {
 }
 
 // =============================================
+// MUTATION HELPERS
+// =============================================
+
+async function getAuthenticatedUser() {
+  const supabase = createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) throw new Error("Not authenticated");
+  return { supabase, user };
+}
+
+// =============================================
 // TRANSACTION MUTATIONS
 // =============================================
 
-/**
- * Create a new transaction
- */
 export function useCreateTransaction() {
   const queryClient = useQueryClient();
-  const supabase = createClient();
 
   return useMutation({
     mutationFn: async (transaction: TransactionInput) => {
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
-
-      if (!user) throw new Error("Not authenticated");
+      const { supabase, user } = await getAuthenticatedUser();
 
       const { data, error } = await supabase
         .from("transactions")
-        .insert({
-          user_id: user.id,
-          ...transaction,
-        })
+        .insert({ user_id: user.id, ...transaction })
         .select()
         .single();
 
@@ -272,18 +215,16 @@ export function useCreateTransaction() {
   });
 }
 
-/**
- * Update an existing transaction
- */
 export function useUpdateTransaction() {
   const queryClient = useQueryClient();
-  const supabase = createClient();
 
   return useMutation({
     mutationFn: async ({
       id,
       ...transaction
     }: Partial<Transaction> & { id: string }) => {
+      const supabase = createClient();
+
       const { data, error } = await supabase
         .from("transactions")
         .update(transaction)
@@ -301,15 +242,12 @@ export function useUpdateTransaction() {
   });
 }
 
-/**
- * Delete a transaction
- */
 export function useDeleteTransaction() {
   const queryClient = useQueryClient();
-  const supabase = createClient();
 
   return useMutation({
     mutationFn: async (id: string) => {
+      const supabase = createClient();
       const { error } = await supabase
         .from("transactions")
         .delete()
@@ -328,27 +266,16 @@ export function useDeleteTransaction() {
 // BUDGET MUTATIONS
 // =============================================
 
-/**
- * Create a new budget
- */
 export function useCreateBudget() {
   const queryClient = useQueryClient();
-  const supabase = createClient();
 
   return useMutation({
     mutationFn: async (budget: BudgetInput) => {
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
-
-      if (!user) throw new Error("Not authenticated");
+      const { supabase, user } = await getAuthenticatedUser();
 
       const { data, error } = await supabase
         .from("budgets")
-        .insert({
-          user_id: user.id,
-          ...budget,
-        })
+        .insert({ user_id: user.id, ...budget })
         .select()
         .single();
 
@@ -361,18 +288,16 @@ export function useCreateBudget() {
   });
 }
 
-/**
- * Update an existing budget
- */
 export function useUpdateBudget() {
   const queryClient = useQueryClient();
-  const supabase = createClient();
 
   return useMutation({
     mutationFn: async ({
       id,
       ...budget
     }: Partial<Budget> & { id: string }) => {
+      const supabase = createClient();
+
       const { data, error } = await supabase
         .from("budgets")
         .update(budget)
@@ -389,15 +314,12 @@ export function useUpdateBudget() {
   });
 }
 
-/**
- * Delete a budget
- */
 export function useDeleteBudget() {
   const queryClient = useQueryClient();
-  const supabase = createClient();
 
   return useMutation({
     mutationFn: async (id: string) => {
+      const supabase = createClient();
       const { error } = await supabase.from("budgets").delete().eq("id", id);
 
       if (error) throw error;
@@ -412,27 +334,16 @@ export function useDeleteBudget() {
 // POT MUTATIONS
 // =============================================
 
-/**
- * Create a new pot
- */
 export function useCreatePot() {
   const queryClient = useQueryClient();
-  const supabase = createClient();
 
   return useMutation({
     mutationFn: async (pot: PotInput) => {
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
-
-      if (!user) throw new Error("Not authenticated");
+      const { supabase, user } = await getAuthenticatedUser();
 
       const { data, error } = await supabase
         .from("pots")
-        .insert({
-          user_id: user.id,
-          ...pot,
-        })
+        .insert({ user_id: user.id, ...pot })
         .select()
         .single();
 
@@ -445,15 +356,13 @@ export function useCreatePot() {
   });
 }
 
-/**
- * Update an existing pot
- */
 export function useUpdatePot() {
   const queryClient = useQueryClient();
-  const supabase = createClient();
 
   return useMutation({
     mutationFn: async ({ id, ...pot }: Partial<Pot> & { id: string }) => {
+      const supabase = createClient();
+
       const { data, error } = await supabase
         .from("pots")
         .update(pot)
@@ -470,15 +379,12 @@ export function useUpdatePot() {
   });
 }
 
-/**
- * Delete a pot
- */
 export function useDeletePot() {
   const queryClient = useQueryClient();
-  const supabase = createClient();
 
   return useMutation({
     mutationFn: async (id: string) => {
+      const supabase = createClient();
       const { error } = await supabase.from("pots").delete().eq("id", id);
 
       if (error) throw error;
@@ -489,16 +395,13 @@ export function useDeletePot() {
   });
 }
 
-/**
- * Add money to a pot
- */
 export function useAddMoneyToPot() {
   const queryClient = useQueryClient();
-  const supabase = createClient();
 
   return useMutation({
     mutationFn: async ({ id, amount }: { id: string; amount: number }) => {
-      // First get current total
+      const supabase = createClient();
+
       const { data: pot, error: fetchError } = await supabase
         .from("pots")
         .select("total")
@@ -526,16 +429,13 @@ export function useAddMoneyToPot() {
   });
 }
 
-/**
- * Withdraw money from a pot
- */
 export function useWithdrawFromPot() {
   const queryClient = useQueryClient();
-  const supabase = createClient();
 
   return useMutation({
     mutationFn: async ({ id, amount }: { id: string; amount: number }) => {
-      // First get current total
+      const supabase = createClient();
+
       const { data: pot, error: fetchError } = await supabase
         .from("pots")
         .select("total")
@@ -567,20 +467,12 @@ export function useWithdrawFromPot() {
 // BALANCE MUTATIONS
 // =============================================
 
-/**
- * Update balance
- */
 export function useUpdateBalance() {
   const queryClient = useQueryClient();
-  const supabase = createClient();
 
   return useMutation({
     mutationFn: async (balance: Partial<Balance>) => {
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
-
-      if (!user) throw new Error("Not authenticated");
+      const { supabase, user } = await getAuthenticatedUser();
 
       const { data, error } = await supabase
         .from("balance")

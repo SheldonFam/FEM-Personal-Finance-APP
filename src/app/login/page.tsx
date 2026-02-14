@@ -35,7 +35,12 @@ function LoginForm() {
   const [error, setError] = useState<string | null>(null);
 
   // Get the callback URL from query params (set by middleware when redirecting from protected routes)
-  const callbackUrl = searchParams.get("callbackUrl") ?? "/dashboard";
+  // Validate that callbackUrl is a relative path to prevent open redirect attacks
+  const rawCallbackUrl = searchParams.get("callbackUrl");
+  const callbackUrl =
+    rawCallbackUrl && rawCallbackUrl.startsWith("/") && !rawCallbackUrl.startsWith("//")
+      ? rawCallbackUrl
+      : "/dashboard";
 
   const {
     register,

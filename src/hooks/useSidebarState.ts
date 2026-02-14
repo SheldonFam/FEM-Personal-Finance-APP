@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import { logger } from "@/lib/logger";
 
 const STORAGE_KEY = "sidebar-collapsed";
 
@@ -25,7 +26,7 @@ export function useSidebarState(initialCollapsed: boolean = true) {
       try {
         window.localStorage.setItem(STORAGE_KEY, next ? "1" : "0");
       } catch (error) {
-        console.error("Failed to save sidebar state:", error);
+        logger.error("Failed to save sidebar state:", error);
       }
     });
   };

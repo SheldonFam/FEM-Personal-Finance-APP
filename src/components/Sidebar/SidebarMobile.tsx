@@ -8,6 +8,7 @@ import { SidebarNavItem } from "./SidebarNavItem";
 import type { SidebarMobileProps } from "./types";
 import { Button } from "@/components/ui/Button";
 import { logout } from "@/services/auth.service";
+import { logger } from "@/lib/logger";
 import { cn } from "@/lib/utils";
 
 export function SidebarMobile({ isActive }: SidebarMobileProps) {
@@ -20,7 +21,7 @@ export function SidebarMobile({ isActive }: SidebarMobileProps) {
       await logout();
       router.push("/login");
     } catch (error) {
-      console.error("Logout failed:", error);
+      logger.error("Logout failed:", error);
       setIsLoggingOut(false);
     }
   };
