@@ -1,9 +1,6 @@
 "use client";
 
 import React, { useState } from "react";
-import { Card } from "@/components/ui/Card";
-import { Button } from "@/components/ui/Button";
-import Image from "next/image";
 import { Pot } from "@/lib/types";
 import {
   getThemeNameFromHex,
@@ -13,6 +10,10 @@ import PotFormModal from "@/components/Modals/PotFormModal";
 import PotMoneyModal from "@/components/Modals/PotMoneyModal";
 import { DeleteConfirmationModal } from "@/components/Modals/DeleteConfirmationModal";
 import { PotCard } from "@/components/Pots/PotCard";
+import { Button } from "@/components/ui/Button";
+import { PageLayout } from "@/components/PageLayout";
+import { EmptyState } from "@/components/EmptyState";
+import { DataErrorAlert } from "@/components/DataErrorAlert";
 import {
   usePots,
   useCreatePot,
@@ -21,7 +22,6 @@ import {
   useAddMoneyToPot,
   useWithdrawFromPot,
 } from "@/hooks/useFinanceData";
-import { DataErrorAlert } from "@/components/DataErrorAlert";
 
 export default function PotsPage() {
   const { data: pots = [], isLoading, isError } = usePots();
@@ -113,21 +113,21 @@ export default function PotsPage() {
   };
 
   return (
-    <div className="bg-[#F8F4F0] p-4 md:p-8 pb-[68px] sm:pb-[90px] md:pb-8">
-      <div className="max-w-[1440px] mx-auto">
-        {isError && <DataErrorAlert />}
-
-        {/* Header */}
-        <div className="flex items-center justify-between mb-6 md:mb-8">
-          <h1 className="text-2xl md:text-3xl font-bold text-gray-900">Pots</h1>
+    <PageLayout
+      title="Pots"
+      action={
         <Button onClick={() => setIsAddModalOpen(true)}>+ Add New Pot</Button>
-      </div>
+      }
+    >
+      {isError && <DataErrorAlert />}
 
-      {/* Pots Grid */}
       {isLoading ? (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {[1, 2, 3, 4].map((i) => (
-            <div key={i} className="h-[200px] animate-pulse bg-gray-200 rounded-lg" />
+            <div
+              key={i}
+              className="h-[200px] animate-pulse bg-gray-200 rounded-lg"
+            />
           ))}
         </div>
       ) : pots.length > 0 ? (
@@ -136,11 +136,7 @@ export default function PotsPage() {
             <PotCard
               key={pot.name}
               pot={pot}
-              onEdit={() =>
-                setEditingPot({
-                  ...pot,
-                })
-              }
+              onEdit={() => setEditingPot({ ...pot })}
               onDelete={() => setDeletingPot(pot)}
               onAddMoney={() => setAddMoneyPot(pot)}
               onWithdraw={() => setWithdrawPot(pot)}
@@ -148,29 +144,15 @@ export default function PotsPage() {
           ))}
         </div>
       ) : (
-        <Card className="p-12 text-center">
-          <div className="max-w-md mx-auto">
-            <Image
-              src="/assets/images/icon-pot.svg"
-              alt="No pots"
-              width={64}
-              height={64}
-              className="mx-auto mb-4 opacity-20"
-            />
-            <h3 className="text-xl font-bold text-gray-900 mb-2">
-              No pots yet
-            </h3>
-            <p className="text-gray-600 mb-6">
-              Create your first pot to start saving towards your goals.
-            </p>
-            <Button onClick={() => setIsAddModalOpen(true)}>
-              + Add New Pot
-            </Button>
-          </div>
-        </Card>
+        <EmptyState
+          icon="/assets/images/icon-pot.svg"
+          title="No pots yet"
+          description="Create your first pot to start saving towards your goals."
+          actionLabel="+ Add New Pot"
+          onAction={() => setIsAddModalOpen(true)}
+        />
       )}
 
-      {/* Modals */}
       <PotFormModal
         mode="add"
         open={isAddModalOpen}
@@ -235,7 +217,6 @@ export default function PotsPage() {
           }}
         />
       )}
-      </div>
-    </div>
+    </PageLayout>
   );
 }
