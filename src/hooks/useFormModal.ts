@@ -49,6 +49,7 @@ export function useFormModal<
 
   // Store initialData in ref to track when it actually changes
   const initialDataRef = useRef(initialData);
+  initialDataRef.current = initialData;
   const prevOpenRef = useRef(false);
 
   const form = useForm<TFormData>({

@@ -10,7 +10,7 @@ export function DataErrorAlert({
   message = "Failed to load data. Please try refreshing the page.",
 }: DataErrorAlertProps) {
   return (
-    <Alert variant="destructive" className="mb-4">
+    <Alert variant="destructive" className="mb-4" aria-live="assertive">
       <AlertDescription>{message}</AlertDescription>
     </Alert>
   );

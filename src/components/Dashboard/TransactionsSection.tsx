@@ -50,9 +50,9 @@ export function TransactionsSection({
       />
 
       <div className="space-y-1">
-        {recentTransactions.map((transaction, index) => (
+        {recentTransactions.map((transaction) => (
           <TransactionItem
-            key={index}
+            key={transaction.id ?? `${transaction.name}-${transaction.date}`}
             name={transaction.name}
             amount={Math.abs(transaction.amount)}
             date={formatDate(transaction.date)}

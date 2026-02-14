@@ -78,9 +78,9 @@ export function RecurringBillsSection({
       />
 
       <div className="space-y-3">
-        {bills.map((bill, index) => (
+        {bills.map((bill) => (
           <RecurringBillCard
-            key={index}
+            key={bill.label}
             label={bill.label}
             amount={bill.amount}
             borderColor={bill.borderColor}

@@ -1,6 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { createClient } from "@/lib/supabase/client";
-import { logger } from "@/lib/logger";
 import type { Balance, Transaction, Budget, Pot } from "@/lib/types";
 import localData from "@/data/data.json";
 
@@ -25,8 +24,6 @@ function createSupabaseQueryFn<T>(options: {
     supabase: ReturnType<typeof createClient>,
     userId: string,
   ) => Promise<T>;
-  errorFallback: T;
-  label: string;
 }): () => Promise<T> {
   return async () => {
     if (!isSupabaseConfigured()) {
@@ -42,12 +39,7 @@ function createSupabaseQueryFn<T>(options: {
       return options.localFallback();
     }
 
-    try {
-      return await options.queryFn(supabase, user.id);
-    } catch (error) {
-      logger.error(`${options.label} fetch error:`, error);
-      return options.errorFallback;
-    }
+    return await options.queryFn(supabase, user.id);
   };
 }
 
@@ -60,8 +52,7 @@ export function useBalance() {
     queryKey: ["balance"],
     queryFn: createSupabaseQueryFn<Balance>({
       localFallback: () => localData.balance as Balance,
-      errorFallback: { current: 0, income: 0, expenses: 0 },
-      label: "Balance",
+
       queryFn: async (supabase, userId) => {
         const { data, error } = await supabase
           .from("balance")
@@ -81,8 +72,7 @@ export function useTransactions() {
     queryKey: ["transactions"],
     queryFn: createSupabaseQueryFn<Transaction[]>({
       localFallback: () => localData.transactions as Transaction[],
-      errorFallback: [],
-      label: "Transactions",
+
       queryFn: async (supabase, userId) => {
         const { data, error } = await supabase
           .from("transactions")
@@ -102,8 +92,7 @@ export function useBudgets() {
     queryKey: ["budgets"],
     queryFn: createSupabaseQueryFn<Budget[]>({
       localFallback: () => localData.budgets as Budget[],
-      errorFallback: [],
-      label: "Budgets",
+
       queryFn: async (supabase, userId) => {
         const { data, error } = await supabase
           .from("budgets")
@@ -122,8 +111,7 @@ export function usePots() {
     queryKey: ["pots"],
     queryFn: createSupabaseQueryFn<Pot[]>({
       localFallback: () => localData.pots as Pot[],
-      errorFallback: [],
-      label: "Pots",
+
       queryFn: async (supabase, userId) => {
         const { data, error } = await supabase
           .from("pots")
@@ -143,8 +131,7 @@ export function useRecurringBills() {
     queryFn: createSupabaseQueryFn<Transaction[]>({
       localFallback: () =>
         (localData.transactions as Transaction[]).filter((t) => t.recurring),
-      errorFallback: [],
-      label: "Recurring bills",
+
       queryFn: async (supabase, userId) => {
         const { data, error } = await supabase
           .from("transactions")
