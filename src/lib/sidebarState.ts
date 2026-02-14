@@ -5,6 +5,8 @@
  * on the client side, ensuring no hydration mismatches occur.
  */
 
+import { logger } from "@/lib/logger";
+
 const STORAGE_KEY = "sidebar-collapsed";
 
 /**
@@ -25,7 +27,7 @@ export function getInitialSidebarState(): boolean {
     const stored = window.localStorage.getItem(STORAGE_KEY);
     return stored === null ? true : stored === "1";
   } catch (error) {
-    console.error("Failed to read sidebar state:", error);
+    logger.error("Failed to read sidebar state:", error);
     return true;
   }
 }
@@ -41,6 +43,6 @@ export function saveSidebarState(collapsed: boolean): void {
   try {
     window.localStorage.setItem(STORAGE_KEY, collapsed ? "1" : "0");
   } catch (error) {
-    console.error("Failed to save sidebar state:", error);
+    logger.error("Failed to save sidebar state:", error);
   }
 }

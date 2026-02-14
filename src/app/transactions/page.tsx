@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/Select";
 import Image from "next/image";
 import { useTransactions } from "@/hooks/useFinanceData";
+import { DataErrorAlert } from "@/components/DataErrorAlert";
 import {
   TRANSACTION_CATEGORIES,
   SORT_OPTIONS,
@@ -32,7 +33,7 @@ export default function TransactionsPage() {
   const [isCategorySelectOpen, setIsCategorySelectOpen] = useState(false);
   const [isSortSelectOpen, setIsSortSelectOpen] = useState(false);
 
-  const { data: transactions = [], isLoading } = useTransactions();
+  const { data: transactions = [], isLoading, isError } = useTransactions();
 
   // Filter and sort transactions
   const filteredAndSortedTransactions = useTransactionFilters({
@@ -59,6 +60,8 @@ export default function TransactionsPage() {
         <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-6 md:mb-8">
           Transactions
         </h1>
+
+        {isError && <DataErrorAlert />}
 
         {/* Transactions Card */}
         <Card className="p-5 md:p-8">

@@ -10,6 +10,7 @@ import { SidebarNavItem } from "@/components/Sidebar/SidebarNavItem";
 import { NAV_ITEMS } from "@/components/Sidebar/nav-items";
 import { Button } from "@/components/ui/Button";
 import { logout } from "@/services/auth.service";
+import { logger } from "@/lib/logger";
 import { cn } from "@/lib/utils";
 
 export function SidebarDesktop({
@@ -26,7 +27,7 @@ export function SidebarDesktop({
       await logout();
       router.push("/login");
     } catch (error) {
-      console.error("Logout failed:", error);
+      logger.error("Logout failed:", error);
       setIsLoggingOut(false);
     }
   };

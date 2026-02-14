@@ -5,6 +5,7 @@ import {
   FieldValues,
   DefaultValues,
 } from "react-hook-form";
+import { logger } from "@/lib/logger";
 
 interface UseFormModalOptions<
   TFormData extends FieldValues,
@@ -67,7 +68,7 @@ export function useFormModal<
       reset(defaultValuesRef.current);
       onOpenChange(false);
     } catch (error) {
-      console.error(`Failed to ${mode}:`, error);
+      logger.error(`Failed to ${mode}:`, error);
       setSubmitError(error instanceof Error ? error.message : errorMessage);
     }
   };

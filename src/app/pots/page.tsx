@@ -21,9 +21,10 @@ import {
   useAddMoneyToPot,
   useWithdrawFromPot,
 } from "@/hooks/useFinanceData";
+import { DataErrorAlert } from "@/components/DataErrorAlert";
 
 export default function PotsPage() {
-  const { data: pots = [], isLoading } = usePots();
+  const { data: pots = [], isLoading, isError } = usePots();
 
   const createPot = useCreatePot();
   const updatePot = useUpdatePot();
@@ -114,6 +115,8 @@ export default function PotsPage() {
   return (
     <div className="bg-[#F8F4F0] p-4 md:p-8 pb-[68px] sm:pb-[90px] md:pb-8">
       <div className="max-w-[1440px] mx-auto">
+        {isError && <DataErrorAlert />}
+
         {/* Header */}
         <div className="flex items-center justify-between mb-6 md:mb-8">
           <h1 className="text-2xl md:text-3xl font-bold text-gray-900">Pots</h1>

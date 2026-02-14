@@ -20,10 +20,11 @@ import {
   useUpdateBudget,
   useDeleteBudget,
 } from "@/hooks/useFinanceData";
+import { DataErrorAlert } from "@/components/DataErrorAlert";
 
 export default function BudgetsPage() {
-  const { data: budgets = [], isLoading: isLoadingBudgets } = useBudgets();
-  const { data: transactions = [], isLoading: isLoadingTransactions } = useTransactions();
+  const { data: budgets = [], isLoading: isLoadingBudgets, isError: isBudgetsError } = useBudgets();
+  const { data: transactions = [], isLoading: isLoadingTransactions, isError: isTransactionsError } = useTransactions();
 
   const createBudget = useCreateBudget();
   const updateBudget = useUpdateBudget();
@@ -106,6 +107,8 @@ export default function BudgetsPage() {
   return (
     <div className="bg-[#F8F4F0] p-4 md:p-8 pb-[68px] sm:pb-[90px] md:pb-8">
       <div className="max-w-[1440px] mx-auto">
+        {(isBudgetsError || isTransactionsError) && <DataErrorAlert />}
+
         {/* Header */}
         <div className="flex items-center justify-between mb-6 md:mb-8">
           <h1 className="text-3xl font-bold text-gray-900">Budgets</h1>
