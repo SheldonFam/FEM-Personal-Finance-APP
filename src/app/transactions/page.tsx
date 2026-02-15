@@ -23,6 +23,8 @@ import { useTransactionFilters } from "@/hooks/useTransactionFilters";
 import { usePagination } from "@/hooks/usePagination";
 import { TransactionRow } from "@/components/Transactions/TransactionRow";
 import { Pagination } from "@/components/ui/Pagination";
+import { exportTransactionsToCsv } from "@/lib/exportCsv";
+import { ImportTransactionsModal } from "@/components/Modals/ImportTransactionsModal";
 
 export default function TransactionsPage() {
   const [searchTerm, setSearchTerm] = useState("");
@@ -33,6 +35,7 @@ export default function TransactionsPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [isCategorySelectOpen, setIsCategorySelectOpen] = useState(false);
   const [isSortSelectOpen, setIsSortSelectOpen] = useState(false);
+  const [isImportModalOpen, setIsImportModalOpen] = useState(false);
 
   const { data: transactions = [], isLoading, isError } = useTransactions();
 
@@ -56,7 +59,26 @@ export default function TransactionsPage() {
   }, [searchTerm, selectedCategory, sortBy]);
 
   return (
-    <PageLayout title="Transactions">
+    <PageLayout
+      title="Transactions"
+      action={
+        <div className="flex gap-2">
+          <Button
+            variant="outline"
+            onClick={() => setIsImportModalOpen(true)}
+          >
+            Import CSV
+          </Button>
+          <Button
+            variant="outline"
+            onClick={() => exportTransactionsToCsv(filteredAndSortedTransactions)}
+            disabled={isLoading || filteredAndSortedTransactions.length === 0}
+          >
+            Export CSV
+          </Button>
+        </div>
+      }
+    >
       {isError && <DataErrorAlert />}
 
       {/* Transactions Card */}
@@ -238,6 +260,11 @@ export default function TransactionsPage() {
             )}
           </div>
       </Card>
+
+      <ImportTransactionsModal
+        open={isImportModalOpen}
+        onOpenChange={setIsImportModalOpen}
+      />
     </PageLayout>
   );
 }
