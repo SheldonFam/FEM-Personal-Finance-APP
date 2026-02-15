@@ -6,6 +6,8 @@ import { normalizeImagePath } from "@/lib/utils";
 import { Progress } from "@/components/ui/Progress";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
+import { Alert, AlertDescription } from "@/components/ui/Alert";
+import { getBudgetAlertStatus } from "@/lib/budgetAlerts";
 
 interface BudgetCardProps {
   budget: Budget;
@@ -25,6 +27,7 @@ export const BudgetCard = ({
   const [showMenu, setShowMenu] = useState(false);
   const percentage = Math.min((spent / budget.maximum) * 100, 100);
   const remaining = Math.max(0, budget.maximum - spent);
+  const alertStatus = getBudgetAlertStatus(spent, budget.maximum);
 
   // Get latest 3 transactions for this category
   const latestTransactions = transactions
@@ -129,6 +132,15 @@ export const BudgetCard = ({
           color={budget.theme}
           aria-label={`${percentage.toFixed(1)}% of budget spent`}
         />
+
+        {alertStatus.level !== "safe" && (
+          <Alert
+            variant={alertStatus.level === "exceeded" ? "destructive" : "default"}
+            className="mb-3"
+          >
+            <AlertDescription>{alertStatus.message}</AlertDescription>
+          </Alert>
+        )}
 
         {/* Spending info below progress bar */}
         <div className="grid grid-cols-2 gap-8 mt-4">

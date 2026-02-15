@@ -6,6 +6,7 @@ import { PotsSection } from "@/components/Dashboard/PotsSection";
 import { TransactionsSection } from "@/components/Dashboard/TransactionsSection";
 import { BudgetsSection } from "@/components/Dashboard/BudgetsSection";
 import { RecurringBillsSection } from "@/components/Dashboard/RecurringBillsSection";
+import { SpendingInsightsSection } from "@/components/Dashboard/SpendingInsightsSection";
 import { DataErrorAlert } from "@/components/DataErrorAlert";
 import { PageLayout } from "@/components/PageLayout";
 
@@ -36,6 +37,10 @@ export default function DashboardPage() {
           <div className="flex flex-col gap-4 md:gap-6">
             <PotsSection pots={pots.data ?? []} isLoading={pots.isLoading} />
             <TransactionsSection
+              transactions={transactions.data ?? []}
+              isLoading={transactions.isLoading}
+            />
+            <SpendingInsightsSection
               transactions={transactions.data ?? []}
               isLoading={transactions.isLoading}
             />

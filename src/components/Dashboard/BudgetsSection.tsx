@@ -3,6 +3,7 @@ import { Skeleton } from "@/components/ui/Skeleton";
 import { SectionHeader } from "./SectionHeader";
 import { BudgetItem } from "./BudgetItem";
 import BudgetDonutChart from "@/components/Charts/BudgetDonutChart";
+import { getBudgetAlertStatus } from "@/lib/budgetAlerts";
 import type { Budget, Transaction } from "@/lib/types";
 
 interface BudgetsSectionProps {
@@ -66,14 +67,18 @@ export function BudgetsSection({
 
         {/* Budget Categories */}
         <div className="flex-1 py-2 min-w-0 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-4 w-full h-full">
-          {budgetCategories.map((category) => (
-            <BudgetItem
-              key={category.name}
-              category={category.name}
-              amount={category.limit}
-              color={category.color}
-            />
-          ))}
+          {budgetCategories.map((category) => {
+            const alert = getBudgetAlertStatus(category.spent, category.limit);
+            return (
+              <BudgetItem
+                key={category.name}
+                category={category.name}
+                amount={category.limit}
+                color={category.color}
+                alertLevel={alert.level}
+              />
+            );
+          })}
         </div>
       </div>
     </Card>

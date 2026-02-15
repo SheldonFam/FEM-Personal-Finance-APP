@@ -51,18 +51,33 @@ const getMobilePages = (
 };
 
 const getDesktopPages = (
-  _currentPage: number,
+  currentPage: number,
   totalPages: number
 ): PageItem[] => {
-  const pages: PageItem[] = [];
-
-  const max = Math.min(5, totalPages);
-
-  for (let i = 1; i <= max; i++) {
-    pages.push(i);
+  if (totalPages <= 5) {
+    return Array.from({ length: totalPages }, (_, i) => i + 1);
   }
 
-  if (totalPages > 5) {
+  const pages: PageItem[] = [];
+
+  // Always show first page
+  pages.push(1);
+
+  if (currentPage <= 3) {
+    // Near start: 1 2 3 4 ... last
+    for (let i = 2; i <= 4; i++) pages.push(i);
+    pages.push("...");
+    pages.push(totalPages);
+  } else if (currentPage >= totalPages - 2) {
+    // Near end: 1 ... (last-3) (last-2) (last-1) last
+    pages.push("...");
+    for (let i = totalPages - 3; i <= totalPages; i++) pages.push(i);
+  } else {
+    // Middle: 1 ... (cur-1) cur (cur+1) ... last
+    pages.push("...");
+    pages.push(currentPage - 1);
+    pages.push(currentPage);
+    pages.push(currentPage + 1);
     pages.push("...");
     pages.push(totalPages);
   }
