@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useCallback } from "react";
+import React, { useState } from "react";
 import { BaseModal } from "./shared/BaseModal";
 import { Button } from "@/components/ui/Button";
 import {
@@ -38,13 +38,13 @@ export function ImportTransactionsModal({
 
   const bulkCreate = useBulkCreateTransactions();
 
-  const reset = useCallback(() => {
+  const reset = () => {
     setStep("upload");
     setRows([]);
     setErrors([]);
     setImportCount(0);
     bulkCreate.reset();
-  }, [bulkCreate]);
+  };
 
   const handleOpenChange = (isOpen: boolean) => {
     if (!isOpen) reset();

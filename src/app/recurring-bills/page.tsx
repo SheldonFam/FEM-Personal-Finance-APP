@@ -35,22 +35,34 @@ export default function RecurringBillsPage() {
     [recurringTransactions]
   );
 
-  // Calculate summary (static data, no need for memoization)
-  const paidBills = allBills.filter((b) => b.isPaid);
-  const upcomingBills = allBills.filter((b) => !b.isPaid);
-  const dueSoonBills = allBills.filter((b) => b.isDueSoon);
-
-  const summary = {
-    total: Math.abs(allBills.reduce((sum, b) => sum + b.amount, 0)),
-    paidCount: paidBills.length,
-    paidAmount: Math.abs(paidBills.reduce((sum, b) => sum + b.amount, 0)),
-    upcomingCount: upcomingBills.length,
-    upcomingAmount: Math.abs(
-      upcomingBills.reduce((sum, b) => sum + b.amount, 0)
-    ),
-    dueSoonCount: dueSoonBills.length,
-    dueSoonAmount: Math.abs(dueSoonBills.reduce((sum, b) => sum + b.amount, 0)),
-  };
+  // Calculate summary in a single pass
+  const summary = allBills.reduce(
+    (acc, b) => {
+      const amount = b.amount;
+      acc.total += Math.abs(amount);
+      if (b.isPaid) {
+        acc.paidCount++;
+        acc.paidAmount += Math.abs(amount);
+      } else {
+        acc.upcomingCount++;
+        acc.upcomingAmount += Math.abs(amount);
+      }
+      if (b.isDueSoon) {
+        acc.dueSoonCount++;
+        acc.dueSoonAmount += Math.abs(amount);
+      }
+      return acc;
+    },
+    {
+      total: 0,
+      paidCount: 0,
+      paidAmount: 0,
+      upcomingCount: 0,
+      upcomingAmount: 0,
+      dueSoonCount: 0,
+      dueSoonAmount: 0,
+    }
+  );
 
   // Filter and sort bills
   const filteredAndSortedBills = useBillFilters({

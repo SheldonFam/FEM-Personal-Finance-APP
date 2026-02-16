@@ -29,7 +29,7 @@ export function SidebarNavItem({
   );
 
   const iconClasses = cn(
-    "flex-shrink-0 transition-all",
+    "flex-shrink-0 transition-opacity motion-reduce:transition-none",
     !active && "opacity-80 group-hover:opacity-100 group-hover:brightness-[2.5]"
   );
 

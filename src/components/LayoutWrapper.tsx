@@ -4,7 +4,7 @@ import { Suspense } from "react";
 import { usePathname } from "next/navigation";
 import Sidebar from "@/components/Sidebar/Sidebar";
 
-const AUTH_ROUTES = ["/login", "/signup", "/forgot-password", "/reset-password"];
+const AUTH_ROUTES = new Set(["/login", "/signup", "/forgot-password", "/reset-password"]);
 
 export default function LayoutWrapper({
   children,
@@ -12,7 +12,7 @@ export default function LayoutWrapper({
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
-  const isAuthPage = AUTH_ROUTES.includes(pathname);
+  const isAuthPage = AUTH_ROUTES.has(pathname);
 
   if (isAuthPage) {
     return (

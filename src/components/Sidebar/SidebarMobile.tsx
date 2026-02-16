@@ -55,7 +55,7 @@ export function SidebarMobile({ isActive }: SidebarMobileProps) {
             aria-label="Logout"
           >
             <LogOut
-              className="flex-shrink-0 transition-all opacity-80 group-hover:opacity-100 group-hover:brightness-[2.5] w-5 h-5"
+              className="flex-shrink-0 transition-opacity motion-reduce:transition-none opacity-80 group-hover:opacity-100 group-hover:brightness-[2.5] w-5 h-5"
               strokeWidth={2.5}
               aria-hidden="true"
             />

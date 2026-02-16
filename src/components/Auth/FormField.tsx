@@ -9,6 +9,7 @@ interface FormFieldProps {
   placeholder: string;
   error?: string;
   register: UseFormRegisterReturn;
+  autoComplete?: string;
 }
 
 /**
@@ -21,6 +22,7 @@ export const FormField: React.FC<FormFieldProps> = ({
   placeholder,
   error,
   register,
+  autoComplete,
 }) => {
   return (
     <div className="space-y-1">
@@ -30,6 +32,7 @@ export const FormField: React.FC<FormFieldProps> = ({
         placeholder={placeholder}
         error={error}
         aria-invalid={error ? "true" : "false"}
+        autoComplete={autoComplete}
         {...register}
       />
     </div>

@@ -84,6 +84,7 @@ export default function SignUpPage() {
           placeholder="Enter your full name"
           error={errors.name?.message}
           register={register("name", AUTH_VALIDATION.name)}
+          autoComplete="name"
         />
 
         <FormField
@@ -92,6 +93,7 @@ export default function SignUpPage() {
           placeholder="Enter your email"
           error={errors.email?.message}
           register={register("email", AUTH_VALIDATION.email)}
+          autoComplete="email"
         />
 
         <FormPasswordField
@@ -102,6 +104,7 @@ export default function SignUpPage() {
           error={errors.password?.message}
           register={register("password", AUTH_VALIDATION.password)}
           helperText={`Passwords must be at least ${PASSWORD_MIN_LENGTH} characters`}
+          autoComplete="new-password"
         />
 
         <FormConfirmPasswordField
@@ -114,6 +117,7 @@ export default function SignUpPage() {
             required: "Please confirm your password",
             validate: validatePasswordConfirmation(password),
           })}
+          autoComplete="new-password"
         />
 
         <Button

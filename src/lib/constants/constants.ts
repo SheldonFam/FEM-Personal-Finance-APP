@@ -20,13 +20,18 @@ export const COLOR_THEMES: Record<string, string> = {
   Orange: "#BE6C49",
 };
 
+/** Reverse lookup map: hex -> theme name (built once at module load) */
+const HEX_TO_THEME_NAME = new Map(
+  Object.entries(COLOR_THEMES).map(([name, hex]) => [hex, name])
+);
+
 /**
  * Helper: Get theme name from hex color code
  * @param hex - The hex color code (e.g., "#277C78")
  * @returns The theme name (e.g., "Green") or undefined if not found
  */
 export const getThemeNameFromHex = (hex: string): string | undefined => {
-  return Object.entries(COLOR_THEMES).find(([_, value]) => value === hex)?.[0];
+  return HEX_TO_THEME_NAME.get(hex);
 };
 
 /**

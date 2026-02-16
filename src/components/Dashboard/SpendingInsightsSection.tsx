@@ -30,6 +30,8 @@ function getCategoryColor(category: string): string {
   return CATEGORY_COLORS[category] ?? "#98908B";
 }
 
+const SKELETON_ITEMS = [1, 2, 3, 4, 5] as const;
+
 export function SpendingInsightsSection({
   transactions,
   isLoading,
@@ -39,7 +41,7 @@ export function SpendingInsightsSection({
       <Card className="p-8">
         <SectionHeader title="Spending Insights" />
         <div className="space-y-4">
-          {[1, 2, 3, 4, 5].map((i) => (
+          {SKELETON_ITEMS.map((i) => (
             <Skeleton key={i} className="h-[48px]" />
           ))}
         </div>
@@ -87,7 +89,7 @@ export function SpendingInsightsSection({
             </div>
             <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
               <div
-                className="h-full rounded-full transition-all"
+                className="h-full rounded-full transition-[width] motion-reduce:transition-none"
                 style={{
                   width: `${item.percentage}%`,
                   backgroundColor: getCategoryColor(item.category),
