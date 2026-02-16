@@ -34,7 +34,7 @@ export function SidebarDesktop({
 
   return (
     <aside
-      className={`hidden md:flex flex-col justify-between bg-[#201F24] text-zinc-300 rounded-r-2xl transition-all duration-300 ${
+      className={`hidden md:flex flex-col justify-between bg-[#201F24] text-zinc-300 rounded-r-2xl transition-[width] duration-300 motion-reduce:transition-none ${
         collapsed ? "w-[88px]" : "w-[300px]"
       }`}
       aria-label="Main navigation"
@@ -104,7 +104,7 @@ export function SidebarDesktop({
           aria-label="Logout"
         >
           <LogOut
-            className="flex-shrink-0 transition-all opacity-80 group-hover:opacity-100 group-hover:brightness-[2.5] w-6 h-6"
+            className="flex-shrink-0 transition-opacity motion-reduce:transition-none opacity-80 group-hover:opacity-100 group-hover:brightness-[2.5] w-6 h-6"
             strokeWidth={2.5}
             aria-hidden="true"
           />
@@ -137,7 +137,7 @@ export function SidebarDesktop({
             width={24}
             height={24}
             className={cn(
-              "flex-shrink-0 transition-all duration-300 opacity-80 group-hover:opacity-100 group-hover:brightness-[2.5]",
+              "flex-shrink-0 transition-[opacity,transform] duration-300 motion-reduce:transition-none opacity-80 group-hover:opacity-100 group-hover:brightness-[2.5]",
               collapsed && "rotate-180"
             )}
           />

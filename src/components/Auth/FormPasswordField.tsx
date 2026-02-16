@@ -11,6 +11,7 @@ interface FormPasswordFieldProps {
   show: boolean;
   onToggleVisibility: () => void;
   helperText?: string;
+  autoComplete?: string;
 }
 
 /**
@@ -25,6 +26,7 @@ export const FormPasswordField: React.FC<FormPasswordFieldProps> = ({
   show,
   onToggleVisibility,
   helperText,
+  autoComplete,
 }) => {
   return (
     <div className="space-y-1">
@@ -35,6 +37,7 @@ export const FormPasswordField: React.FC<FormPasswordFieldProps> = ({
         onToggleVisibility={onToggleVisibility}
         error={error}
         aria-invalid={error ? "true" : "false"}
+        autoComplete={autoComplete}
         {...register}
       />
       {helperText && (

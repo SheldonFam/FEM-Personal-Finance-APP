@@ -30,7 +30,7 @@ function Progress({
       <ProgressPrimitive.Indicator
         data-slot="progress-indicator"
         className={cn(
-          "h-full w-full flex-1 transition-all rounded-full",
+          "h-full w-full flex-1 transition-transform motion-reduce:transition-none rounded-full",
           indicatorClassName
         )}
         style={{

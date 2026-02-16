@@ -106,10 +106,12 @@ export default function PotFormModal({
   const potName = watch("name");
 
   // Filter out already used themes (only for add mode)
-  const usedThemes = mode === "add" ? existingPots.map((pot) => pot.theme) : [];
   const availableThemes =
     mode === "add"
-      ? Object.keys(COLOR_THEMES).filter((t) => !usedThemes.includes(t))
+      ? (() => {
+          const usedThemes = new Set(existingPots.map((pot) => pot.theme));
+          return Object.keys(COLOR_THEMES).filter((t) => !usedThemes.has(t));
+        })()
       : undefined;
 
   return (

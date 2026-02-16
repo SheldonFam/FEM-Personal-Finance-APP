@@ -16,14 +16,17 @@ const THEME_OPTIONS = Object.entries(COLOR_THEMES).map(([name, color]) => ({
   color,
 }));
 
+const NO_THEMES_OPTION = [{ value: "none", label: "No themes available", disabled: true }];
+
 export default function ThemeSelector({
   control,
   errors,
   name = "theme",
   availableThemes,
 }: ThemeSelectorProps) {
-  const themes = availableThemes
-    ? THEME_OPTIONS.filter((t) => availableThemes.includes(t.name))
+  const availableSet = availableThemes ? new Set(availableThemes) : null;
+  const themes = availableSet
+    ? THEME_OPTIONS.filter((t) => availableSet.has(t.name))
     : THEME_OPTIONS;
 
   const options =
@@ -41,7 +44,7 @@ export default function ThemeSelector({
             </div>
           ),
         }))
-      : [{ value: "none", label: "No themes available", disabled: true }];
+      : NO_THEMES_OPTION;
 
   return (
     <FormSelect

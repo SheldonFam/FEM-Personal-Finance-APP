@@ -1,9 +1,19 @@
+import dynamic from "next/dynamic";
 import { Card } from "@/components/ui/Card";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { SectionHeader } from "./SectionHeader";
 import { BudgetItem } from "./BudgetItem";
-import BudgetDonutChart from "@/components/Charts/BudgetDonutChart";
 import { getBudgetAlertStatus } from "@/lib/budgetAlerts";
+
+const BudgetDonutChart = dynamic(
+  () => import("@/components/Charts/BudgetDonutChart"),
+  {
+    ssr: false,
+    loading: () => (
+      <Skeleton className="w-[240px] h-[240px] rounded-full" />
+    ),
+  }
+);
 import type { Budget, Transaction } from "@/lib/types";
 
 interface BudgetsSectionProps {
@@ -34,22 +44,32 @@ export function BudgetsSection({
     );
   }
 
-  // Calculate spent amount for each budget category
+  // Build spending index once, then look up per budget (avoids O(n*m))
+  const spentByCategory = new Map<string, number>();
+  for (const t of transactions) {
+    if (t.amount < 0) {
+      spentByCategory.set(
+        t.category,
+        (spentByCategory.get(t.category) ?? 0) + Math.abs(t.amount),
+      );
+    }
+  }
+
+  let totalSpent = 0;
+  let totalLimit = 0;
+
   const budgetCategories = budgets.map((budget) => {
-    const spent = transactions
-      .filter((t) => t.category === budget.category && t.amount < 0)
-      .reduce((sum, t) => sum + Math.abs(t.amount), 0);
+    const spent = Math.min(spentByCategory.get(budget.category) ?? 0, budget.maximum);
+    totalSpent += spent;
+    totalLimit += budget.maximum;
 
     return {
       name: budget.category,
-      spent: Math.min(spent, budget.maximum),
+      spent,
       limit: budget.maximum,
       color: budget.theme,
     };
   });
-
-  const totalSpent = budgetCategories.reduce((sum, cat) => sum + cat.spent, 0);
-  const totalLimit = budgetCategories.reduce((sum, cat) => sum + cat.limit, 0);
 
   return (
     <Card className="p-8">

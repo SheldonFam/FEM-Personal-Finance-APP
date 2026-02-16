@@ -81,6 +81,7 @@ function LoginForm() {
           placeholder="Enter your email"
           error={errors.email?.message}
           register={register("email", AUTH_VALIDATION.email)}
+          autoComplete="email"
         />
 
         <FormPasswordField
@@ -90,6 +91,7 @@ function LoginForm() {
           onToggleVisibility={togglePasswordVisibility}
           error={errors.password?.message}
           register={register("password", AUTH_VALIDATION.password)}
+          autoComplete="current-password"
         />
 
         {/* Forgot Password Link */}
