@@ -176,7 +176,7 @@ export const BudgetCard = ({
 
       {/* Spending Breakdown */}
       <div className="pt-6 border-t border-gray-100">
-        <div className="bg-[#F8F4F0] rounded-lg p-4 -mx-1">
+        <div className="bg-finance-beige rounded-lg p-4 -mx-1">
           <div className="flex items-center justify-between mb-4">
             <h4 className="text-sm font-bold text-gray-900">Latest Spending</h4>
             {latestTransactions.length > 0 && (

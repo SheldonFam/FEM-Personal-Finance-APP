@@ -14,11 +14,11 @@ export function SectionHeader({
 }: SectionHeaderProps) {
   return (
     <div className="flex items-center justify-between mb-5">
-      <h2 className="text-xl font-bold text-[#201F24]">{title}</h2>
+      <h2 className="text-xl font-bold text-finance-navy">{title}</h2>
       {href && (
         <Link
           href={href}
-          className="text-sm text-[#696868] hover:text-[#201F24] flex items-center gap-3 transition-colors"
+          className="text-sm text-finance-grey hover:text-finance-navy flex items-center gap-3 transition-colors"
         >
           {linkText}
           <Image

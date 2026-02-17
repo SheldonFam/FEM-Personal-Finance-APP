@@ -28,18 +28,18 @@ export function TransactionItem({
             className="w-full h-full object-cover"
           />
         </div>
-        <p className="font-bold text-sm text-[#201F24]">{name}</p>
+        <p className="font-bold text-sm text-finance-navy">{name}</p>
       </div>
 
       <div className="text-right flex-shrink-0">
         <p
           className={`font-bold text-sm ${
-            isPositive ? "text-[#277C78]" : "text-[#201F24]"
+            isPositive ? "text-finance-green" : "text-finance-navy"
           }`}
         >
           {isPositive ? "+" : "-"}${Math.abs(amount).toFixed(2)}
         </p>
-        <p className="text-xs text-[#696868] mt-1">{date}</p>
+        <p className="text-xs text-finance-grey mt-1">{date}</p>
       </div>
     </div>
   );

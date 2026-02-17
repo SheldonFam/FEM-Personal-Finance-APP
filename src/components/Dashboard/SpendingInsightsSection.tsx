@@ -14,20 +14,20 @@ interface SpendingInsightsSectionProps {
 }
 
 const CATEGORY_COLORS: Record<string, string> = {
-  Entertainment: "#277C78",
-  Bills: "#82C9D7",
-  "Dining Out": "#F2CDAC",
+  Entertainment: "var(--finance-green)",
+  Bills: "var(--finance-cyan)",
+  "Dining Out": "var(--finance-sand)",
   "Personal Care": "#626B7F",
-  General: "#98908B",
+  General: "var(--finance-grey-500)",
   Groceries: "#826CB0",
   Transportation: "#AF81BA",
   Lifestyle: "#597C7C",
-  Shopping: "#C94736",
+  Shopping: "var(--finance-red)",
   Education: "#CAB361",
 };
 
 function getCategoryColor(category: string): string {
-  return CATEGORY_COLORS[category] ?? "#98908B";
+  return CATEGORY_COLORS[category] ?? "var(--finance-grey-500)";
 }
 
 const SKELETON_ITEMS = [1, 2, 3, 4, 5] as const;

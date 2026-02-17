@@ -64,9 +64,9 @@ export function RecurringBillsSection({
   );
 
   const bills = [
-    { label: "Paid Bills", amount: paidAmount, borderColor: "#277C78" },
-    { label: "Total Upcoming", amount: upcomingAmount, borderColor: "#F2CDAC" },
-    { label: "Due Soon", amount: dueSoonAmount, borderColor: "#82C9D7" },
+    { label: "Paid Bills", amount: paidAmount, borderColor: "var(--finance-green)" },
+    { label: "Total Upcoming", amount: upcomingAmount, borderColor: "var(--finance-sand)" },
+    { label: "Due Soon", amount: dueSoonAmount, borderColor: "var(--finance-cyan)" },
   ];
 
   return (

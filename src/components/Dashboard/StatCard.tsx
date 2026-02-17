@@ -18,7 +18,7 @@ export function StatCard({
   return (
     <Card
       className={`p-5 md:p-6 min-w-0 ${
-        isDark ? "bg-[#201F24] text-white" : ""
+        isDark ? "bg-finance-navy text-white" : ""
       } ${className}`}
     >
       <p

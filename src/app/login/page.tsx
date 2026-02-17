@@ -66,7 +66,7 @@ function LoginForm() {
 
   return (
     <AuthLayout>
-      <h2 className="text-2xl font-bold text-[#201f24] mb-8">Login</h2>
+      <h2 className="text-2xl font-bold text-finance-navy mb-8">Login</h2>
 
       {error && (
         <Alert variant="destructive" className="mb-4">
@@ -98,7 +98,7 @@ function LoginForm() {
         <div className="text-right">
           <Link
             href="/forgot-password"
-            className="text-sm text-gray-600 hover:text-[#201f24] underline"
+            className="text-sm text-gray-600 hover:text-finance-navy underline"
           >
             Forgot Password?
           </Link>
@@ -135,7 +135,7 @@ export default function LoginPage() {
     <Suspense
       fallback={
         <AuthLayout>
-          <h2 className="text-2xl font-bold text-[#201f24] mb-8">Login</h2>
+          <h2 className="text-2xl font-bold text-finance-navy mb-8">Login</h2>
           <div className="animate-pulse space-y-4">
             <div className="h-12 bg-gray-200 rounded" />
             <div className="h-12 bg-gray-200 rounded" />

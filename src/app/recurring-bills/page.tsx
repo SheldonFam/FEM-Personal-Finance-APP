@@ -78,7 +78,7 @@ export default function RecurringBillsPage() {
       <div className="flex flex-col lg:flex-row lg:items-start gap-6 mb-8">
         <div className="space-y-6 lg:w-80 flex-shrink-0">
           {/* Total Bills Card */}
-          <Card className="bg-[#201F24] text-white p-6 border-0">
+          <Card className="bg-finance-navy text-white p-6 border-0">
             <div className="flex items-center gap-3 mb-3">
               <Image
                 src="/assets/images/icon-recurring-bills.svg"
@@ -135,7 +135,7 @@ export default function RecurringBillsPage() {
                   placeholder="Search bills"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full h-[45px] pr-12"
+                  className="w-full h-11 pr-12"
                 />
                 <Image
                   src="/assets/images/icon-search.svg"
@@ -153,7 +153,7 @@ export default function RecurringBillsPage() {
                   type="button"
                   variant="ghost"
                   size="icon-sm"
-                  className="sm:hidden size-[45px] rounded-lg bg-transparent p-0 hover:bg-gray-100 focus-visible:ring-0 focus-visible:ring-offset-0"
+                  className="sm:hidden size-11 rounded-lg bg-transparent p-0 hover:bg-gray-100 focus-visible:ring-0 focus-visible:ring-offset-0"
                   aria-label="Open sort options"
                   aria-haspopup="listbox"
                   aria-expanded={isSortSelectOpen}
@@ -179,7 +179,7 @@ export default function RecurringBillsPage() {
                   open={isSortSelectOpen}
                   onOpenChange={setIsSortSelectOpen}
                 >
-                  <SelectTrigger className="absolute inset-0 h-0 w-0 opacity-0 pointer-events-none sm:static sm:h-[45px] sm:w-[150px] sm:opacity-100 sm:pointer-events-auto sm:flex bg-white border border-gray-200 rounded-lg px-4 text-sm font-medium text-gray-700 justify-between shadow-sm hover:bg-gray-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-200 data-[state=open]:border-primary-300">
+                  <SelectTrigger className="absolute inset-0 h-0 w-0 opacity-0 pointer-events-none sm:static sm:h-11 sm:w-[150px] sm:opacity-100 sm:pointer-events-auto sm:flex bg-white border border-gray-200 rounded-lg px-4 text-sm font-medium text-gray-700 justify-between shadow-sm hover:bg-gray-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-200 data-[state=open]:border-primary-300">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent

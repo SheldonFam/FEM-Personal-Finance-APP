@@ -24,7 +24,7 @@ export function AuthLayout({ children }: AuthLayoutProps) {
         <MarketingPanel />
 
         {/* Right Column - Form Content */}
-        <div className="flex-1 lg:w-3/5 bg-[#f8f4f0] flex items-center justify-center p-4">
+        <div className="flex-1 lg:w-3/5 bg-finance-beige flex items-center justify-center p-4">
           <div className="w-full max-w-xl">
             <div className="bg-white rounded-lg shadow-sm p-5 sm:p-8">
               {children}

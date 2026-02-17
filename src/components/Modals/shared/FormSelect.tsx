@@ -53,7 +53,7 @@ export default function FormSelect({
         render={({ field }) => (
           <>
             <Select value={field.value} onValueChange={field.onChange}>
-              <SelectTrigger className="w-full h-[45px] text-sm">
+              <SelectTrigger className="w-full h-11 text-sm">
                 <SelectValue placeholder={placeholder} />
               </SelectTrigger>
               <SelectContent>

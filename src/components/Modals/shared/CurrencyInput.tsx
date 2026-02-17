@@ -35,7 +35,7 @@ export default function CurrencyInput<TFieldValues extends FieldValues = FieldVa
         prefix="$"
         placeholder={placeholder}
         {...register(name, validation)}
-        className="h-[45px]"
+        className="h-11"
         min="0"
         max={max}
         step="0.01"

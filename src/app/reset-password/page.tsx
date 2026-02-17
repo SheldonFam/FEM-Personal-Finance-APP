@@ -96,7 +96,7 @@ export default function ResetPasswordPage() {
 
   return (
     <AuthLayout>
-      <h2 className="text-2xl font-bold text-[#201f24] mb-4">Reset Password</h2>
+      <h2 className="text-2xl font-bold text-finance-navy mb-4">Reset Password</h2>
       <p className="text-gray-600 text-sm mb-8">
         Enter your new password below.
       </p>

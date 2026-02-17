@@ -49,7 +49,7 @@ export default function ForgotPasswordPage() {
 
   return (
     <AuthLayout>
-      <h2 className="text-2xl font-bold text-[#201f24] mb-4">
+      <h2 className="text-2xl font-bold text-finance-navy mb-4">
         Forgot Password
       </h2>
       <p className="text-gray-600 text-sm mb-8">

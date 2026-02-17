@@ -94,7 +94,7 @@ export default function TransactionsPage() {
                     placeholder="Search transaction"
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    className="pr-12 h-[45px]"
+                    className="pr-12 h-11"
                   />
                   <Image
                     src="/assets/images/icon-search.svg"
@@ -114,7 +114,7 @@ export default function TransactionsPage() {
                     type="button"
                     variant="ghost"
                     size="icon-sm"
-                    className="sm:hidden size-[45px] rounded-lg bg-transparent p-0 hover:bg-gray-100 focus-visible:ring-0 focus-visible:ring-offset-0"
+                    className="sm:hidden size-11 rounded-lg bg-transparent p-0 hover:bg-gray-100 focus-visible:ring-0 focus-visible:ring-offset-0"
                     aria-label="Open category filter"
                     aria-haspopup="listbox"
                     aria-expanded={isCategorySelectOpen}
@@ -143,7 +143,7 @@ export default function TransactionsPage() {
                   >
                     <SelectTrigger
                       aria-label="Sort by"
-                      className="absolute inset-0 h-0 w-0 opacity-0 pointer-events-none sm:static sm:h-[45px] sm:w-[115px] md:w-[130px] lg:w-[150px] sm:opacity-100 sm:pointer-events-auto sm:flex bg-white border border-gray-200 rounded-lg px-4 text-sm font-medium text-gray-700 justify-between shadow-sm hover:bg-gray-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-200 data-[state=open]:border-primary-300"
+                      className="absolute inset-0 h-0 w-0 opacity-0 pointer-events-none sm:static sm:h-11 sm:w-[115px] md:w-[130px] lg:w-[150px] sm:opacity-100 sm:pointer-events-auto sm:flex bg-white border border-gray-200 rounded-lg px-4 text-sm font-medium text-gray-700 justify-between shadow-sm hover:bg-gray-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-200 data-[state=open]:border-primary-300"
                     >
                       <SelectValue />
                     </SelectTrigger>
@@ -169,7 +169,7 @@ export default function TransactionsPage() {
                     type="button"
                     variant="ghost"
                     size="icon-sm"
-                    className="sm:hidden size-[45px] rounded-lg bg-transparent p-0 hover:bg-gray-100 focus-visible:ring-0 focus-visible:ring-offset-0"
+                    className="sm:hidden size-11 rounded-lg bg-transparent p-0 hover:bg-gray-100 focus-visible:ring-0 focus-visible:ring-offset-0"
                     aria-label="Open sort options"
                     aria-haspopup="listbox"
                     aria-expanded={isSortSelectOpen}
@@ -197,7 +197,7 @@ export default function TransactionsPage() {
                   >
                     <SelectTrigger
                       aria-label="Category"
-                      className="absolute inset-0 h-0 w-0 opacity-0 pointer-events-none sm:static sm:h-[45px] sm:w-[140px] md:w-[160px] lg:w-[180px] sm:opacity-100 sm:pointer-events-auto sm:flex bg-white border border-gray-200 rounded-lg px-4 text-sm font-medium text-gray-700 justify-between shadow-sm hover:bg-gray-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-200 data-[state=open]:border-primary-300"
+                      className="absolute inset-0 h-0 w-0 opacity-0 pointer-events-none sm:static sm:h-11 sm:w-[140px] md:w-[160px] lg:w-[180px] sm:opacity-100 sm:pointer-events-auto sm:flex bg-white border border-gray-200 rounded-lg px-4 text-sm font-medium text-gray-700 justify-between shadow-sm hover:bg-gray-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-200 data-[state=open]:border-primary-300"
                     >
                       <SelectValue />
                     </SelectTrigger>

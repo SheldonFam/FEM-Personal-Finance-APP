@@ -37,7 +37,7 @@ export function PotsSection({ pots, isLoading }: PotsSectionProps) {
 
       <div className="flex items-start gap-5 flex-col lg:flex-row">
         {/* Total Saved */}
-        <div className="bg-[#F8F4F0] rounded-xl p-5 flex items-center gap-4 w-full lg:flex-1">
+        <div className="bg-finance-beige rounded-xl p-5 flex items-center gap-4 w-full lg:flex-1">
           <div className="w-10 h-10 rounded-full flex items-center justify-center">
             <Image
               src="/assets/images/icon-pot.svg"
@@ -47,8 +47,8 @@ export function PotsSection({ pots, isLoading }: PotsSectionProps) {
             />
           </div>
           <div>
-            <p className="text-sm text-[#696868] mb-1">Total Saved</p>
-            <p className="text-[32px] leading-[1.2] font-bold text-[#201F24]">
+            <p className="text-sm text-finance-grey mb-1">Total Saved</p>
+            <p className="text-[2rem] leading-[1.2] font-bold text-finance-navy">
               ${totalSaved.toLocaleString()}
             </p>
           </div>
