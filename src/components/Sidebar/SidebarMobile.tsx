@@ -28,7 +28,7 @@ export function SidebarMobile({ isActive }: SidebarMobileProps) {
 
   return (
     <nav
-      className="md:hidden fixed bottom-0 left-0 right-0 bg-[#201F24] border-t border-zinc-800 z-50 h-[52px] sm:h-[74px]"
+      className="md:hidden fixed bottom-0 left-0 right-0 bg-finance-navy border-t border-zinc-800 z-50 h-[52px] sm:h-[74px]"
       aria-label="Mobile navigation"
     >
       <ul className="flex justify-around items-center h-full px-2">
@@ -50,7 +50,7 @@ export function SidebarMobile({ isActive }: SidebarMobileProps) {
             variant="ghost"
             className={cn(
               "flex-col gap-1 py-2 px-3 rounded-t-lg transition-colors group hover:bg-transparent",
-              "text-[#B3B3B3] hover:text-[#F2F2F2]"
+              "text-finance-grey-300 hover:text-finance-grey-100"
             )}
             aria-label="Logout"
           >

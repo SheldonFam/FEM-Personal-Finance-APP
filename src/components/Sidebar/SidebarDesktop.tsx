@@ -34,7 +34,7 @@ export function SidebarDesktop({
 
   return (
     <aside
-      className={`hidden md:flex flex-col justify-between bg-[#201F24] text-zinc-300 rounded-r-2xl transition-[width] duration-300 motion-reduce:transition-none ${
+      className={`hidden md:flex flex-col justify-between bg-finance-navy text-zinc-300 rounded-r-2xl transition-[width] duration-300 motion-reduce:transition-none ${
         collapsed ? "w-[88px]" : "w-[300px]"
       }`}
       aria-label="Main navigation"
@@ -99,7 +99,7 @@ export function SidebarDesktop({
             collapsed
               ? "justify-center w-full rounded-r-lg"
               : "gap-4 w-full rounded-r-lg justify-start",
-            "text-[#B3B3B3] hover:text-[#F2F2F2]"
+            "text-finance-grey-300 hover:text-finance-grey-100"
           )}
           aria-label="Logout"
         >
@@ -126,7 +126,7 @@ export function SidebarDesktop({
             collapsed
               ? "justify-center w-full rounded-r-lg"
               : "gap-4 w-full rounded-r-lg justify-start pl-0",
-            "text-[#B3B3B3] hover:text-[#F2F2F2]"
+            "text-finance-grey-300 hover:text-finance-grey-100"
           )}
           aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
           aria-expanded={!collapsed}

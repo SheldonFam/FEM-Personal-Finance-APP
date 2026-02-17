@@ -135,7 +135,7 @@ export default function PotFormModal({
           maxLength={30}
           {...register("name", requiredFieldRules("Pot name"))}
           className={cn(
-            "h-[45px]",
+            "h-11",
             errors.name && "border-destructive focus-visible:ring-destructive"
           )}
         />

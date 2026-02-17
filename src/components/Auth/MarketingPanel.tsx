@@ -9,8 +9,8 @@ import React from "react";
  */
 export function MarketingPanel() {
   return (
-    <div className="p-5 rounded-lg bg-[#f8f4f0] hidden lg:flex lg:w-2/5 xl:w-2/5">
-      <div className="w-full h-full bg-[#201f24] relative overflow-hidden rounded-lg">
+    <div className="p-5 rounded-lg bg-finance-beige hidden lg:flex lg:w-2/5 xl:w-2/5">
+      <div className="w-full h-full bg-finance-navy relative overflow-hidden rounded-lg">
         {/* Logo at top */}
         <div className="absolute top-6 left-6 lg:top-8 lg:left-8 xl:top-10 xl:left-10 z-10">
           <h1 className="text-white text-xl lg:text-2xl font-bold">finance</h1>

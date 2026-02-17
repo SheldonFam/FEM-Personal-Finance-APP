@@ -16,7 +16,7 @@ export function BudgetItem({ category, amount, color, alertLevel }: BudgetItemPr
       />
       <div className="flex flex-col gap-1 min-w-0 flex-1">
         <div className="flex items-center gap-2">
-          <span className="text-sm text-[#696868] truncate">{category}</span>
+          <span className="text-sm text-finance-grey truncate">{category}</span>
           {alertLevel === "exceeded" && (
             <span
               className="w-2 h-2 rounded-full bg-red-500 flex-shrink-0"
@@ -30,7 +30,7 @@ export function BudgetItem({ category, amount, color, alertLevel }: BudgetItemPr
             />
           )}
         </div>
-        <span className="font-bold text-sm text-[#201F24]">
+        <span className="font-bold text-sm text-finance-navy">
           ${amount.toFixed(2)}
         </span>
       </div>

@@ -40,7 +40,7 @@ const MODAL_CONFIG = {
     placeholder: "e.g. 100",
     buttonLabel: (isSubmitting: boolean) =>
       isSubmitting ? "Adding..." : "Confirm Addition",
-    defaultColor: "#277C78",
+    defaultColor: "var(--finance-green)",
   },
   withdraw: {
     title: (potName: string) => `Withdraw from '${potName}'`,
@@ -50,7 +50,7 @@ const MODAL_CONFIG = {
     placeholder: (maxAmount: number) => `Maximum: ${maxAmount.toFixed(2)}`,
     buttonLabel: (isSubmitting: boolean) =>
       isSubmitting ? "Processing..." : "Confirm Withdrawal",
-    defaultColor: "#C94736",
+    defaultColor: "var(--finance-red)",
   },
 } as const;
 
@@ -113,7 +113,7 @@ export default function PotMoneyModal({
         {/* New Amount Display */}
         <div className="flex items-center justify-between">
           <span className="text-sm text-muted-foreground">New Amount</span>
-          <span className="text-[32px] font-bold">${newAmount.toFixed(2)}</span>
+          <span className="text-[2rem] font-bold">${newAmount.toFixed(2)}</span>
         </div>
 
         {/* Progress Bar */}
@@ -158,7 +158,7 @@ export default function PotMoneyModal({
           <Button
             type="submit"
             disabled={isSubmitting}
-            className="w-full h-[53px] text-sm font-bold mt-5"
+            className="w-full h-14 text-sm font-bold mt-5"
           >
             {config.buttonLabel(isSubmitting)}
           </Button>

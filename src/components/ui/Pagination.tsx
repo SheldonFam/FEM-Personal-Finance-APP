@@ -140,8 +140,8 @@ export const Pagination = ({
                 flex items-center justify-center hover:bg-transparent
                 ${
                   isActive
-                    ? "bg-[#201F24] text-[#FFFFFF] hover:bg-[#201F24]"
-                    : "bg-transparent text-[#201F24] border border-[#98908B] hover:bg-[#F0F0F0]"
+                    ? "bg-finance-navy text-white hover:bg-finance-navy"
+                    : "bg-transparent text-finance-navy border border-finance-grey-500 hover:bg-finance-grey-50"
                 }
               `}
             >
@@ -174,8 +174,8 @@ export const Pagination = ({
                 flex items-center justify-center hover:bg-transparent
                 ${
                   isActive
-                    ? "bg-[#201F24] text-[#FFFFFF] hover:bg-[#201F24]"
-                    : "bg-transparent text-[#201F24] border border-[#98908B] hover:bg-[#F0F0F0]"
+                    ? "bg-finance-navy text-white hover:bg-finance-navy"
+                    : "bg-transparent text-finance-navy border border-finance-grey-500 hover:bg-finance-grey-50"
                 }
               `}
             >

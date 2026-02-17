@@ -12,8 +12,8 @@ export function PotItem({ label, amount, color }: PotItemProps) {
         style={{ backgroundColor: color }}
       />
       <div className="flex-1 flex items-center justify-between gap-2 min-w-0">
-        <p className="text-xs text-[#696868] truncate">{label}</p>
-        <p className="font-bold text-sm text-[#201F24] whitespace-nowrap">${amount.toFixed(0)}</p>
+        <p className="text-xs text-finance-grey truncate">{label}</p>
+        <p className="font-bold text-sm text-finance-navy whitespace-nowrap">${amount.toFixed(0)}</p>
       </div>
     </div>
   );

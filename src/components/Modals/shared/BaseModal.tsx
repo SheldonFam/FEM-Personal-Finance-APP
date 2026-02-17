@@ -30,7 +30,7 @@ export function BaseModal({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className={`${maxWidth} p-5 sm:p-8`}>
         <DialogHeader>
-          <DialogTitle className="text-xl sm:text-[32px] font-bold text-foreground">
+          <DialogTitle className="text-xl sm:text-[2rem] font-bold text-foreground">
             {title}
           </DialogTitle>
           <DialogDescription className="text-sm text-muted-foreground">

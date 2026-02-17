@@ -112,7 +112,7 @@ export const PotCard = ({
       {/* Total Saved */}
       <div className="mb-8">
         <p className="text-sm text-gray-500 mb-3">Total Saved</p>
-        <p className="text-[32px] font-bold text-gray-900">
+        <p className="text-[2rem] font-bold text-gray-900">
           {formatCurrency(pot.total, false)}
         </p>
       </div>
@@ -140,14 +140,14 @@ export const PotCard = ({
         <Button
           variant="outline"
           onClick={onAddMoney}
-          className="h-[53px] text-sm font-bold"
+          className="h-14 text-sm font-bold"
         >
           + Add Money
         </Button>
         <Button
           variant="outline"
           onClick={onWithdraw}
-          className="h-[53px] text-sm font-bold"
+          className="h-14 text-sm font-bold"
         >
           Withdraw
         </Button>

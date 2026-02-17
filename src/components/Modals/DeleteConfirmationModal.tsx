@@ -41,7 +41,7 @@ export function DeleteConfirmationModal({
         <Button
           variant="destructive"
           onClick={handleConfirm}
-          className="w-full h-[53px] text-sm font-bold"
+          className="w-full h-14 text-sm font-bold"
           disabled={isLoading}
         >
           {isLoading ? "Deleting..." : "Yes, Confirm Deletion"}
@@ -49,7 +49,7 @@ export function DeleteConfirmationModal({
         <Button
           variant="ghost"
           onClick={() => onOpenChange(false)}
-          className="w-full h-[53px] text-sm font-medium"
+          className="w-full h-14 text-sm font-medium"
           disabled={isLoading}
         >
           No,I want to go back

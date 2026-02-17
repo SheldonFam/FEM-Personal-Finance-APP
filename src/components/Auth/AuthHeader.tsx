@@ -8,7 +8,7 @@ import Image from "next/image";
 export default function AuthHeader() {
   return (
     <header
-      className="block lg:hidden bg-[#201F24] py-6"
+      className="block lg:hidden bg-finance-navy py-6"
       aria-label="Authentication header"
     >
       <div className="flex justify-center">

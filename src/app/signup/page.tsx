@@ -69,7 +69,7 @@ export default function SignUpPage() {
 
   return (
     <AuthLayout>
-      <h2 className="text-2xl font-bold text-[#201f24] mb-8">Sign Up</h2>
+      <h2 className="text-2xl font-bold text-finance-navy mb-8">Sign Up</h2>
 
       {error && (
         <Alert variant="destructive" className="mb-4">

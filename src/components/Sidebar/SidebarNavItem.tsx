@@ -22,10 +22,10 @@ export function SidebarNavItem({
 
     // State
     active &&
-      `bg-white text-[#201F24] border-[#277C78] ${
+      `bg-white text-finance-navy border-finance-green ${
         isMobile ? "border-b-4" : "border-l-4"
       }`,
-    !active && "text-[#B3B3B3] hover:text-[#F2F2F2]"
+    !active && "text-finance-grey-300 hover:text-finance-grey-100"
   );
 
   const iconClasses = cn(

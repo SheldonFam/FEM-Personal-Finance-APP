@@ -45,7 +45,7 @@ export function BaseFormModal({
         <Button
           type="submit"
           disabled={isSubmitting}
-          className="w-full h-[53px] text-sm font-bold mt-1 cursor-pointer"
+          className="w-full h-14 text-sm font-bold mt-1 cursor-pointer"
         >
           {buttonLabel}
         </Button>

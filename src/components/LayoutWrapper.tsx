@@ -16,16 +16,16 @@ export default function LayoutWrapper({
 
   if (isAuthPage) {
     return (
-      <div className="min-h-screen bg-[var(--primary-light)]">{children}</div>
+      <div className="min-h-screen bg-finance-beige">{children}</div>
     );
   }
 
   return (
-    <div className="flex h-screen bg-[var(--primary-light)]">
+    <div className="flex h-screen bg-finance-beige">
       <Suspense
         fallback={
           <aside
-            className="hidden md:block w-[88px] bg-[#201F24] rounded-r-2xl"
+            className="hidden md:block w-[88px] bg-finance-navy rounded-r-2xl"
             aria-label="Loading navigation"
           >
             <div className="animate-pulse p-4">

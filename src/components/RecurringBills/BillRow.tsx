@@ -12,7 +12,7 @@ export const BillRow = ({ bill }: BillRowProps) => {
   const dueLabel = `Monthly - ${bill.dayOfMonth}${getOrdinalSuffix(
     bill.dayOfMonth
   )}`;
-  const dueDateColor = bill.isPaid ? "text-[#277C78]" : "text-[#696868]";
+  const dueDateColor = bill.isPaid ? "text-finance-green" : "text-finance-grey";
 
   return (
     <div className="px-4 sm:px-6 py-5 border-b border-gray-100 last:border-0 hover:bg-gray-50/50 transition-colors">
@@ -57,7 +57,7 @@ export const BillRow = ({ bill }: BillRowProps) => {
           <span
             className={`font-bold text-sm ${
               bill.isDueSoon && !bill.isPaid
-                ? "text-[#C94736]"
+                ? "text-finance-red"
                 : "text-gray-900"
             }`}
           >
@@ -109,7 +109,7 @@ export const BillRow = ({ bill }: BillRowProps) => {
           <span
             className={`font-bold text-sm ${
               bill.isDueSoon && !bill.isPaid
-                ? "text-[#C94736]"
+                ? "text-finance-red"
                 : "text-gray-900"
             }`}
           >
