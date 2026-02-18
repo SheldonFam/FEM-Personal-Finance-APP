@@ -89,7 +89,7 @@ export default function RecurringBillsPage() {
               />
             </div>
             <p className="text-sm text-gray-400 mb-1">Total Bills</p>
-            <p className="text-4xl font-bold">${summary.total.toFixed(2)}</p>
+            <p className="text-4xl font-bold tabular-nums">${summary.total.toFixed(2)}</p>
           </Card>
 
           {/* Summary Card */}
@@ -99,7 +99,7 @@ export default function RecurringBillsPage() {
               {/* Paid Bills */}
               <div className="flex items-center justify-between pb-4 border-b border-gray-200">
                 <span className="text-sm text-gray-600">Paid Bills</span>
-                <span className="font-bold text-sm text-gray-900">
+                <span className="font-bold text-sm text-gray-900 tabular-nums">
                   {summary.paidCount} (${summary.paidAmount.toFixed(2)})
                 </span>
               </div>
@@ -107,7 +107,7 @@ export default function RecurringBillsPage() {
               {/* Total Upcoming */}
               <div className="flex items-center justify-between pb-4 border-b border-gray-200">
                 <span className="text-sm text-gray-600">Total Upcoming</span>
-                <span className="font-bold text-sm text-gray-900">
+                <span className="font-bold text-sm text-gray-900 tabular-nums">
                   {summary.upcomingCount} ($
                   {summary.upcomingAmount.toFixed(2)})
                 </span>
@@ -116,7 +116,7 @@ export default function RecurringBillsPage() {
               {/* Due Soon */}
               <div className="flex items-center justify-between">
                 <span className="text-sm text-red-600">Due Soon</span>
-                <span className="font-bold text-sm text-red-600">
+                <span className="font-bold text-sm text-red-600 tabular-nums">
                   {summary.dueSoonCount} (${summary.dueSoonAmount.toFixed(2)})
                 </span>
               </div>
@@ -136,6 +136,7 @@ export default function RecurringBillsPage() {
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="w-full h-11 pr-12"
+                  aria-label="Search bills"
                 />
                 <Image
                   src="/assets/images/icon-search.svg"
@@ -165,6 +166,7 @@ export default function RecurringBillsPage() {
                     width={16}
                     height={15}
                     className="shrink-0"
+                    aria-hidden="true"
                   />
                 </Button>
                 <span className="hidden sm:inline text-xs font-medium text-gray-500">
@@ -179,7 +181,7 @@ export default function RecurringBillsPage() {
                   open={isSortSelectOpen}
                   onOpenChange={setIsSortSelectOpen}
                 >
-                  <SelectTrigger className="absolute inset-0 h-0 w-0 opacity-0 pointer-events-none sm:static sm:h-11 sm:w-[150px] sm:opacity-100 sm:pointer-events-auto sm:flex bg-white border border-gray-200 rounded-lg px-4 text-sm font-medium text-gray-700 justify-between shadow-sm hover:bg-gray-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-200 data-[state=open]:border-primary-300">
+                  <SelectTrigger aria-label="Sort by" className="absolute inset-0 h-0 w-0 opacity-0 pointer-events-none sm:static sm:h-11 sm:w-[150px] sm:opacity-100 sm:pointer-events-auto sm:flex bg-white border border-gray-200 rounded-lg px-4 text-sm font-medium text-gray-700 justify-between shadow-sm hover:bg-gray-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-200 data-[state=open]:border-primary-300">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent

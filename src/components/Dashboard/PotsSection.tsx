@@ -48,7 +48,7 @@ export function PotsSection({ pots, isLoading }: PotsSectionProps) {
           </div>
           <div>
             <p className="text-sm text-finance-grey mb-1">Total Saved</p>
-            <p className="text-[2rem] leading-[1.2] font-bold text-finance-navy">
+            <p className="text-[2rem] leading-[1.2] font-bold text-finance-navy tabular-nums">
               ${totalSaved.toLocaleString()}
             </p>
           </div>

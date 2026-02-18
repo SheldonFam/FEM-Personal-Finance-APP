@@ -95,6 +95,7 @@ export default function TransactionsPage() {
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                     className="pr-12 h-11"
+                    aria-label="Search transactions"
                   />
                   <Image
                     src="/assets/images/icon-search.svg"
@@ -126,6 +127,7 @@ export default function TransactionsPage() {
                       width={18}
                       height={16}
                       className="shrink-0"
+                      aria-hidden="true"
                     />
                   </Button>
 
@@ -143,7 +145,7 @@ export default function TransactionsPage() {
                   >
                     <SelectTrigger
                       aria-label="Sort by"
-                      className="absolute inset-0 h-0 w-0 opacity-0 pointer-events-none sm:static sm:h-11 sm:w-[115px] md:w-[130px] lg:w-[150px] sm:opacity-100 sm:pointer-events-auto sm:flex bg-white border border-gray-200 rounded-lg px-4 text-sm font-medium text-gray-700 justify-between shadow-sm hover:bg-gray-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-200 data-[state=open]:border-primary-300"
+                      className="absolute inset-0 h-0 w-0 opacity-0 pointer-events-none sm:static sm:h-11 sm:w-[115px] md:w-[130px] lg:w-[150px] sm:opacity-100 sm:pointer-events-auto sm:flex bg-white border border-gray-200 rounded-lg px-4 text-sm font-medium text-gray-700 justify-between shadow-sm hover:bg-gray-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-200 data-[state=open]:border-primary-300"
                     >
                       <SelectValue />
                     </SelectTrigger>
@@ -181,6 +183,7 @@ export default function TransactionsPage() {
                       width={16}
                       height={15}
                       className="shrink-0"
+                      aria-hidden="true"
                     />
                   </Button>
                   <span className="hidden sm:inline text-xs font-medium text-gray-500">
@@ -197,7 +200,7 @@ export default function TransactionsPage() {
                   >
                     <SelectTrigger
                       aria-label="Category"
-                      className="absolute inset-0 h-0 w-0 opacity-0 pointer-events-none sm:static sm:h-11 sm:w-[140px] md:w-[160px] lg:w-[180px] sm:opacity-100 sm:pointer-events-auto sm:flex bg-white border border-gray-200 rounded-lg px-4 text-sm font-medium text-gray-700 justify-between shadow-sm hover:bg-gray-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-200 data-[state=open]:border-primary-300"
+                      className="absolute inset-0 h-0 w-0 opacity-0 pointer-events-none sm:static sm:h-11 sm:w-[140px] md:w-[160px] lg:w-[180px] sm:opacity-100 sm:pointer-events-auto sm:flex bg-white border border-gray-200 rounded-lg px-4 text-sm font-medium text-gray-700 justify-between shadow-sm hover:bg-gray-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-200 data-[state=open]:border-primary-300"
                     >
                       <SelectValue />
                     </SelectTrigger>

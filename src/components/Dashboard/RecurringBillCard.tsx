@@ -15,7 +15,7 @@ export function RecurringBillCard({
       style={{ borderLeftColor: borderColor }}
     >
       <span className="text-sm text-finance-navy font-normal">{label}</span>
-      <span className="text-sm text-finance-navy font-bold">
+      <span className="text-sm text-finance-navy font-bold tabular-nums">
         ${amount.toFixed(2)}
       </span>
     </div>

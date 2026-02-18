@@ -13,7 +13,7 @@ export function PotItem({ label, amount, color }: PotItemProps) {
       />
       <div className="flex-1 flex items-center justify-between gap-2 min-w-0">
         <p className="text-xs text-finance-grey truncate">{label}</p>
-        <p className="font-bold text-sm text-finance-navy whitespace-nowrap">${amount.toFixed(0)}</p>
+        <p className="font-bold text-sm text-finance-navy whitespace-nowrap tabular-nums">${amount.toFixed(0)}</p>
       </div>
     </div>
   );

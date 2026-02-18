@@ -33,7 +33,7 @@ export function TransactionItem({
 
       <div className="text-right flex-shrink-0">
         <p
-          className={`font-bold text-sm ${
+          className={`font-bold text-sm tabular-nums ${
             isPositive ? "text-finance-green" : "text-finance-navy"
           }`}
         >

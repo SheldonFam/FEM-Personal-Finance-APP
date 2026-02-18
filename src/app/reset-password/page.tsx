@@ -151,11 +151,11 @@ export default function ResetPasswordPage() {
 
       {!isValidSession && (
         <div className="mt-4">
-          <Link href="/forgot-password">
-            <Button className={AUTH_BUTTON_CLASS}>
+          <Button asChild className={AUTH_BUTTON_CLASS}>
+            <Link href="/forgot-password">
               Request New Reset Link
-            </Button>
-          </Link>
+            </Link>
+          </Button>
         </div>
       )}
 

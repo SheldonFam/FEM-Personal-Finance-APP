@@ -30,7 +30,7 @@ export const FormPasswordField: React.FC<FormPasswordFieldProps> = ({
 }) => {
   return (
     <div className="space-y-1">
-      <Label className="block text-sm font-medium text-gray-700">{label}</Label>
+      <Label htmlFor={register.name} className="block text-sm font-medium text-gray-700">{label}</Label>
       <PasswordInput
         placeholder={placeholder}
         show={show}

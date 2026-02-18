@@ -136,6 +136,7 @@ export function SidebarDesktop({
             alt=""
             width={24}
             height={24}
+            aria-hidden="true"
             className={cn(
               "flex-shrink-0 transition-[opacity,transform] duration-300 motion-reduce:transition-none opacity-80 group-hover:opacity-100 group-hover:brightness-[2.5]",
               collapsed && "rotate-180"

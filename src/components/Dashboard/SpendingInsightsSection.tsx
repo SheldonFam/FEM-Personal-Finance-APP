@@ -79,7 +79,7 @@ export function SpendingInsightsSection({
                 {item.category}
               </span>
               <div className="flex items-center gap-3">
-                <span className="text-gray-900 font-bold">
+                <span className="text-gray-900 font-bold tabular-nums">
                   {formatCurrency(item.amount)}
                 </span>
                 <span className="text-xs text-gray-400">
@@ -87,7 +87,14 @@ export function SpendingInsightsSection({
                 </span>
               </div>
             </div>
-            <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
+            <div
+              className="h-2 bg-gray-100 rounded-full overflow-hidden"
+              role="progressbar"
+              aria-valuenow={Math.round(item.percentage)}
+              aria-valuemin={0}
+              aria-valuemax={100}
+              aria-label={`${item.category} spending: ${Math.round(item.percentage)}%`}
+            >
               <div
                 className="h-full rounded-full transition-[width] motion-reduce:transition-none"
                 style={{
