@@ -26,7 +26,7 @@ export const FormField: React.FC<FormFieldProps> = ({
 }) => {
   return (
     <div className="space-y-1">
-      <Label className="block text-sm font-medium text-gray-700">{label}</Label>
+      <Label htmlFor={register.name} className="block text-sm font-medium text-gray-700">{label}</Label>
       <Input
         type={type}
         placeholder={placeholder}

@@ -20,17 +20,21 @@ export function BudgetItem({ category, amount, color, alertLevel }: BudgetItemPr
           {alertLevel === "exceeded" && (
             <span
               className="w-2 h-2 rounded-full bg-red-500 flex-shrink-0"
+              role="img"
+              aria-label="Budget exceeded"
               title="Budget exceeded"
             />
           )}
           {alertLevel === "warning" && (
             <span
               className="w-2 h-2 rounded-full bg-amber-500 flex-shrink-0"
+              role="img"
+              aria-label="Approaching budget limit"
               title="Approaching budget limit"
             />
           )}
         </div>
-        <span className="font-bold text-sm text-finance-navy">
+        <span className="font-bold text-sm text-finance-navy tabular-nums">
           ${amount.toFixed(2)}
         </span>
       </div>

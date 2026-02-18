@@ -47,10 +47,11 @@ function SelectTrigger({
       <SelectPrimitive.Icon asChild>
         <Image
           src="/assets/images/icon-caret-down.svg"
-          alt="Open"
+          alt=""
           width={12}
           height={6}
           className="opacity-50"
+          aria-hidden="true"
           priority
         />
       </SelectPrimitive.Icon>
@@ -183,9 +184,10 @@ function SelectScrollDownButton({
     >
       <Image
         src="/assets/images/icon-caret-down.svg"
-        alt="Down"
+        alt=""
         width={12}
         height={6}
+        aria-hidden="true"
       />
     </SelectPrimitive.ScrollDownButton>
   );

@@ -35,7 +35,7 @@ export const TransactionRow = ({ transaction }: TransactionRowProps) => {
           </div>
           <div className="ml-auto text-right sm:hidden">
             <p
-              className={`font-bold text-sm ${
+              className={`font-bold text-sm tabular-nums ${
                 isPositive ? "text-green-600" : "text-gray-900"
               }`}
             >
@@ -61,7 +61,7 @@ export const TransactionRow = ({ transaction }: TransactionRowProps) => {
         {/* Amount */}
         <div className="hidden sm:block text-right">
           <p
-            className={`font-bold text-sm md:text-base ${
+            className={`font-bold text-sm md:text-base tabular-nums ${
               isPositive ? "text-green-600" : "text-gray-900"
             }`}
           >

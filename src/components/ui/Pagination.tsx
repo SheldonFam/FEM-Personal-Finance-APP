@@ -122,7 +122,7 @@ export const Pagination = ({
         {mobilePages.map((page, index) => {
           if (page === "...") {
             return (
-              <span key={`m-ellipsis-${index}`} className="px-2 text-gray-400">
+              <span key={`m-ellipsis-${index}`} className="px-2 text-gray-400" aria-hidden="true">
                 ...
               </span>
             );
@@ -156,7 +156,7 @@ export const Pagination = ({
         {desktopPages.map((page, index) => {
           if (page === "...") {
             return (
-              <span key={`d-ellipsis-${index}`} className="px-2 text-gray-400">
+              <span key={`d-ellipsis-${index}`} className="px-2 text-gray-400" aria-hidden="true">
                 ...
               </span>
             );

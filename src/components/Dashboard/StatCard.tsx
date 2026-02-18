@@ -26,7 +26,7 @@ export function StatCard({
       >
         {label}
       </p>
-      <p className="text-xl sm:text-2xl md:text-3xl font-bold truncate">
+      <p className="text-xl sm:text-2xl md:text-3xl font-bold truncate tabular-nums">
         $
         {amount.toLocaleString("en-US", {
           minimumFractionDigits: 2,

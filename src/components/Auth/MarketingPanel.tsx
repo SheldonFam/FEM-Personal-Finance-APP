@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import Image from "next/image";
 
 /**
  * MarketingPanel Component
@@ -18,10 +19,13 @@ export function MarketingPanel() {
 
         {/* Illustration - positioned absolutely to fill space */}
         <div className="flex items-center justify-center">
-          <img
+          <Image
             src="/assets/images/illustration-authentication.svg"
             alt="Finance illustration"
+            width={560}
+            height={720}
             className="w-full h-full"
+            loading="lazy"
           />
         </div>
 

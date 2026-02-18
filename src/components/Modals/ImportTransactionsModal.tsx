@@ -205,6 +205,8 @@ export function ImportTransactionsModal({
                             {row.suggestedCategory && (
                               <span
                                 className="inline-block w-2 h-2 rounded-full bg-blue-400 flex-shrink-0"
+                                role="img"
+                                aria-label="Auto-suggested category"
                                 title="Auto-suggested category"
                               />
                             )}

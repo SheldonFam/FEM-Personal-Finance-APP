@@ -22,7 +22,7 @@ export const FormConfirmPasswordField: React.FC<
 > = ({ label, placeholder, error, register, show, onToggleVisibility, autoComplete }) => {
   return (
     <div className="space-y-1">
-      <Label className="block text-sm font-medium text-gray-700">{label}</Label>
+      <Label htmlFor={register.name} className="block text-sm font-medium text-gray-700">{label}</Label>
       <PasswordInput
         placeholder={placeholder}
         show={show}

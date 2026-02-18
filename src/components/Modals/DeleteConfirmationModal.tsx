@@ -52,7 +52,7 @@ export function DeleteConfirmationModal({
           className="w-full h-14 text-sm font-medium"
           disabled={isLoading}
         >
-          No,I want to go back
+          No, I want to go back
         </Button>
       </div>
     </BaseModal>

@@ -48,10 +48,11 @@ export function SidebarNavItem({
       >
         <Image
           src={item.icon}
-          alt="icon"
+          alt=""
           width={isMobile ? 20 : 24}
           height={isMobile ? 20 : 24}
           className={iconClasses}
+          aria-hidden="true"
           style={
             active
               ? {

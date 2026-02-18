@@ -112,7 +112,7 @@ export const PotCard = ({
       {/* Total Saved */}
       <div className="mb-8">
         <p className="text-sm text-gray-500 mb-3">Total Saved</p>
-        <p className="text-[2rem] font-bold text-gray-900">
+        <p className="text-[2rem] font-bold text-gray-900 tabular-nums">
           {formatCurrency(pot.total, false)}
         </p>
       </div>

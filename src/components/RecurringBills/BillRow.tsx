@@ -55,7 +55,7 @@ export const BillRow = ({ bill }: BillRowProps) => {
             )}
           </div>
           <span
-            className={`font-bold text-sm ${
+            className={`font-bold text-sm tabular-nums ${
               bill.isDueSoon && !bill.isPaid
                 ? "text-finance-red"
                 : "text-gray-900"
@@ -107,7 +107,7 @@ export const BillRow = ({ bill }: BillRowProps) => {
         </div>
         <div className="text-right">
           <span
-            className={`font-bold text-sm ${
+            className={`font-bold text-sm tabular-nums ${
               bill.isDueSoon && !bill.isPaid
                 ? "text-finance-red"
                 : "text-gray-900"

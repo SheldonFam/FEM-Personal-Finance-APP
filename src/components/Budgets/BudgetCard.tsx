@@ -153,7 +153,7 @@ export const BudgetCard = ({
             />
             <div>
               <p className="text-xs text-gray-500 mb-1">Spent</p>
-              <p className="text-base font-bold text-gray-900">
+              <p className="text-base font-bold text-gray-900 tabular-nums">
                 {formatCurrency(spent)}
               </p>
             </div>
@@ -166,7 +166,7 @@ export const BudgetCard = ({
             />
             <div>
               <p className="text-xs text-gray-500 mb-1">Remaining</p>
-              <p className="text-base font-bold text-gray-900">
+              <p className="text-base font-bold text-gray-900 tabular-nums">
                 {formatCurrency(remaining)}
               </p>
             </div>

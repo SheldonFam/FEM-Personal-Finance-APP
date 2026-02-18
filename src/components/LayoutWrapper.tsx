@@ -16,7 +16,7 @@ export default function LayoutWrapper({
 
   if (isAuthPage) {
     return (
-      <div className="min-h-screen bg-finance-beige">{children}</div>
+      <main className="min-h-screen bg-finance-beige">{children}</main>
     );
   }
 

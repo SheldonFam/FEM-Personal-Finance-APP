@@ -57,7 +57,7 @@ export default function BudgetDonutChart({
       {/* Center Text */}
       <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
         <div className="text-center">
-          <p className="text-4xl leading-none font-bold text-gray-900">
+          <p className="text-4xl leading-none font-bold text-gray-900 tabular-nums">
             ${Math.round(totalSpent).toLocaleString("en-US")}
           </p>
           <p className="text-xs text-gray-500 mt-2">
@@ -92,14 +92,15 @@ export function BudgetLegend({ categories }: BudgetLegendProps) {
             <div
               className="w-1 h-10 rounded-full flex-shrink-0"
               style={{ backgroundColor: category.color }}
+              aria-hidden="true"
             />
             <span className="text-sm text-gray-600">{category.name}</span>
           </div>
           <div className="text-right">
-            <p className="font-bold text-sm text-gray-900">
+            <p className="font-bold text-sm text-gray-900 tabular-nums">
               ${category.spent.toFixed(2)}
             </p>
-            <p className="text-xs text-gray-500">
+            <p className="text-xs text-gray-500 tabular-nums">
               of ${category.limit.toFixed(2)}
             </p>
           </div>
