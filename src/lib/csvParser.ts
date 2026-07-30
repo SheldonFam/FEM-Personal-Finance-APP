@@ -1,4 +1,4 @@
-import { TRANSACTION_CATEGORIES } from "@/lib/constants/constants";
+import { isTransactionCategory } from "@/lib/constants/constants";
 import { suggestCategory } from "@/lib/categorySuggestions";
 
 export interface ParsedRow {
@@ -17,9 +17,6 @@ export interface CsvParseResult {
 }
 
 const REQUIRED_COLUMNS = ["date", "name", "amount"];
-const VALID_CATEGORIES = TRANSACTION_CATEGORIES.filter(
-  (c) => c !== "All Transactions",
-);
 
 function parseCsvLine(line: string): string[] {
   const fields: string[] = [];
@@ -123,7 +120,7 @@ export function parseTransactionsCsv(csvText: string): CsvParseResult {
     let category = rawCategory;
     let suggestedCat = false;
 
-    if (category && !VALID_CATEGORIES.includes(category as typeof VALID_CATEGORIES[number])) {
+    if (category && !isTransactionCategory(category)) {
       errors.push(`Row ${rowNum}: Unknown category "${category}", defaulting to suggestion or "General"`);
       category = "";
     }

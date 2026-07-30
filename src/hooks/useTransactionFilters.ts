@@ -1,4 +1,5 @@
 import { Transaction, SortOption } from "@/lib/types";
+import { ALL_CATEGORIES_FILTER } from "@/lib/constants/constants";
 import { useFilteredItems } from "./useFilteredItems";
 
 interface UseTransactionFiltersProps {
@@ -26,7 +27,7 @@ export const useTransactionFilters = ({
     },
     category: {
       selectedCategory,
-      allCategoriesValue: "All Transactions",
+      allCategoriesValue: ALL_CATEGORIES_FILTER,
       getCategory: (transaction) => transaction.category,
     },
     sort: {

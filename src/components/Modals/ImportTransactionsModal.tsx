@@ -23,10 +23,6 @@ interface ImportTransactionsModalProps {
 
 type Step = "upload" | "preview" | "done";
 
-const VALID_CATEGORIES = TRANSACTION_CATEGORIES.filter(
-  (c) => c !== "All Transactions",
-);
-
 export function ImportTransactionsModal({
   open,
   onOpenChange,
@@ -191,7 +187,7 @@ export function ImportTransactionsModal({
                                 <SelectValue />
                               </SelectTrigger>
                               <SelectContent>
-                                {VALID_CATEGORIES.map((cat) => (
+                                {TRANSACTION_CATEGORIES.map((cat) => (
                                   <SelectItem
                                     key={cat}
                                     value={cat}

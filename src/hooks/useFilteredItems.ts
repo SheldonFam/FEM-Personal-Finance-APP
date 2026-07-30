@@ -19,7 +19,7 @@ interface CategoryConfig<T> {
   getCategory: (item: T) => string;
   /** Selected category to filter by */
   selectedCategory: string;
-  /** Value representing "all categories" (e.g., "All Transactions") */
+  /** Sentinel meaning "no category filter" — see ALL_CATEGORIES_FILTER */
   allCategoriesValue: string;
 }
 
@@ -59,7 +59,7 @@ interface UseFilteredItemsProps<T> {
  *   },
  *   category: {
  *     selectedCategory,
- *     allCategoriesValue: "All Transactions",
+ *     allCategoriesValue: ALL_CATEGORIES_FILTER,
  *     getCategory: (t) => t.category
  *   },
  *   sort: {
