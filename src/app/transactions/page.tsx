@@ -245,8 +245,8 @@ export default function TransactionsPage() {
                   ))}
                 </div>
               ) : paginatedTransactions.length > 0 ? (
-                paginatedTransactions.map((transaction, index) => (
-                  <TransactionRow key={index} transaction={transaction} />
+                paginatedTransactions.map((transaction) => (
+                  <TransactionRow key={transaction.id} transaction={transaction} />
                 ))
               ) : (
                 <div className="text-center py-12">
