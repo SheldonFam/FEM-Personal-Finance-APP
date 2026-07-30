@@ -85,11 +85,10 @@ export async function signUp(data: SignUpData): Promise<AuthResponse> {
   }
 
   return {
-    user: {
-      id: authData.user.id,
-      name: data.name,
-      email: authData.user.email || "",
-    },
+    // Shared mapping for id/email. The submitted name overrides it: we already
+    // know it, so there's no need to depend on it having round-tripped through
+    // user metadata by the time signUp returns.
+    user: { ...toAuthUser(authData.user), name: data.name },
   };
 }
 

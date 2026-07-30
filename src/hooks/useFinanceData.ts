@@ -396,10 +396,16 @@ export function useDeletePot() {
 }
 
 /**
- * Applies a signed delta to a pot's current total, never dropping below zero.
+ * Applies a signed delta to a pot's current total, clamping at zero.
  *
  * Pure so the arithmetic is stated in one place rather than mirrored across a
  * deposit and a withdrawal path.
+ *
+ * NOTE: the clamp applies in BOTH directions, where previously only the
+ * withdrawal path clamped. For a deposit it is a no-op -- a positive delta on
+ * a non-negative total cannot go below zero -- so this widens nothing in
+ * practice. Stating "a pot total is never negative" once is clearer than
+ * making the invariant conditional on direction.
  */
 export function applyPotDelta(currentTotal: number, delta: number): number {
   return Math.max(0, currentTotal + delta);
@@ -411,7 +417,7 @@ export function applyPotDelta(currentTotal: number, delta: number): number {
  * NOTE: read-then-write, so two overlapping adjustments can lose one of them.
  * #35 replaces this with a single atomic statement in the database.
  */
-function usePotBalanceMutation(direction: 1 | -1) {
+function usePotBalanceMutation(adjustment: "deposit" | "withdraw") {
   const queryClient = useQueryClient();
 
   return useMutation({
@@ -426,7 +432,8 @@ function usePotBalanceMutation(direction: 1 | -1) {
 
       if (fetchError) throw fetchError;
 
-      const newTotal = applyPotDelta(pot?.total || 0, direction * amount);
+      const delta = adjustment === "deposit" ? amount : -amount;
+      const newTotal = applyPotDelta(pot?.total || 0, delta);
 
       const { data, error } = await supabase
         .from("pots")
@@ -446,11 +453,11 @@ function usePotBalanceMutation(direction: 1 | -1) {
 }
 
 export function useAddMoneyToPot() {
-  return usePotBalanceMutation(1);
+  return usePotBalanceMutation("deposit");
 }
 
 export function useWithdrawFromPot() {
-  return usePotBalanceMutation(-1);
+  return usePotBalanceMutation("withdraw");
 }
 
 // =============================================
