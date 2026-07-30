@@ -220,8 +220,8 @@ export default function RecurringBillsPage() {
                 ))}
               </div>
             ) : filteredAndSortedBills.length > 0 ? (
-              filteredAndSortedBills.map((bill, index) => (
-                <BillRow key={`${bill.name}-${index}`} bill={bill} />
+              filteredAndSortedBills.map((bill) => (
+                <BillRow key={bill.name} bill={bill} />
               ))
             ) : (
               <div className="py-12 text-center">
