@@ -1,5 +1,5 @@
 import { RecurringBill, SortOption } from "@/lib/types";
-import { useFilteredItems } from "./useFilteredItems";
+import { useFilteredItems, type FilterAccessors } from "./useFilteredItems";
 
 interface UseBillFiltersProps {
   bills: RecurringBill[];
@@ -8,32 +8,32 @@ interface UseBillFiltersProps {
 }
 
 /**
- * Custom hook for filtering and sorting recurring bills
- * Uses the generic useFilteredItems hook with bill-specific configuration
- * Note: For bills, "latest" sorts by earliest day of month, "oldest" by latest day
+ * Module scope, so its identity is stable across renders and the memo inside
+ * useFilteredItems actually holds.
+ *
+ * Bills sort by day of month rather than by date, and compare amounts by
+ * magnitude, so they override every handler except the name ones.
+ */
+const BILL_ACCESSORS: FilterAccessors<RecurringBill> = {
+  getSearchableText: (bill) => bill.name,
+  getName: (bill) => bill.name,
+  sortHandlers: {
+    latest: (a, b) => a.dayOfMonth - b.dayOfMonth,
+    oldest: (a, b) => b.dayOfMonth - a.dayOfMonth,
+    highest: (a, b) => Math.abs(b.amount) - Math.abs(a.amount),
+    lowest: (a, b) => Math.abs(a.amount) - Math.abs(b.amount),
+  },
+};
+
+/**
+ * Filters and sorts recurring bills.
  */
 export const useBillFilters = ({
   bills,
   searchQuery,
   sortBy,
-}: UseBillFiltersProps) => {
-  return useFilteredItems({
-    items: bills,
-    search: {
-      searchTerm: searchQuery,
-      getSearchableText: (bill) => bill.name,
-    },
-    sort: {
-      sortBy,
-      getName: (bill) => bill.name,
-      // Custom sort handlers for bills (amounts use absolute values)
-      sortHandlers: {
-        latest: (a, b) => a.dayOfMonth - b.dayOfMonth,
-        oldest: (a, b) => b.dayOfMonth - a.dayOfMonth,
-        highest: (a, b) => Math.abs(b.amount) - Math.abs(a.amount),
-        lowest: (a, b) => Math.abs(a.amount) - Math.abs(b.amount),
-      },
-    },
+}: UseBillFiltersProps) =>
+  useFilteredItems(bills, BILL_ACCESSORS, {
+    searchTerm: searchQuery,
+    sortBy,
   });
-};
-

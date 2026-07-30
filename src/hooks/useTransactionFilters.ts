@@ -1,6 +1,6 @@
 import { Transaction, SortOption } from "@/lib/types";
 import { ALL_CATEGORIES_FILTER } from "@/lib/constants/constants";
-import { useFilteredItems } from "./useFilteredItems";
+import { useFilteredItems, type FilterAccessors } from "./useFilteredItems";
 
 interface UseTransactionFiltersProps {
   transactions: Transaction[];
@@ -10,32 +10,29 @@ interface UseTransactionFiltersProps {
 }
 
 /**
- * Custom hook for filtering and sorting transactions
- * Uses the generic useFilteredItems hook with transaction-specific configuration
+ * Module scope, so its identity is stable across renders and the memo inside
+ * useFilteredItems actually holds.
+ */
+const TRANSACTION_ACCESSORS: FilterAccessors<Transaction> = {
+  getSearchableText: (transaction) => transaction.name,
+  getCategory: (transaction) => transaction.category,
+  getDate: (transaction) => transaction.date,
+  getAmount: (transaction) => transaction.amount,
+  getName: (transaction) => transaction.name,
+};
+
+/**
+ * Filters and sorts transactions.
  */
 export const useTransactionFilters = ({
   transactions,
   searchTerm,
   selectedCategory,
   sortBy,
-}: UseTransactionFiltersProps) => {
-  return useFilteredItems({
-    items: transactions,
-    search: {
-      searchTerm,
-      getSearchableText: (transaction) => transaction.name,
-    },
-    category: {
-      selectedCategory,
-      allCategoriesValue: ALL_CATEGORIES_FILTER,
-      getCategory: (transaction) => transaction.category,
-    },
-    sort: {
-      sortBy,
-      getDate: (transaction) => transaction.date,
-      getAmount: (transaction) => transaction.amount,
-      getName: (transaction) => transaction.name,
-    },
+}: UseTransactionFiltersProps) =>
+  useFilteredItems(transactions, TRANSACTION_ACCESSORS, {
+    searchTerm,
+    selectedCategory,
+    allCategoriesValue: ALL_CATEGORIES_FILTER,
+    sortBy,
   });
-};
-
