@@ -1,15 +1,17 @@
 "use client";
 
-import { createContext, useContext, useEffect, useState, ReactNode } from "react";
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+  ReactNode,
+} from "react";
 import { createClient } from "@/lib/supabase/client";
 import { useQueryClient } from "@tanstack/react-query";
-import type { User } from "@supabase/supabase-js";
-
-interface AuthUser {
-  id: string;
-  name: string;
-  email: string;
-}
+import { toAuthUser } from "@/services/auth.service";
+import type { AuthUser } from "@/lib/types";
 
 interface AuthContextType {
   user: AuthUser | null;
@@ -25,47 +27,57 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const supabase = createClient();
   const queryClient = useQueryClient();
 
+  // Who the cache currently belongs to. Held in a ref, not state, because the
+  // auth subscription below is established once and would otherwise close over
+  // the value as it was on first render — which is null, making the
+  // cross-account clear below unreachable.
+  const cachedUserIdRef = useRef<string | null>(null);
+
   useEffect(() => {
     const getUser = async () => {
-      const { data: { user: supabaseUser } } = await supabase.auth.getUser();
+      const {
+        data: { user: supabaseUser },
+      } = await supabase.auth.getUser();
       if (supabaseUser) {
-        setUser(mapUser(supabaseUser));
+        cachedUserIdRef.current = supabaseUser.id;
+        setUser(toAuthUser(supabaseUser));
       }
       setIsLoading(false);
     };
 
     getUser();
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (_event, session) => {
-        if (session?.user) {
-          // If user changed, clear the cache to fetch new user's data
-          if (user?.id && user.id !== session.user.id) {
-            queryClient.clear();
-          }
-          setUser(mapUser(session.user));
-        } else {
-          // User logged out - clear all cached data
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange(async (_event, session) => {
+      if (session?.user) {
+        // A different user than the cache holds — drop it before their data
+        // is read as the new user's.
+        if (
+          cachedUserIdRef.current &&
+          cachedUserIdRef.current !== session.user.id
+        ) {
           queryClient.clear();
-          setUser(null);
         }
-        setIsLoading(false);
+        cachedUserIdRef.current = session.user.id;
+        setUser(toAuthUser(session.user));
+      } else {
+        // Signed out - clear all cached data
+        cachedUserIdRef.current = null;
+        queryClient.clear();
+        setUser(null);
       }
-    );
+      setIsLoading(false);
+    });
 
     return () => {
       subscription.unsubscribe();
     };
-  }, [supabase.auth]);
-
-  const mapUser = (supabaseUser: User): AuthUser => ({
-    id: supabaseUser.id,
-    name: supabaseUser.user_metadata?.name || supabaseUser.email?.split("@")[0] || "",
-    email: supabaseUser.email || "",
-  });
+  }, [supabase.auth, queryClient]);
 
   const signOut = async () => {
     // Clear all cached data before signing out
+    cachedUserIdRef.current = null;
     queryClient.clear();
     await supabase.auth.signOut();
     setUser(null);
