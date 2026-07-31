@@ -321,66 +321,14 @@ export const {
 // POT MUTATIONS
 // =============================================
 
-export function useCreatePot() {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: async (pot: PotInput) => {
-      const { supabase, user } = await getAuthenticatedUser();
-
-      const { data, error } = await supabase
-        .from("pots")
-        .insert({ user_id: user.id, ...pot })
-        .select()
-        .single();
-
-      if (error) throw error;
-      return data;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["pots"] });
-    },
-  });
-}
-
-export function useUpdatePot() {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: async ({ id, ...pot }: Partial<Pot> & { id: string }) => {
-      const supabase = createClient();
-
-      const { data, error } = await supabase
-        .from("pots")
-        .update(pot)
-        .eq("id", id)
-        .select()
-        .single();
-
-      if (error) throw error;
-      return data;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["pots"] });
-    },
-  });
-}
-
-export function useDeletePot() {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: async (id: string) => {
-      const supabase = createClient();
-      const { error } = await supabase.from("pots").delete().eq("id", id);
-
-      if (error) throw error;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["pots"] });
-    },
-  });
-}
+export const {
+  useCreate: useCreatePot,
+  useUpdate: useUpdatePot,
+  useDelete: useDeletePot,
+} = createEntityMutations<Pot, PotInput>({
+  table: "pots",
+  invalidates: ["pots"],
+});
 
 /**
  * Deposits into or withdraws from a pot.
