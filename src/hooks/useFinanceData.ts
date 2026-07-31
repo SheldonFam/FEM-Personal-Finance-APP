@@ -178,6 +178,12 @@ export function useFinanceData() {
 // MUTATION HELPERS
 // =============================================
 
+/**
+ * Establishes the signed-in user and hands back a client to write with.
+ *
+ * Every write goes through here, so "a write is authenticated" is settled in
+ * one place rather than asserted -- or forgotten -- at each call site.
+ */
 async function getAuthenticatedUser() {
   const supabase = createClient();
   const {
@@ -188,79 +194,115 @@ async function getAuthenticatedUser() {
   return { supabase, user };
 }
 
+/**
+ * Builds the create, update and delete mutations for one table.
+ *
+ * The three were previously spelled out per entity: nine blocks that differed
+ * only in a table name and a set of cache keys. They had also drifted -- create
+ * established the user through getAuthenticatedUser, while update and delete
+ * built a client directly and never established one at all, leaning entirely on
+ * row level security to refuse the write. Producing all three from here makes
+ * that divergence unrepresentable; a write cannot skip the check by omission.
+ *
+ * Only these three shapes belong here. A mutation that does something else --
+ * the pot balance adjustment, say -- stays written out, rather than growing an
+ * options flag that every other caller has to read past.
+ */
+function createEntityMutations<TEntity extends { id?: string }, TInput>(options: {
+  table: string;
+  invalidates: readonly string[];
+}) {
+  const { table, invalidates } = options;
+
+  function useInvalidateOnSuccess() {
+    const queryClient = useQueryClient();
+
+    return () => {
+      for (const key of invalidates) {
+        queryClient.invalidateQueries({ queryKey: [key] });
+      }
+    };
+  }
+
+  function useCreate() {
+    const onSuccess = useInvalidateOnSuccess();
+
+    return useMutation({
+      mutationFn: async (input: TInput) => {
+        const { supabase, user } = await getAuthenticatedUser();
+
+        const { data, error } = await supabase
+          .from(table)
+          .insert({ user_id: user.id, ...input })
+          .select()
+          .single();
+
+        if (error) throw error;
+        return data;
+      },
+      onSuccess,
+    });
+  }
+
+  function useUpdate() {
+    const onSuccess = useInvalidateOnSuccess();
+
+    return useMutation({
+      mutationFn: async ({
+        id,
+        ...changes
+      }: Partial<TEntity> & { id: string }) => {
+        const { supabase } = await getAuthenticatedUser();
+
+        const { data, error } = await supabase
+          .from(table)
+          .update(changes)
+          .eq("id", id)
+          .select()
+          .single();
+
+        if (error) throw error;
+        return data;
+      },
+      onSuccess,
+    });
+  }
+
+  function useDelete() {
+    const onSuccess = useInvalidateOnSuccess();
+
+    return useMutation({
+      mutationFn: async (id: string) => {
+        const { supabase } = await getAuthenticatedUser();
+
+        const { error } = await supabase.from(table).delete().eq("id", id);
+
+        if (error) throw error;
+      },
+      onSuccess,
+    });
+  }
+
+  return { useCreate, useUpdate, useDelete };
+}
+
 // =============================================
 // TRANSACTION MUTATIONS
 // =============================================
 
-export function useCreateTransaction() {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: async (transaction: TransactionInput) => {
-      const { supabase, user } = await getAuthenticatedUser();
-
-      const { data, error } = await supabase
-        .from("transactions")
-        .insert({ user_id: user.id, ...transaction })
-        .select()
-        .single();
-
-      if (error) throw error;
-      return data;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["transactions"] });
-      queryClient.invalidateQueries({ queryKey: ["recurring-bills"] });
-    },
-  });
-}
-
-export function useUpdateTransaction() {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: async ({
-      id,
-      ...transaction
-    }: Partial<Transaction> & { id: string }) => {
-      const supabase = createClient();
-
-      const { data, error } = await supabase
-        .from("transactions")
-        .update(transaction)
-        .eq("id", id)
-        .select()
-        .single();
-
-      if (error) throw error;
-      return data;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["transactions"] });
-      queryClient.invalidateQueries({ queryKey: ["recurring-bills"] });
-    },
-  });
-}
-
-export function useDeleteTransaction() {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: async (id: string) => {
-      const supabase = createClient();
-      const { error } = await supabase
-        .from("transactions")
-        .delete()
-        .eq("id", id);
-
-      if (error) throw error;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["transactions"] });
-      queryClient.invalidateQueries({ queryKey: ["recurring-bills"] });
-    },
-  });
-}
+/**
+ * Writing a transaction can change which bills are recurring, so both caches
+ * are invalidated. This pairing was already duplicated across all three
+ * mutations; now it is stated once.
+ */
+export const {
+  useCreate: useCreateTransaction,
+  useUpdate: useUpdateTransaction,
+  useDelete: useDeleteTransaction,
+} = createEntityMutations<Transaction, TransactionInput>({
+  table: "transactions",
+  invalidates: ["transactions", "recurring-bills"],
+});
 
 // =============================================
 // BUDGET MUTATIONS
