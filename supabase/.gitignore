@@ -1,3 +1,8 @@
-# Supabase CLI working files -- local state, not project configuration.
+# Supabase CLI working files -- machine-local state, not project configuration.
 .branches
 .temp
+
+# Env files, in case the CLI ever writes one here.
+.env.keys
+.env.local
+.env.*.local
