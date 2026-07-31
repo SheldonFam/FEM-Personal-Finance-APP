@@ -184,7 +184,7 @@ export function useFinanceData() {
  * Every write goes through here, so "a write is authenticated" is settled in
  * one place rather than asserted -- or forgotten -- at each call site.
  */
-async function getAuthenticatedUser() {
+export async function getAuthenticatedUser() {
   const supabase = createClient();
   const {
     data: { user },
