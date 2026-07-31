@@ -208,10 +208,10 @@ export async function getAuthenticatedUser() {
  * the pot balance adjustment, say -- stays written out, rather than growing an
  * options flag that every other caller has to read past.
  */
-function createEntityMutations<TEntity extends { id?: string }, TInput>(options: {
-  table: string;
-  invalidates: readonly string[];
-}) {
+function createEntityMutations<
+  TEntity extends { id?: string },
+  TInput,
+>(options: { table: string; invalidates: readonly string[] }) {
   const { table, invalidates } = options;
 
   function useInvalidateOnSuccess() {
