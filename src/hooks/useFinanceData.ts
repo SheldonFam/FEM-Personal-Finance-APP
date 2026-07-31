@@ -308,69 +308,14 @@ export const {
 // BUDGET MUTATIONS
 // =============================================
 
-export function useCreateBudget() {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: async (budget: BudgetInput) => {
-      const { supabase, user } = await getAuthenticatedUser();
-
-      const { data, error } = await supabase
-        .from("budgets")
-        .insert({ user_id: user.id, ...budget })
-        .select()
-        .single();
-
-      if (error) throw error;
-      return data;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["budgets"] });
-    },
-  });
-}
-
-export function useUpdateBudget() {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: async ({
-      id,
-      ...budget
-    }: Partial<Budget> & { id: string }) => {
-      const supabase = createClient();
-
-      const { data, error } = await supabase
-        .from("budgets")
-        .update(budget)
-        .eq("id", id)
-        .select()
-        .single();
-
-      if (error) throw error;
-      return data;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["budgets"] });
-    },
-  });
-}
-
-export function useDeleteBudget() {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: async (id: string) => {
-      const supabase = createClient();
-      const { error } = await supabase.from("budgets").delete().eq("id", id);
-
-      if (error) throw error;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["budgets"] });
-    },
-  });
-}
+export const {
+  useCreate: useCreateBudget,
+  useUpdate: useUpdateBudget,
+  useDelete: useDeleteBudget,
+} = createEntityMutations<Budget, BudgetInput>({
+  table: "budgets",
+  invalidates: ["budgets"],
+});
 
 // =============================================
 // POT MUTATIONS
