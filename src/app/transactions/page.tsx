@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { Suspense, useState } from "react";
 import { Card } from "@/components/ui/Card";
 import { Input } from "@/components/ui/Input";
 import { Button } from "@/components/ui/Button";
@@ -16,7 +16,6 @@ import { useTransactions } from "@/hooks/useFinanceData";
 import { DataErrorAlert } from "@/components/DataErrorAlert";
 import { PageLayout } from "@/components/PageLayout";
 import {
-  ALL_CATEGORIES_FILTER,
   CATEGORY_FILTER_OPTIONS,
   SORT_OPTIONS,
 } from "@/lib/constants/constants";
@@ -26,16 +25,44 @@ import { TransactionRow } from "@/components/Transactions/TransactionRow";
 import { Pagination } from "@/components/ui/Pagination";
 import { exportTransactionsToCsv } from "@/lib/exportCsv";
 import { ImportTransactionsModal } from "@/components/Modals/ImportTransactionsModal";
-import type { CategoryFilter } from "@/lib/types";
+import { useTransactionUrlState } from "@/hooks/useTransactionUrlState";
+import type { CategoryFilter, SortOption } from "@/lib/types";
 
+/**
+ * useSearchParams needs a Suspense boundary above it, so the page splits: this
+ * shell stays prerenderable, and everything that depends on the URL lives in
+ * TransactionsList below.
+ */
 export default function TransactionsPage() {
-  const [searchTerm, setSearchTerm] = useState("");
-  const [selectedCategory, setSelectedCategory] =
-    useState<CategoryFilter>(ALL_CATEGORIES_FILTER);
-  const [sortBy, setSortBy] = useState<
-    "latest" | "oldest" | "highest" | "lowest" | "a-z" | "z-a"
-  >("latest");
-  const [currentPage, setCurrentPage] = useState(1);
+  return (
+    <Suspense fallback={<TransactionsListFallback />}>
+      <TransactionsList />
+    </Suspense>
+  );
+}
+
+function TransactionsListFallback() {
+  return (
+    <PageLayout title="Transactions">
+      <Card className="p-6 sm:p-8">
+        <div className="h-11 w-full animate-pulse rounded-lg bg-gray-100" />
+      </Card>
+    </PageLayout>
+  );
+}
+
+function TransactionsList() {
+  const {
+    searchTerm,
+    selectedCategory,
+    sortBy,
+    currentPage,
+    setSearchTerm,
+    setSelectedCategory,
+    setSortBy,
+    setCurrentPage,
+  } = useTransactionUrlState();
+
   const [isCategorySelectOpen, setIsCategorySelectOpen] = useState(false);
   const [isSortSelectOpen, setIsSortSelectOpen] = useState(false);
   const [isImportModalOpen, setIsImportModalOpen] = useState(false);
@@ -55,26 +82,6 @@ export default function TransactionsPage() {
     items: filteredAndSortedTransactions,
     currentPage,
   });
-
-  // Narrowing or reordering the list invalidates whichever page you were on,
-  // so each filter change returns to the first. Done where the change
-  // happens rather than in an effect watching the values: an effect runs
-  // after the render it corrects, so every keystroke rendered twice -- once
-  // with the new search and the old page, once with the page put back.
-  const handleSearchChange = (value: string) => {
-    setSearchTerm(value);
-    setCurrentPage(1);
-  };
-
-  const handleSortChange = (value: typeof sortBy) => {
-    setSortBy(value);
-    setCurrentPage(1);
-  };
-
-  const handleCategoryChange = (value: CategoryFilter) => {
-    setSelectedCategory(value);
-    setCurrentPage(1);
-  };
 
   return (
     <PageLayout
@@ -111,7 +118,7 @@ export default function TransactionsPage() {
                     type="text"
                     placeholder="Search transaction"
                     value={searchTerm}
-                    onChange={(e) => handleSearchChange(e.target.value)}
+                    onChange={(e) => setSearchTerm(e.target.value)}
                     className="pr-12 h-11"
                     aria-label="Search transactions"
                   />
@@ -161,7 +168,7 @@ export default function TransactionsPage() {
                   <Select
                     value={sortBy}
                     onValueChange={(value) => {
-                      handleSortChange(value as typeof sortBy);
+                      setSortBy(value as SortOption);
                       setIsSortSelectOpen(false);
                     }}
                     open={isSortSelectOpen}
@@ -217,7 +224,7 @@ export default function TransactionsPage() {
                   <Select
                     value={selectedCategory}
                     onValueChange={(value) => {
-                      handleCategoryChange(value as CategoryFilter);
+                      setSelectedCategory(value as CategoryFilter);
                       setIsCategorySelectOpen(false);
                     }}
                     open={isCategorySelectOpen}
