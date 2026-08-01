@@ -1,7 +1,6 @@
-import Image from "next/image";
+import { TransactionAvatar } from "@/components/TransactionAvatar";
 import { Transaction } from "@/lib/types";
 import { formatCurrency, formatDate } from "@/lib/formatters";
-import { normalizeImagePath } from "@/lib/utils";
 
 interface TransactionRowProps {
   transaction: Transaction;
@@ -9,22 +8,16 @@ interface TransactionRowProps {
 
 export const TransactionRow = ({ transaction }: TransactionRowProps) => {
   const isPositive = transaction.amount > 0;
-  const avatarPath = normalizeImagePath(transaction.avatar);
 
   return (
     <div className="py-4 border-b border-gray-100 last:border-0 hover:bg-gray-50 transition-colors">
       <div className="flex flex-col gap-3 sm:grid sm:grid-cols-4 sm:items-center sm:gap-0">
         {/* Recipient / Sender */}
         <div className="flex gap-4 min-w-0 sm:col-span-1 items-center">
-          <div className="w-10 h-10 rounded-full overflow-hidden bg-gray-100 flex-shrink-0">
-            <Image
-              src={avatarPath}
-              alt={transaction.name}
-              width={40}
-              height={40}
-              className="w-full h-full object-cover"
-            />
-          </div>
+          <TransactionAvatar
+            src={transaction.avatar}
+            name={transaction.name}
+          />
           <div className="min-w-0 flex-1">
             <p className="font-bold text-sm text-gray-900 truncate">
               {transaction.name}

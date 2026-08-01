@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
+import { TransactionAvatar } from "@/components/TransactionAvatar";
 import Image from "next/image";
 import { Budget, Transaction } from "@/lib/types";
 import { formatCurrency, formatDate } from "@/lib/formatters";
-import { normalizeImagePath } from "@/lib/utils";
 import { Progress } from "@/components/ui/Progress";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
@@ -200,22 +200,17 @@ export const BudgetCard = ({
           {latestTransactions.length > 0 ? (
             <div className="space-y-0">
               {latestTransactions.map((transaction) => {
-                const avatarPath = normalizeImagePath(transaction.avatar);
                 return (
                   <div
                     key={transaction.id}
                     className="flex items-center justify-between py-3 border-b border-gray-200 last:border-0"
                   >
                     <div className="flex items-center gap-3 min-w-0 flex-1">
-                      <div className="w-8 h-8 rounded-full overflow-hidden bg-gray-100 flex-shrink-0">
-                        <Image
-                          src={avatarPath}
-                          alt={transaction.name}
-                          width={32}
-                          height={32}
-                          className="w-full h-full object-cover"
-                        />
-                      </div>
+                      <TransactionAvatar
+                        src={transaction.avatar}
+                        name={transaction.name}
+                        size={32}
+                      />
                       <p className="text-sm text-gray-900 truncate">
                         {transaction.name}
                       </p>

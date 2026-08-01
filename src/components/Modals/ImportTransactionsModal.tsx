@@ -153,7 +153,10 @@ export function ImportTransactionsModal({
       date: r.date,
       amount: r.amount,
       recurring: r.recurring,
-      avatar: "/assets/images/avatars/bytewise.jpg",
+      // No image of its own. TransactionAvatar shows the merchant's initials
+      // rather than borrowing some other business's logo, which is what this
+      // used to do -- every imported row wore the same one.
+      avatar: "",
     }));
 
     bulkCreate.mutate(transactions, {

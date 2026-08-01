@@ -1,14 +1,13 @@
 import Image from "next/image";
+import { TransactionAvatar } from "@/components/TransactionAvatar";
 import { RecurringBill } from "@/lib/types";
 import { formatCurrency, getOrdinalSuffix } from "@/lib/formatters";
-import { normalizeImagePath } from "@/lib/utils";
 
 interface BillRowProps {
   bill: RecurringBill;
 }
 
 export const BillRow = ({ bill }: BillRowProps) => {
-  const avatarPath = normalizeImagePath(bill.avatar);
   const dueLabel = `Monthly - ${bill.dayOfMonth}${getOrdinalSuffix(
     bill.dayOfMonth
   )}`;
@@ -19,15 +18,7 @@ export const BillRow = ({ bill }: BillRowProps) => {
       {/* Mobile Layout */}
       <div className="sm:hidden space-y-3">
         <div className="flex items-center gap-3 min-w-0">
-          <div className="w-10 h-10 rounded-full overflow-hidden bg-gray-100 flex-shrink-0">
-            <Image
-              src={avatarPath}
-              alt={bill.name}
-              width={40}
-              height={40}
-              className="w-full h-full object-cover"
-            />
-          </div>
+          <TransactionAvatar src={bill.avatar} name={bill.name} />
           <p className="font-bold text-sm text-gray-900 truncate">
             {bill.name}
           </p>
@@ -69,15 +60,7 @@ export const BillRow = ({ bill }: BillRowProps) => {
       {/* Desktop Layout */}
       <div className="hidden sm:grid sm:grid-cols-3 sm:items-center sm:gap-4">
         <div className="flex items-center gap-4 min-w-0">
-          <div className="w-10 h-10 rounded-full overflow-hidden bg-gray-100 flex-shrink-0">
-            <Image
-              src={avatarPath}
-              alt={bill.name}
-              width={40}
-              height={40}
-              className="w-full h-full object-cover"
-            />
-          </div>
+          <TransactionAvatar src={bill.avatar} name={bill.name} />
           <p className="font-bold text-sm text-gray-900 truncate">
             {bill.name}
           </p>
