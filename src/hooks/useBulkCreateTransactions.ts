@@ -1,18 +1,24 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { createClient } from "@/lib/supabase/client";
-import type { TransactionInput } from "@/hooks/useFinanceData";
+import {
+  getAuthenticatedUser,
+  type TransactionInput,
+} from "@/hooks/useFinanceData";
 
+/**
+ * Inserts a whole CSV import in one statement.
+ *
+ * Not built from the entity mutation factory: this writes many rows at once and
+ * invalidates a wider set of caches than a single transaction write does -- an
+ * import shifts the balance and can introduce recurring bills. It shares the
+ * authentication step with every other write, which was the part worth having
+ * in common.
+ */
 export function useBulkCreateTransactions() {
   const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: async (transactions: TransactionInput[]) => {
-      const supabase = createClient();
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
-
-      if (!user) throw new Error("Not authenticated");
+      const { supabase, user } = await getAuthenticatedUser();
 
       const rows = transactions.map((t) => ({ user_id: user.id, ...t }));
 
