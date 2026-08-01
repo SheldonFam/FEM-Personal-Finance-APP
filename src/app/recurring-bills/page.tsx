@@ -17,6 +17,7 @@ import { processRecurringBills } from "@/lib/billing/recurringBills";
 import { useBillFilters } from "@/hooks/useBillFilters";
 import { BillRow } from "@/components/RecurringBills/BillRow";
 import { useRecurringBills } from "@/hooks/useFinanceData";
+import { useCurrentDate } from "@/hooks/useCurrentDate";
 import { DataErrorAlert } from "@/components/DataErrorAlert";
 import { PageLayout } from "@/components/PageLayout";
 
@@ -29,10 +30,13 @@ export default function RecurringBillsPage() {
 
   const { data: recurringTransactions = [], isLoading, isError } = useRecurringBills();
 
-  // Process bills
+  // Process bills. The reference date is a dependency rather than the default
+  // read inside processRecurringBills, so statuses follow the calendar rather
+  // than freezing at whatever the clock said when the bills last loaded.
+  const today = useCurrentDate();
   const allBills = useMemo(
-    () => processRecurringBills(recurringTransactions),
-    [recurringTransactions]
+    () => processRecurringBills(recurringTransactions, today),
+    [recurringTransactions, today]
   );
 
   // Calculate summary in a single pass
