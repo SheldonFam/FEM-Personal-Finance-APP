@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { Card } from "@/components/ui/Card";
 import { Input } from "@/components/ui/Input";
 import { Button } from "@/components/ui/Button";
@@ -55,10 +55,25 @@ export default function TransactionsPage() {
     currentPage,
   });
 
-  // Reset to page 1 when filters change
-  useEffect(() => {
+  // Narrowing or reordering the list invalidates whichever page you were on,
+  // so each filter change returns to the first. Done where the change
+  // happens rather than in an effect watching the values: an effect runs
+  // after the render it corrects, so every keystroke rendered twice -- once
+  // with the new search and the old page, once with the page put back.
+  const handleSearchChange = (value: string) => {
+    setSearchTerm(value);
     setCurrentPage(1);
-  }, [searchTerm, selectedCategory, sortBy]);
+  };
+
+  const handleSortChange = (value: typeof sortBy) => {
+    setSortBy(value);
+    setCurrentPage(1);
+  };
+
+  const handleCategoryChange = (value: string) => {
+    setSelectedCategory(value);
+    setCurrentPage(1);
+  };
 
   return (
     <PageLayout
@@ -95,7 +110,7 @@ export default function TransactionsPage() {
                     type="text"
                     placeholder="Search transaction"
                     value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
+                    onChange={(e) => handleSearchChange(e.target.value)}
                     className="pr-12 h-11"
                     aria-label="Search transactions"
                   />
@@ -139,7 +154,7 @@ export default function TransactionsPage() {
                   <Select
                     value={sortBy}
                     onValueChange={(value) => {
-                      setSortBy(value as typeof sortBy);
+                      handleSortChange(value as typeof sortBy);
                       setIsSortSelectOpen(false);
                     }}
                     open={isSortSelectOpen}
@@ -194,7 +209,7 @@ export default function TransactionsPage() {
                   <Select
                     value={selectedCategory}
                     onValueChange={(value) => {
-                      setSelectedCategory(value);
+                      handleCategoryChange(value);
                       setIsCategorySelectOpen(false);
                     }}
                     open={isCategorySelectOpen}
