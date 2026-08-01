@@ -56,6 +56,18 @@ export type SortOption =
 export type TransactionCategory =
   typeof import("./constants/constants").TRANSACTION_CATEGORIES[number];
 
+/**
+ * What the transactions category filter can be set to: any real category, or
+ * the sentinel meaning "no filter".
+ *
+ * Derived from the same array the dropdown renders, so the two cannot drift.
+ * Deliberately a wider type than TransactionCategory -- a slot typed as the
+ * latter will not accept the sentinel, which is the point of keeping them
+ * separate.
+ */
+export type CategoryFilter =
+  typeof import("./constants/constants").CATEGORY_FILTER_OPTIONS[number];
+
 /** The signed-in user, as the app models them. */
 export interface AuthUser {
   id: string;

@@ -26,11 +26,12 @@ import { TransactionRow } from "@/components/Transactions/TransactionRow";
 import { Pagination } from "@/components/ui/Pagination";
 import { exportTransactionsToCsv } from "@/lib/exportCsv";
 import { ImportTransactionsModal } from "@/components/Modals/ImportTransactionsModal";
+import type { CategoryFilter } from "@/lib/types";
 
 export default function TransactionsPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] =
-    useState<string>(ALL_CATEGORIES_FILTER);
+    useState<CategoryFilter>(ALL_CATEGORIES_FILTER);
   const [sortBy, setSortBy] = useState<
     "latest" | "oldest" | "highest" | "lowest" | "a-z" | "z-a"
   >("latest");
@@ -70,7 +71,7 @@ export default function TransactionsPage() {
     setCurrentPage(1);
   };
 
-  const handleCategoryChange = (value: string) => {
+  const handleCategoryChange = (value: CategoryFilter) => {
     setSelectedCategory(value);
     setCurrentPage(1);
   };
@@ -209,7 +210,7 @@ export default function TransactionsPage() {
                   <Select
                     value={selectedCategory}
                     onValueChange={(value) => {
-                      handleCategoryChange(value);
+                      handleCategoryChange(value as CategoryFilter);
                       setIsCategorySelectOpen(false);
                     }}
                     open={isCategorySelectOpen}

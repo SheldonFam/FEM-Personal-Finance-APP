@@ -2,13 +2,18 @@
 
 import { Control, FieldErrors } from "react-hook-form";
 import FormSelect from "@/components/Modals/shared/FormSelect";
+import type { TransactionCategory } from "@/lib/types";
 
 interface CategorySelectProps {
   control: Control<any>;
   errors: FieldErrors;
   name?: string;
   label?: string;
-  categories: readonly string[];
+  /**
+   * Real categories only. Typed to exclude the filter sentinel, which must
+   * never reach a form that writes a category onto a record.
+   */
+  categories: readonly TransactionCategory[];
 }
 
 export default function CategorySelect({

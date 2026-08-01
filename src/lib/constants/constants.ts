@@ -1,3 +1,5 @@
+import type { TransactionCategory } from "@/lib/types";
+
 /**
  * Color theme mappings (SINGLE SOURCE OF TRUTH)
  * Maps theme names to hex color codes
@@ -87,8 +89,7 @@ const TRANSACTION_CATEGORY_SET: ReadonlySet<string> = new Set(
 /** Whether a value is one of the real transaction categories. */
 export const isTransactionCategory = (
   value: string
-): value is (typeof TRANSACTION_CATEGORIES)[number] =>
-  TRANSACTION_CATEGORY_SET.has(value);
+): value is TransactionCategory => TRANSACTION_CATEGORY_SET.has(value);
 
 /**
  * Options for the transactions category filter: the sentinel, then every
