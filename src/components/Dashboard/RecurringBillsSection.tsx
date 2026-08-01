@@ -1,8 +1,16 @@
+"use client";
+
+import { useMemo } from "react";
 import { Card } from "@/components/ui/Card";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { SectionHeader } from "./SectionHeader";
 import { RecurringBillCard } from "./RecurringBillCard";
 import type { Transaction } from "@/lib/types";
+import {
+  processRecurringBills,
+  summariseRecurringBills,
+} from "@/lib/billing/recurringBills";
+import { useCurrentDate } from "@/hooks/useCurrentDate";
 
 interface RecurringBillsSectionProps {
   recurringBills: Transaction[];
@@ -13,6 +21,19 @@ export function RecurringBillsSection({
   recurringBills,
   isLoading,
 }: RecurringBillsSectionProps) {
+  // The same rules the Recurring Bills page uses, from the same place. This
+  // section previously inlined its own: it counted a bill due today as due
+  // soon where the page requires the due day to be strictly ahead, and it
+  // never deduped, so several transactions for one bill were totalled several
+  // times over. The two surfaces reported different figures for the same data.
+  //
+  // Hooks first: the loading branch below returns early.
+  const today = useCurrentDate();
+  const summary = useMemo(
+    () => summariseRecurringBills(processRecurringBills(recurringBills, today)),
+    [recurringBills, today]
+  );
+
   if (isLoading) {
     return (
       <Card className="h-full p-8">
@@ -30,43 +51,22 @@ export function RecurringBillsSection({
     );
   }
 
-  // Calculate bill summaries
-  const now = new Date();
-  const currentDay = now.getDate();
-
-  const paidBills = recurringBills.filter((bill) => {
-    const billDate = new Date(bill.date);
-    return billDate.getDate() < currentDay;
-  });
-
-  const upcomingBills = recurringBills.filter((bill) => {
-    const billDate = new Date(bill.date);
-    return billDate.getDate() >= currentDay;
-  });
-
-  const dueSoonBills = recurringBills.filter((bill) => {
-    const billDate = new Date(bill.date);
-    const dayOfMonth = billDate.getDate();
-    return dayOfMonth >= currentDay && dayOfMonth <= currentDay + 5;
-  });
-
-  const paidAmount = paidBills.reduce(
-    (sum, bill) => sum + Math.abs(bill.amount),
-    0
-  );
-  const upcomingAmount = upcomingBills.reduce(
-    (sum, bill) => sum + Math.abs(bill.amount),
-    0
-  );
-  const dueSoonAmount = dueSoonBills.reduce(
-    (sum, bill) => sum + Math.abs(bill.amount),
-    0
-  );
-
   const bills = [
-    { label: "Paid Bills", amount: paidAmount, borderColor: "var(--finance-green)" },
-    { label: "Total Upcoming", amount: upcomingAmount, borderColor: "var(--finance-sand)" },
-    { label: "Due Soon", amount: dueSoonAmount, borderColor: "var(--finance-cyan)" },
+    {
+      label: "Paid Bills",
+      amount: summary.paidAmount,
+      borderColor: "var(--finance-green)",
+    },
+    {
+      label: "Total Upcoming",
+      amount: summary.upcomingAmount,
+      borderColor: "var(--finance-sand)",
+    },
+    {
+      label: "Due Soon",
+      amount: summary.dueSoonAmount,
+      borderColor: "var(--finance-cyan)",
+    },
   ];
 
   return (

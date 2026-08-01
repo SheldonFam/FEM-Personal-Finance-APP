@@ -13,7 +13,10 @@ import {
 } from "@/components/ui/Select";
 import Image from "next/image";
 import { SORT_OPTIONS } from "@/lib/constants/constants";
-import { processRecurringBills } from "@/lib/billing/recurringBills";
+import {
+  processRecurringBills,
+  summariseRecurringBills,
+} from "@/lib/billing/recurringBills";
 import { formatCurrency } from "@/lib/formatters";
 import { useBillFilters } from "@/hooks/useBillFilters";
 import { BillRow } from "@/components/RecurringBills/BillRow";
@@ -40,34 +43,7 @@ export default function RecurringBillsPage() {
     [recurringTransactions, today]
   );
 
-  // Calculate summary in a single pass
-  const summary = allBills.reduce(
-    (acc, b) => {
-      const amount = b.amount;
-      acc.total += Math.abs(amount);
-      if (b.isPaid) {
-        acc.paidCount++;
-        acc.paidAmount += Math.abs(amount);
-      } else {
-        acc.upcomingCount++;
-        acc.upcomingAmount += Math.abs(amount);
-      }
-      if (b.isDueSoon) {
-        acc.dueSoonCount++;
-        acc.dueSoonAmount += Math.abs(amount);
-      }
-      return acc;
-    },
-    {
-      total: 0,
-      paidCount: 0,
-      paidAmount: 0,
-      upcomingCount: 0,
-      upcomingAmount: 0,
-      dueSoonCount: 0,
-      dueSoonAmount: 0,
-    }
-  );
+  const summary = summariseRecurringBills(allBills);
 
   // Filter and sort bills
   const filteredAndSortedBills = useBillFilters({
