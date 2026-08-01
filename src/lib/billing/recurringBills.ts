@@ -41,3 +41,60 @@ export const processRecurringBills = (
     };
   });
 };
+
+export interface RecurringBillSummary {
+  total: number;
+  paidCount: number;
+  paidAmount: number;
+  upcomingCount: number;
+  upcomingAmount: number;
+  dueSoonCount: number;
+  dueSoonAmount: number;
+}
+
+/**
+ * Totals for a set of processed bills, in one pass.
+ *
+ * Takes bills rather than transactions, deliberately: the input must already
+ * have been through processRecurringBills, which decides what is paid and what
+ * is due soon and dedupes several transactions for the same bill down to one.
+ * The dashboard used to total raw transactions against its own inlined rules,
+ * and reported figures several times larger than the recurring bills page for
+ * the same data.
+ *
+ * Amounts are absolute. A bill is an outgoing, stored negative, and these are
+ * read as "how much is upcoming" rather than as signed movements.
+ */
+export const summariseRecurringBills = (
+  bills: RecurringBill[]
+): RecurringBillSummary =>
+  bills.reduce<RecurringBillSummary>(
+    (acc, bill) => {
+      const amount = Math.abs(bill.amount);
+      acc.total += amount;
+
+      if (bill.isPaid) {
+        acc.paidCount++;
+        acc.paidAmount += amount;
+      } else {
+        acc.upcomingCount++;
+        acc.upcomingAmount += amount;
+      }
+
+      if (bill.isDueSoon) {
+        acc.dueSoonCount++;
+        acc.dueSoonAmount += amount;
+      }
+
+      return acc;
+    },
+    {
+      total: 0,
+      paidCount: 0,
+      paidAmount: 0,
+      upcomingCount: 0,
+      upcomingAmount: 0,
+      dueSoonCount: 0,
+      dueSoonAmount: 0,
+    }
+  );
