@@ -1,7 +1,7 @@
 "use client";
 
 import { PieChart, Pie, Cell, ResponsiveContainer } from "recharts";
-import { formatCurrency } from "@/lib/formatters";
+import { formatCurrency, formatCurrencyWhole } from "@/lib/formatters";
 
 // Budget category type
 export interface BudgetCategory {
@@ -57,12 +57,17 @@ export default function BudgetDonutChart({
 
       {/* Center Text */}
       <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-        <div className="text-center">
-          <p className="text-4xl leading-none font-bold text-gray-900 tabular-nums">
-            ${Math.round(totalSpent).toLocaleString("en-US")}
+        {/* Whole dollars here, and only here. innerRadius is 75, so the hole
+            is about 150px wide and this figure sits at text-4xl. Cents push a
+            four-figure total straight out over the ring -- verified in the
+            browser against real data, where $2,689.06 rendered as "$2,689...".
+            The cap and truncate stay as a backstop for five figures. */}
+        <div className="text-center min-w-0 max-w-[8.75rem] px-1">
+          <p className="text-4xl leading-none font-bold text-gray-900 tabular-nums truncate">
+            {formatCurrencyWhole(totalSpent)}
           </p>
-          <p className="text-xs text-gray-500 mt-2">
-            of ${Math.round(totalLimit).toLocaleString("en-US")} limit
+          <p className="text-xs text-gray-500 mt-2 truncate">
+            of {formatCurrencyWhole(totalLimit)} limit
           </p>
         </div>
       </div>
@@ -99,10 +104,10 @@ export function BudgetLegend({ categories }: BudgetLegendProps) {
           </div>
           <div className="text-right">
             <p className="font-bold text-sm text-gray-900 tabular-nums">
-              {formatCurrency(category.spent)}
+              {formatCurrency(category.spent, false)}
             </p>
             <p className="text-xs text-gray-500 tabular-nums">
-              of {formatCurrency(category.limit)}
+              of {formatCurrency(category.limit, false)}
             </p>
           </div>
         </div>

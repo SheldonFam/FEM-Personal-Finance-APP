@@ -2,6 +2,8 @@
  * Reusable form validation rules
  */
 
+import { formatCurrency } from "@/lib/formatters";
+
 export const currencyValidationRules = {
   required: "Amount is required",
   validate: {
@@ -20,7 +22,10 @@ export const createMaxValidation = (max: number, fieldLabel = "Amount") => ({
     ...currencyValidationRules.validate,
     notExceed: (value: string) => {
       const num = parseFloat(value);
-      return num <= max || `${fieldLabel} cannot exceed $${max.toFixed(2)}`;
+      return (
+        num <= max ||
+        `${fieldLabel} cannot exceed ${formatCurrency(max, false)}`
+      );
     },
   },
 });

@@ -131,7 +131,7 @@ export default function PotMoneyModal({
               {newPercentage.toFixed(2)}%
             </span>
             <span className="text-muted-foreground">
-              Target of ${pot?.targetAmount.toLocaleString()}
+              Target of {formatCurrency(pot?.targetAmount ?? 0, false)}
             </span>
           </div>
         </div>
