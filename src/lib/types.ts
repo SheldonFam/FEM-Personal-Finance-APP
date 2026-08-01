@@ -1,5 +1,15 @@
 /**
  * Shared type definitions
+ *
+ * Transaction, Budget and Pot each carry a required `id`. Every record of
+ * these types reaches the app from the database, which assigns one, so the
+ * identifier is a fact about the data rather than a hope. Keying a list by it
+ * is therefore safe: `key={x.id}` cannot silently resolve to undefined and
+ * leave React falling back to array position.
+ *
+ * A record that does not have an identifier yet -- one being created -- is not
+ * one of these types. That shape is the corresponding `*Input`, defined
+ * alongside the mutations as `Omit<Entity, "id">`.
  */
 
 export interface Balance {
@@ -9,7 +19,7 @@ export interface Balance {
 }
 
 export interface Transaction {
-  id?: string;
+  id: string;
   avatar: string;
   name: string;
   category: string;
@@ -25,14 +35,14 @@ export interface RecurringBill extends Transaction {
 }
 
 export interface Budget {
-  id?: string;
+  id: string;
   category: string;
   maximum: number;
   theme: string;
 }
 
 export interface Pot {
-  id?: string;
+  id: string;
   name: string;
   target: number;
   total: number;
