@@ -1,6 +1,7 @@
 "use client";
 
 import { PieChart, Pie, Cell, ResponsiveContainer } from "recharts";
+import { formatCurrency } from "@/lib/formatters";
 
 // Budget category type
 export interface BudgetCategory {
@@ -98,10 +99,10 @@ export function BudgetLegend({ categories }: BudgetLegendProps) {
           </div>
           <div className="text-right">
             <p className="font-bold text-sm text-gray-900 tabular-nums">
-              ${category.spent.toFixed(2)}
+              {formatCurrency(category.spent)}
             </p>
             <p className="text-xs text-gray-500 tabular-nums">
-              of ${category.limit.toFixed(2)}
+              of {formatCurrency(category.limit)}
             </p>
           </div>
         </div>

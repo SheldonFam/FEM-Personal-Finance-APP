@@ -1,4 +1,5 @@
 import type { AlertLevel } from "@/lib/budgetAlerts";
+import { formatCurrency } from "@/lib/formatters";
 
 interface BudgetItemProps {
   category: string;
@@ -35,7 +36,7 @@ export function BudgetItem({ category, amount, color, alertLevel }: BudgetItemPr
           )}
         </div>
         <span className="font-bold text-sm text-finance-navy tabular-nums">
-          ${amount.toFixed(2)}
+          {formatCurrency(amount)}
         </span>
       </div>
     </div>

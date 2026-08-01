@@ -6,6 +6,7 @@ import { Progress } from "@/components/ui/Progress";
 import CurrencyInput from "@/components/Modals/shared/CurrencyInput";
 import FormErrorAlert from "@/components/Modals/shared/FormErrorAlert";
 import { useFormModal } from "@/hooks/useFormModal";
+import { formatCurrency } from "@/lib/formatters";
 import {
   currencyValidationRules,
   createMaxValidation,
@@ -47,7 +48,7 @@ const MODAL_CONFIG = {
     description:
       "Withdraw from your pot to put money back in your main balance. This will reduce the amount you have in this pot.",
     label: "Amount to Withdraw",
-    placeholder: (maxAmount: number) => `Maximum: ${maxAmount.toFixed(2)}`,
+    placeholder: (maxAmount: number) => `Maximum: ${formatCurrency(maxAmount)}`,
     buttonLabel: (isSubmitting: boolean) =>
       isSubmitting ? "Processing..." : "Confirm Withdrawal",
     defaultColor: "var(--finance-red)",
@@ -113,7 +114,9 @@ export default function PotMoneyModal({
         {/* New Amount Display */}
         <div className="flex items-center justify-between">
           <span className="text-sm text-muted-foreground">New Amount</span>
-          <span className="text-[2rem] font-bold">${newAmount.toFixed(2)}</span>
+          <span className="text-[2rem] font-bold">
+            {formatCurrency(newAmount)}
+          </span>
         </div>
 
         {/* Progress Bar */}

@@ -14,6 +14,7 @@ import {
 import Image from "next/image";
 import { SORT_OPTIONS } from "@/lib/constants/constants";
 import { processRecurringBills } from "@/lib/billing/recurringBills";
+import { formatCurrency } from "@/lib/formatters";
 import { useBillFilters } from "@/hooks/useBillFilters";
 import { BillRow } from "@/components/RecurringBills/BillRow";
 import { useRecurringBills } from "@/hooks/useFinanceData";
@@ -93,7 +94,9 @@ export default function RecurringBillsPage() {
               />
             </div>
             <p className="text-sm text-gray-400 mb-1">Total Bills</p>
-            <p className="text-4xl font-bold tabular-nums">${summary.total.toFixed(2)}</p>
+            <p className="text-4xl font-bold tabular-nums">
+              {formatCurrency(summary.total)}
+            </p>
           </Card>
 
           {/* Summary Card */}
@@ -104,7 +107,7 @@ export default function RecurringBillsPage() {
               <div className="flex items-center justify-between pb-4 border-b border-gray-200">
                 <span className="text-sm text-gray-600">Paid Bills</span>
                 <span className="font-bold text-sm text-gray-900 tabular-nums">
-                  {summary.paidCount} (${summary.paidAmount.toFixed(2)})
+                  {summary.paidCount} ({formatCurrency(summary.paidAmount)})
                 </span>
               </div>
 
@@ -112,8 +115,8 @@ export default function RecurringBillsPage() {
               <div className="flex items-center justify-between pb-4 border-b border-gray-200">
                 <span className="text-sm text-gray-600">Total Upcoming</span>
                 <span className="font-bold text-sm text-gray-900 tabular-nums">
-                  {summary.upcomingCount} ($
-                  {summary.upcomingAmount.toFixed(2)})
+                  {summary.upcomingCount} (
+                  {formatCurrency(summary.upcomingAmount)})
                 </span>
               </div>
 
@@ -121,7 +124,7 @@ export default function RecurringBillsPage() {
               <div className="flex items-center justify-between">
                 <span className="text-sm text-red-600">Due Soon</span>
                 <span className="font-bold text-sm text-red-600 tabular-nums">
-                  {summary.dueSoonCount} (${summary.dueSoonAmount.toFixed(2)})
+                  {summary.dueSoonCount} ({formatCurrency(summary.dueSoonAmount)})
                 </span>
               </div>
             </div>
