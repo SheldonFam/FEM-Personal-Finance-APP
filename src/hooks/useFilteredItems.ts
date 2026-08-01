@@ -44,20 +44,32 @@ export function filterAndSortItems<T>(
     accessors;
   const { searchTerm, selectedCategory, allCategoriesValue, sortBy } = criteria;
 
-  let filtered = items;
+  // Each active criterion becomes a predicate first, so the pass below walks
+  // the list once and tests only what is actually selected. Two chained
+  // .filter() calls read the same array twice and allocate an intermediate
+  // that nothing else ever sees.
+  const needle = searchTerm?.toLowerCase();
 
-  if (getSearchableText && searchTerm) {
-    const needle = searchTerm.toLowerCase();
-    filtered = filtered.filter((item) =>
-      getSearchableText(item).toLowerCase().includes(needle)
-    );
-  }
+  const matchesSearch =
+    getSearchableText && needle
+      ? (item: T) => getSearchableText(item).toLowerCase().includes(needle)
+      : null;
 
-  if (getCategory && selectedCategory && selectedCategory !== allCategoriesValue) {
-    filtered = filtered.filter(
-      (item) => getCategory(item) === selectedCategory
-    );
-  }
+  const matchesCategory =
+    getCategory && selectedCategory && selectedCategory !== allCategoriesValue
+      ? (item: T) => getCategory(item) === selectedCategory
+      : null;
+
+  // With nothing selected the original array is passed straight through,
+  // rather than copied by a filter that would keep every element.
+  const filtered =
+    matchesSearch || matchesCategory
+      ? items.filter(
+          (item) =>
+            (!matchesSearch || matchesSearch(item)) &&
+            (!matchesCategory || matchesCategory(item))
+        )
+      : items;
 
   const sorted = [...filtered];
 
