@@ -2,17 +2,7 @@
 
 import React, { useState, useMemo } from "react";
 import { Card } from "@/components/ui/Card";
-import { Input } from "@/components/ui/Input";
-import { Button } from "@/components/ui/Button";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/Select";
 import Image from "next/image";
-import { SORT_OPTIONS } from "@/lib/constants/constants";
 import {
   processRecurringBills,
   summariseRecurringBills,
@@ -24,6 +14,7 @@ import { useRecurringBills } from "@/hooks/useFinanceData";
 import { useCurrentDate } from "@/hooks/useCurrentDate";
 import { DataErrorAlert } from "@/components/DataErrorAlert";
 import { PageLayout } from "@/components/PageLayout";
+import { FilterToolbar } from "@/components/Filters/FilterToolbar";
 
 export default function RecurringBillsPage() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -110,81 +101,15 @@ export default function RecurringBillsPage() {
         {/* Bills List */}
         <Card className="overflow-hidden flex-1 mt-6 lg:mt-0">
           {/* Search and Filter Bar */}
-          <div className="flex flex-wrap items-center gap-4 p-6 bg-white sm:flex-nowrap sm:justify-between">
-            <div className="flex-1 min-w-[200px] sm:max-w-[320px]">
-              <div className="relative">
-                <Input
-                  type="text"
-                  placeholder="Search bills"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full h-11 pr-12"
-                  aria-label="Search bills"
-                />
-                <Image
-                  src="/assets/images/icon-search.svg"
-                  alt="Search"
-                  width={14}
-                  height={14}
-                  className="absolute right-5 top-1/2 -translate-y-1/2 opacity-50 pointer-events-none"
-                />
-              </div>
-            </div>
-
-            <div className="flex flex-row items-center gap-3 md:gap-6">
-              <div className="relative flex flex-row items-center gap-2">
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="icon-sm"
-                  className="sm:hidden size-11 rounded-lg bg-transparent p-0 hover:bg-gray-100 focus-visible:ring-0 focus-visible:ring-offset-0"
-                  aria-label="Open sort options"
-                  aria-haspopup="listbox"
-                  aria-expanded={isSortSelectOpen}
-                  onClick={() => setIsSortSelectOpen(true)}
-                >
-                  <Image
-                    src="/assets/images/icon-sort-mobile.svg"
-                    alt=""
-                    width={16}
-                    height={15}
-                    className="shrink-0"
-                    aria-hidden="true"
-                  />
-                </Button>
-                <span className="hidden sm:inline text-xs font-medium text-gray-500">
-                  Sort by
-                </span>
-                <Select
-                  value={sortBy}
-                  onValueChange={(value) => {
-                    setSortBy(value as typeof sortBy);
-                    setIsSortSelectOpen(false);
-                  }}
-                  open={isSortSelectOpen}
-                  onOpenChange={setIsSortSelectOpen}
-                >
-                  <SelectTrigger aria-label="Sort by" className="absolute inset-0 h-0 w-0 opacity-0 pointer-events-none sm:static sm:h-11 sm:w-[150px] sm:opacity-100 sm:pointer-events-auto sm:flex bg-white border border-gray-200 rounded-lg px-4 text-sm font-medium text-gray-700 justify-between shadow-sm hover:bg-gray-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-200 data-[state=open]:border-primary-300">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent
-                    align="end"
-                    className="min-w-[164px] rounded-2xl border border-gray-200 bg-white py-1 shadow-[0px_16px_40px_rgba(15,23,42,0.15)]"
-                  >
-                    {SORT_OPTIONS.map((option) => (
-                      <SelectItem
-                        key={option.value}
-                        value={option.value}
-                        showIndicator={false}
-                        className="px-4 py-2 text-sm text-gray-600 border-b border-gray-200 last:border-b-0 data-[state=checked]:font-semibold data-[state=checked]:text-gray-900 data-[highlighted]:bg-gray-100"
-                      >
-                        {option.label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
+          <div className="p-6 bg-white">
+            <FilterToolbar
+              searchValue={searchQuery}
+              onSearchChange={setSearchQuery}
+              searchLabel="Search bills"
+              searchPlaceholder="Search bills"
+              sortValue={sortBy}
+              onSortChange={setSortBy}
+            />
           </div>
 
           {/* Table Header */}
