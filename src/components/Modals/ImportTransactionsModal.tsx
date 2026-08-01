@@ -13,8 +13,8 @@ import {
 import { Alert, AlertDescription } from "@/components/ui/Alert";
 import {
   parseTransactionsCsv,
-  type ParsedRow,
   type CsvMessage,
+  type CsvParseResult,
 } from "@/lib/csvParser";
 import { useBulkCreateTransactions } from "@/hooks/useBulkCreateTransactions";
 import { TRANSACTION_CATEGORIES } from "@/lib/constants/constants";
@@ -27,23 +27,92 @@ interface ImportTransactionsModalProps {
 
 type Step = "upload" | "preview" | "done";
 
+/** "1 row", "3 rows" -- the count and its noun, agreeing. */
+const plural = (count: number, noun: string) =>
+  `${count} ${noun}${count === 1 ? "" : "s"}`;
+
+/**
+ * No file read yet. Hoisted so that resetting is one assignment rather than
+ * three that could drift apart.
+ */
+const EMPTY_PARSE: CsvParseResult = { data: [], errors: [], warnings: [] };
+
+/**
+ * A malformed file produces one message per row, and a big one could produce
+ * thousands. Past this many the list stops rendering rows and says how many it
+ * held back -- scrolling a thousand of them tells you nothing the count doesn't.
+ */
+const MAX_MESSAGES_SHOWN = 50;
+
+/**
+ * One list of parse messages. Errors and warnings differ only in colour and
+ * wording, so they render from here rather than from two copies of the same
+ * markup that have to be kept in step by hand.
+ *
+ * The heading is built here rather than passed in: it is derived entirely from
+ * the messages, so computing it at the call site meant scanning them on every
+ * render, including the renders where this returns nothing.
+ */
+function CsvMessageList({
+  kind,
+  messages,
+}: {
+  kind: "error" | "warning";
+  messages: readonly CsvMessage[];
+}) {
+  if (messages.length === 0) return null;
+
+  // A file-level message is about the file, not a row, so it must not be
+  // counted as one. Checked for both kinds -- only errors can be file-scoped
+  // today, but nothing in the type says a warning cannot be.
+  const aboutTheFile = messages.some((message) => message.scope === "file");
+
+  const heading = aboutTheFile
+    ? kind === "error"
+      ? "This file could not be read:"
+      : "This file needed adjusting:"
+    : kind === "error"
+      ? `${plural(messages.length, "row")} could not be read and will not be imported:`
+      : `${plural(messages.length, "row")} needed adjusting, and will still be imported:`;
+
+  const shown = messages.slice(0, MAX_MESSAGES_SHOWN);
+  const withheld = messages.length - shown.length;
+
+  return (
+    <Alert variant={kind === "error" ? "destructive" : "warning"}>
+      <AlertDescription>
+        <p className="font-medium mb-1">{heading}</p>
+        <ul className="list-disc list-inside text-xs space-y-0.5 max-h-24 overflow-y-auto">
+          {shown.map((message) => (
+            <li key={message.id}>{message.text}</li>
+          ))}
+          {withheld > 0 ? (
+            <li className="italic">and {withheld} more</li>
+          ) : null}
+        </ul>
+      </AlertDescription>
+    </Alert>
+  );
+}
+
 export function ImportTransactionsModal({
   open,
   onOpenChange,
 }: ImportTransactionsModalProps) {
   const [step, setStep] = useState<Step>("upload");
-  const [rows, setRows] = useState<ParsedRow[]>([]);
-  const [errors, setErrors] = useState<CsvMessage[]>([]);
-  const [warnings, setWarnings] = useState<CsvMessage[]>([]);
+  // One parse, held whole. Rows, errors and warnings all come from the same
+  // file and are only ever set or cleared together, so splitting them across
+  // three states only created ways for them to disagree.
+  const [parse, setParse] = useState<CsvParseResult>(EMPTY_PARSE);
   const [importCount, setImportCount] = useState(0);
+
+  const { data: rows, errors, warnings } = parse;
 
   const bulkCreate = useBulkCreateTransactions();
 
   const reset = () => {
     setStep("upload");
-    setRows([]);
-    setErrors([]);
-    setWarnings([]);
+    setParse(EMPTY_PARSE);
     setImportCount(0);
     bulkCreate.reset();
   };
@@ -60,23 +129,21 @@ export function ImportTransactionsModal({
     const reader = new FileReader();
     reader.onload = (evt) => {
       const text = evt.target?.result as string;
-      const result = parseTransactionsCsv(text);
-      setRows(result.data);
-      setErrors(result.errors);
-      setWarnings(result.warnings);
+      setParse(parseTransactionsCsv(text));
       setStep("preview");
     };
     reader.readAsText(file);
   };
 
   const handleCategoryChange = (rowIndex: number, category: string) => {
-    setRows((prev) =>
-      prev.map((r) =>
+    setParse((prev) => ({
+      ...prev,
+      data: prev.data.map((r) =>
         r.rowIndex === rowIndex
           ? { ...r, category, suggestedCategory: false }
           : r,
       ),
-    );
+    }));
   };
 
   const handleImport = () => {
@@ -110,9 +177,9 @@ export function ImportTransactionsModal({
       }
       description={
         step === "done"
-          ? `Successfully imported ${importCount} transactions.`
+          ? `Successfully imported ${plural(importCount, "transaction")}.`
           : step === "preview"
-            ? `${rows.length} transaction${rows.length !== 1 ? "s" : ""} ready to import.`
+            ? `${plural(rows.length, "transaction")} ready to import.`
             : "Upload a CSV file with your transactions. Required columns: Date, Name, Amount."
       }
       maxWidth="sm:max-w-[700px]"
@@ -138,38 +205,8 @@ export function ImportTransactionsModal({
 
       {step === "preview" && (
         <div className="space-y-4">
-          {errors.length > 0 ? (
-            <Alert variant="destructive">
-              <AlertDescription>
-                <p className="font-medium mb-1">
-                  {errors.some((e) => e.scope === "file")
-                    ? "This file could not be read:"
-                    : `${errors.length} row${errors.length !== 1 ? "s" : ""} could not be read and will not be imported:`}
-                </p>
-                <ul className="list-disc list-inside text-xs space-y-0.5 max-h-24 overflow-y-auto">
-                  {errors.map((err) => (
-                    <li key={err.id}>{err.text}</li>
-                  ))}
-                </ul>
-              </AlertDescription>
-            </Alert>
-          ) : null}
-
-          {warnings.length > 0 ? (
-            <Alert variant="warning">
-              <AlertDescription>
-                <p className="font-medium mb-1">
-                  {warnings.length} row{warnings.length !== 1 ? "s" : ""} needed
-                  adjusting, and will still be imported:
-                </p>
-                <ul className="list-disc list-inside text-xs space-y-0.5 max-h-24 overflow-y-auto">
-                  {warnings.map((warning) => (
-                    <li key={warning.id}>{warning.text}</li>
-                  ))}
-                </ul>
-              </AlertDescription>
-            </Alert>
-          ) : null}
+          <CsvMessageList kind="error" messages={errors} />
+          <CsvMessageList kind="warning" messages={warnings} />
 
           {rows.length > 0 && (
             <div className="border rounded-lg overflow-hidden">
@@ -262,7 +299,7 @@ export function ImportTransactionsModal({
             >
               {bulkCreate.isPending
                 ? "Importing..."
-                : `Import ${rows.length} Transaction${rows.length !== 1 ? "s" : ""}`}
+                : `Import ${plural(rows.length, "Transaction")}`}
             </Button>
           </div>
         </div>
@@ -272,7 +309,7 @@ export function ImportTransactionsModal({
         <div className="space-y-4">
           <Alert variant="success">
             <AlertDescription>
-              {importCount} transaction{importCount !== 1 ? "s" : ""} imported
+              {plural(importCount, "transaction")} imported
               successfully.
             </AlertDescription>
           </Alert>
