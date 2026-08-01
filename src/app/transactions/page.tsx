@@ -16,7 +16,8 @@ import { useTransactions } from "@/hooks/useFinanceData";
 import { DataErrorAlert } from "@/components/DataErrorAlert";
 import { PageLayout } from "@/components/PageLayout";
 import {
-  TRANSACTION_CATEGORIES,
+  ALL_CATEGORIES_FILTER,
+  CATEGORY_FILTER_OPTIONS,
   SORT_OPTIONS,
 } from "@/lib/constants/constants";
 import { useTransactionFilters } from "@/hooks/useTransactionFilters";
@@ -28,7 +29,8 @@ import { ImportTransactionsModal } from "@/components/Modals/ImportTransactionsM
 
 export default function TransactionsPage() {
   const [searchTerm, setSearchTerm] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState("All Transactions");
+  const [selectedCategory, setSelectedCategory] =
+    useState<string>(ALL_CATEGORIES_FILTER);
   const [sortBy, setSortBy] = useState<
     "latest" | "oldest" | "highest" | "lowest" | "a-z" | "z-a"
   >("latest");
@@ -205,7 +207,7 @@ export default function TransactionsPage() {
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      {TRANSACTION_CATEGORIES.map((category) => (
+                      {CATEGORY_FILTER_OPTIONS.map((category) => (
                         <SelectItem
                           key={category}
                           value={category}
@@ -243,8 +245,8 @@ export default function TransactionsPage() {
                   ))}
                 </div>
               ) : paginatedTransactions.length > 0 ? (
-                paginatedTransactions.map((transaction, index) => (
-                  <TransactionRow key={index} transaction={transaction} />
+                paginatedTransactions.map((transaction) => (
+                  <TransactionRow key={transaction.id} transaction={transaction} />
                 ))
               ) : (
                 <div className="text-center py-12">

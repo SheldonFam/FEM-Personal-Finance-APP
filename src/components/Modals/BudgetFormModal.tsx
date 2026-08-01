@@ -7,6 +7,7 @@ import CategorySelect from "@/components/Modals/shared/CategorySelect";
 import { BaseFormModal } from "@/components/Modals/shared/BaseFormModal";
 import { useFormModal } from "@/hooks/useFormModal";
 import { currencyValidationRules } from "@/lib/validations/formValidations";
+import { TRANSACTION_CATEGORIES } from "@/lib/constants/constants";
 
 type BudgetFormMode = "add" | "edit";
 
@@ -31,19 +32,6 @@ interface BudgetFormData {
   maxSpend: string;
   theme: string;
 }
-
-const BUDGET_CATEGORIES = [
-  "Entertainment",
-  "Bills",
-  "Groceries",
-  "Dining Out",
-  "Transportation",
-  "Personal Care",
-  "Education",
-  "Lifestyle",
-  "Shopping",
-  "General",
-];
 
 const MODAL_CONFIG = {
   add: {
@@ -127,7 +115,7 @@ export function BudgetFormModal({
       <CategorySelect
         control={control}
         errors={errors}
-        categories={BUDGET_CATEGORIES}
+        categories={TRANSACTION_CATEGORIES}
       />
 
       <CurrencyInput

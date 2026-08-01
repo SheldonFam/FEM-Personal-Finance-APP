@@ -56,10 +56,17 @@ export const SORT_OPTIONS = [
 ] as const;
 
 /**
- * Transaction categories
+ * Sentinel used by the transactions filter to mean "no category filter".
+ * This is a UI concept, NOT a category — never store it on a transaction
+ * or a budget.
+ */
+export const ALL_CATEGORIES_FILTER = "All Transactions";
+
+/**
+ * Real transaction categories (SINGLE SOURCE OF TRUTH).
+ * Deliberately excludes the filter sentinel — see ALL_CATEGORIES_FILTER.
  */
 export const TRANSACTION_CATEGORIES = [
-  "All Transactions",
   "Entertainment",
   "Bills",
   "Dining Out",
@@ -70,6 +77,26 @@ export const TRANSACTION_CATEGORIES = [
   "Lifestyle",
   "Shopping",
   "Education",
+] as const;
+
+/** Membership index, built once at module load. */
+const TRANSACTION_CATEGORY_SET: ReadonlySet<string> = new Set(
+  TRANSACTION_CATEGORIES
+);
+
+/** Whether a value is one of the real transaction categories. */
+export const isTransactionCategory = (
+  value: string
+): value is (typeof TRANSACTION_CATEGORIES)[number] =>
+  TRANSACTION_CATEGORY_SET.has(value);
+
+/**
+ * Options for the transactions category filter: the sentinel, then every
+ * real category.
+ */
+export const CATEGORY_FILTER_OPTIONS = [
+  ALL_CATEGORIES_FILTER,
+  ...TRANSACTION_CATEGORIES,
 ] as const;
 
 /**

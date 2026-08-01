@@ -395,7 +395,29 @@ export function useDeletePot() {
   });
 }
 
-export function useAddMoneyToPot() {
+/**
+ * Applies a signed delta to a pot's current total, clamping at zero.
+ *
+ * Pure so the arithmetic is stated in one place rather than mirrored across a
+ * deposit and a withdrawal path.
+ *
+ * NOTE: the clamp applies in BOTH directions, where previously only the
+ * withdrawal path clamped. For a deposit it is a no-op -- a positive delta on
+ * a non-negative total cannot go below zero -- so this widens nothing in
+ * practice. Stating "a pot total is never negative" once is clearer than
+ * making the invariant conditional on direction.
+ */
+export function applyPotDelta(currentTotal: number, delta: number): number {
+  return Math.max(0, currentTotal + delta);
+}
+
+/**
+ * Deposits into or withdraws from a pot.
+ *
+ * NOTE: read-then-write, so two overlapping adjustments can lose one of them.
+ * #35 replaces this with a single atomic statement in the database.
+ */
+function usePotBalanceMutation(adjustment: "deposit" | "withdraw") {
   const queryClient = useQueryClient();
 
   return useMutation({
@@ -410,7 +432,8 @@ export function useAddMoneyToPot() {
 
       if (fetchError) throw fetchError;
 
-      const newTotal = (pot?.total || 0) + amount;
+      const delta = adjustment === "deposit" ? amount : -amount;
+      const newTotal = applyPotDelta(pot?.total || 0, delta);
 
       const { data, error } = await supabase
         .from("pots")
@@ -429,38 +452,12 @@ export function useAddMoneyToPot() {
   });
 }
 
+export function useAddMoneyToPot() {
+  return usePotBalanceMutation("deposit");
+}
+
 export function useWithdrawFromPot() {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: async ({ id, amount }: { id: string; amount: number }) => {
-      const supabase = createClient();
-
-      const { data: pot, error: fetchError } = await supabase
-        .from("pots")
-        .select("total")
-        .eq("id", id)
-        .single();
-
-      if (fetchError) throw fetchError;
-
-      const newTotal = Math.max(0, (pot?.total || 0) - amount);
-
-      const { data, error } = await supabase
-        .from("pots")
-        .update({ total: newTotal })
-        .eq("id", id)
-        .select()
-        .single();
-
-      if (error) throw error;
-      return data;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["pots"] });
-      queryClient.invalidateQueries({ queryKey: ["balance"] });
-    },
-  });
+  return usePotBalanceMutation("withdraw");
 }
 
 // =============================================

@@ -8,7 +8,7 @@ interface CategorySelectProps {
   errors: FieldErrors;
   name?: string;
   label?: string;
-  categories: string[];
+  categories: readonly string[];
 }
 
 export default function CategorySelect({

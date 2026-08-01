@@ -3,7 +3,9 @@
  * Handles all authentication using Supabase
  */
 
+import type { User } from "@supabase/supabase-js";
 import { createClient } from "@/lib/supabase/client";
+import type { AuthUser } from "@/lib/types";
 
 export interface LoginCredentials {
   email: string;
@@ -17,10 +19,20 @@ export interface SignUpData {
 }
 
 export interface AuthResponse {
-  user: {
-    id: string;
-    name: string;
-    email: string;
+  user: AuthUser;
+}
+
+/**
+ * Converts a Supabase user into the app's user shape.
+ *
+ * SINGLE SOURCE OF TRUTH for how a display name is derived — prefer the
+ * name they gave us, fall back to the local part of their email.
+ */
+export function toAuthUser(user: User): AuthUser {
+  return {
+    id: user.id,
+    name: user.user_metadata?.name || user.email?.split("@")[0] || "",
+    email: user.email || "",
   };
 }
 
@@ -45,16 +57,7 @@ export async function login(
     throw new Error("Login failed. Please try again.");
   }
 
-  return {
-    user: {
-      id: data.user.id,
-      name:
-        data.user.user_metadata?.name ||
-        data.user.email?.split("@")[0] ||
-        "",
-      email: data.user.email || "",
-    },
-  };
+  return { user: toAuthUser(data.user) };
 }
 
 /**
@@ -82,11 +85,10 @@ export async function signUp(data: SignUpData): Promise<AuthResponse> {
   }
 
   return {
-    user: {
-      id: authData.user.id,
-      name: data.name,
-      email: authData.user.email || "",
-    },
+    // Shared mapping for id/email. The submitted name overrides it: we already
+    // know it, so there's no need to depend on it having round-tripped through
+    // user metadata by the time signUp returns.
+    user: { ...toAuthUser(authData.user), name: data.name },
   };
 }
 
@@ -131,11 +133,7 @@ export async function getCurrentUser() {
     return null;
   }
 
-  return {
-    id: user.id,
-    name: user.user_metadata?.name || user.email?.split("@")[0] || "",
-    email: user.email || "",
-  };
+  return toAuthUser(user);
 }
 
 /**

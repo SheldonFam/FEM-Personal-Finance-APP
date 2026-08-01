@@ -2,15 +2,14 @@ import { Transaction, RecurringBill } from "@/lib/types";
 import { getDayOfMonth } from "@/lib/formatters";
 
 /**
- * Reference date for calculating bill status
- */
-const REFERENCE_DATE = new Date("2024-08-18T00:00:00Z");
-
-/**
- * Process recurring bills from transactions
+ * Process recurring bills from transactions.
+ *
+ * @param today - the date bill status is measured against. Defaults to now;
+ *   pass an explicit date to evaluate status at some other moment.
  */
 export const processRecurringBills = (
-  transactions: Transaction[]
+  transactions: Transaction[],
+  today: Date = new Date()
 ): RecurringBill[] => {
   const recurringTransactions = transactions
     .filter((t) => t.recurring)
@@ -26,7 +25,6 @@ export const processRecurringBills = (
       }, new Map<string, Transaction>())
       .values()
   );
-  const today = REFERENCE_DATE;
   const currentDay = today.getDate();
 
   return uniqueByName.map((transaction) => {

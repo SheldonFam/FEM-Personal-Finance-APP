@@ -41,3 +41,14 @@ export interface Pot {
 
 export type SortOption =
   typeof import("./constants/constants").SORT_OPTIONS[number]["value"];
+
+/** A real transaction category. Excludes the "all categories" filter sentinel. */
+export type TransactionCategory =
+  typeof import("./constants/constants").TRANSACTION_CATEGORIES[number];
+
+/** The signed-in user, as the app models them. */
+export interface AuthUser {
+  id: string;
+  name: string;
+  email: string;
+}

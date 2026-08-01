@@ -199,11 +199,11 @@ export const BudgetCard = ({
 
           {latestTransactions.length > 0 ? (
             <div className="space-y-0">
-              {latestTransactions.map((transaction, index) => {
+              {latestTransactions.map((transaction) => {
                 const avatarPath = normalizeImagePath(transaction.avatar);
                 return (
                   <div
-                    key={index}
+                    key={transaction.id}
                     className="flex items-center justify-between py-3 border-b border-gray-200 last:border-0"
                   >
                     <div className="flex items-center gap-3 min-w-0 flex-1">
