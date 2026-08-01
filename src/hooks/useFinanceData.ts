@@ -1,45 +1,56 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { createClient } from "@/lib/supabase/client";
 import type { Balance, Transaction, Budget, Pot } from "@/lib/types";
-import localData from "@/data/data.json";
 
 // Input types for mutations
 export type TransactionInput = Omit<Transaction, "id">;
 export type BudgetInput = Omit<Budget, "id">;
 export type PotInput = Omit<Pot, "id">;
 
-const isSupabaseConfigured = (): boolean =>
-  !!(
-    process.env.NEXT_PUBLIC_SUPABASE_URL &&
-    process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY
-  );
+/**
+ * Establishes the signed-in user and hands back a client to work with.
+ *
+ * Every read and every write goes through here, so "this touches the database
+ * as a known user" is settled in one place rather than asserted -- or
+ * forgotten -- at each call site.
+ */
+export async function getAuthenticatedUser() {
+  const supabase = createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) throw new Error("Not authenticated");
+  return { supabase, user };
+}
 
 /**
- * Factory for creating authenticated Supabase query functions.
- * Handles config check, auth check, and fallback to local data.
+ * Wraps a table read so it runs as the signed-in user.
+ *
+ * A fixture fallback used to sit here, returning bundled demo records when
+ * Supabase was unconfigured or nobody was signed in. Neither branch was
+ * reachable: middleware redirects unauthenticated requests away from every
+ * data route, and AuthProvider throws outright when Supabase is unconfigured,
+ * so a query only ever runs for a signed-in user against a configured project.
+ *
+ * It was also worse than merely dead. The fixture records carry no identifier
+ * and the fallback asserted them into the entity types regardless -- a cast
+ * that says nothing today and would say something false the moment those
+ * identifiers become required.
+ *
+ * An unauthenticated read now throws rather than resolving to something empty.
+ * A finance page rendering zeroes because auth quietly failed is worse than
+ * one showing an error.
  */
-function createSupabaseQueryFn<T>(options: {
-  localFallback: () => T;
+function createSupabaseQueryFn<T>(
   queryFn: (
     supabase: ReturnType<typeof createClient>,
     userId: string,
-  ) => Promise<T>;
-}): () => Promise<T> {
+  ) => Promise<T>,
+): () => Promise<T> {
   return async () => {
-    if (!isSupabaseConfigured()) {
-      return options.localFallback();
-    }
-
-    const supabase = createClient();
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-
-    if (!user) {
-      return options.localFallback();
-    }
-
-    return await options.queryFn(supabase, user.id);
+    const { supabase, user } = await getAuthenticatedUser();
+    return await queryFn(supabase, user.id);
   };
 }
 
@@ -50,19 +61,15 @@ function createSupabaseQueryFn<T>(options: {
 export function useBalance() {
   return useQuery({
     queryKey: ["balance"],
-    queryFn: createSupabaseQueryFn<Balance>({
-      localFallback: () => localData.balance as Balance,
+    queryFn: createSupabaseQueryFn<Balance>(async (supabase, userId) => {
+      const { data, error } = await supabase
+        .from("balance")
+        .select("current, income, expenses")
+        .eq("user_id", userId)
+        .single();
 
-      queryFn: async (supabase, userId) => {
-        const { data, error } = await supabase
-          .from("balance")
-          .select("current, income, expenses")
-          .eq("user_id", userId)
-          .single();
-
-        if (error) throw error;
-        return data as Balance;
-      },
+      if (error) throw error;
+      return data as Balance;
     }),
   });
 }
@@ -70,19 +77,15 @@ export function useBalance() {
 export function useTransactions() {
   return useQuery({
     queryKey: ["transactions"],
-    queryFn: createSupabaseQueryFn<Transaction[]>({
-      localFallback: () => localData.transactions as Transaction[],
+    queryFn: createSupabaseQueryFn<Transaction[]>(async (supabase, userId) => {
+      const { data, error } = await supabase
+        .from("transactions")
+        .select("id, avatar, name, category, date, amount, recurring")
+        .eq("user_id", userId)
+        .order("date", { ascending: false });
 
-      queryFn: async (supabase, userId) => {
-        const { data, error } = await supabase
-          .from("transactions")
-          .select("id, avatar, name, category, date, amount, recurring")
-          .eq("user_id", userId)
-          .order("date", { ascending: false });
-
-        if (error) throw error;
-        return (data as Transaction[]) || [];
-      },
+      if (error) throw error;
+      return (data as Transaction[]) || [];
     }),
   });
 }
@@ -90,18 +93,14 @@ export function useTransactions() {
 export function useBudgets() {
   return useQuery({
     queryKey: ["budgets"],
-    queryFn: createSupabaseQueryFn<Budget[]>({
-      localFallback: () => localData.budgets as Budget[],
+    queryFn: createSupabaseQueryFn<Budget[]>(async (supabase, userId) => {
+      const { data, error } = await supabase
+        .from("budgets")
+        .select("id, category, maximum, theme")
+        .eq("user_id", userId);
 
-      queryFn: async (supabase, userId) => {
-        const { data, error } = await supabase
-          .from("budgets")
-          .select("id, category, maximum, theme")
-          .eq("user_id", userId);
-
-        if (error) throw error;
-        return (data as Budget[]) || [];
-      },
+      if (error) throw error;
+      return (data as Budget[]) || [];
     }),
   });
 }
@@ -109,18 +108,14 @@ export function useBudgets() {
 export function usePots() {
   return useQuery({
     queryKey: ["pots"],
-    queryFn: createSupabaseQueryFn<Pot[]>({
-      localFallback: () => localData.pots as Pot[],
+    queryFn: createSupabaseQueryFn<Pot[]>(async (supabase, userId) => {
+      const { data, error } = await supabase
+        .from("pots")
+        .select("id, name, target, total, theme")
+        .eq("user_id", userId);
 
-      queryFn: async (supabase, userId) => {
-        const { data, error } = await supabase
-          .from("pots")
-          .select("id, name, target, total, theme")
-          .eq("user_id", userId);
-
-        if (error) throw error;
-        return (data as Pot[]) || [];
-      },
+      if (error) throw error;
+      return (data as Pot[]) || [];
     }),
   });
 }
@@ -128,21 +123,16 @@ export function usePots() {
 export function useRecurringBills() {
   return useQuery({
     queryKey: ["recurring-bills"],
-    queryFn: createSupabaseQueryFn<Transaction[]>({
-      localFallback: () =>
-        (localData.transactions as Transaction[]).filter((t) => t.recurring),
+    queryFn: createSupabaseQueryFn<Transaction[]>(async (supabase, userId) => {
+      const { data, error } = await supabase
+        .from("transactions")
+        .select("id, avatar, name, category, date, amount, recurring")
+        .eq("user_id", userId)
+        .eq("recurring", true)
+        .order("date", { ascending: false });
 
-      queryFn: async (supabase, userId) => {
-        const { data, error } = await supabase
-          .from("transactions")
-          .select("id, avatar, name, category, date, amount, recurring")
-          .eq("user_id", userId)
-          .eq("recurring", true)
-          .order("date", { ascending: false });
-
-        if (error) throw error;
-        return (data as Transaction[]) || [];
-      },
+      if (error) throw error;
+      return (data as Transaction[]) || [];
     }),
   });
 }
@@ -177,22 +167,6 @@ export function useFinanceData() {
 // =============================================
 // MUTATION HELPERS
 // =============================================
-
-/**
- * Establishes the signed-in user and hands back a client to write with.
- *
- * Every write goes through here, so "a write is authenticated" is settled in
- * one place rather than asserted -- or forgotten -- at each call site.
- */
-export async function getAuthenticatedUser() {
-  const supabase = createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) throw new Error("Not authenticated");
-  return { supabase, user };
-}
 
 /**
  * Builds the create, update and delete mutations for one table.
