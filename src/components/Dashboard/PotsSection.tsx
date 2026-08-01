@@ -4,6 +4,7 @@ import { Skeleton } from "@/components/ui/Skeleton";
 import { SectionHeader } from "./SectionHeader";
 import { PotItem } from "./PotItem";
 import type { Pot } from "@/lib/types";
+import { formatCurrency } from "@/lib/formatters";
 
 interface PotsSectionProps {
   pots: Pot[];
@@ -49,7 +50,7 @@ export function PotsSection({ pots, isLoading }: PotsSectionProps) {
           <div>
             <p className="text-sm text-finance-grey mb-1">Total Saved</p>
             <p className="text-[2rem] leading-[1.2] font-bold text-finance-navy tabular-nums">
-              ${totalSaved.toLocaleString()}
+              {formatCurrency(totalSaved, false)}
             </p>
           </div>
         </div>
