@@ -183,7 +183,7 @@ export function useFinanceData() {
  * options flag that every other caller has to read past.
  */
 function createEntityMutations<
-  TEntity extends { id?: string },
+  TEntity extends { id: string },
   TInput,
 >(options: { table: string; invalidates: readonly string[] }) {
   const { table, invalidates } = options;

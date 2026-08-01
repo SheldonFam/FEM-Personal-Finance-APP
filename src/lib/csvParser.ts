@@ -21,6 +21,11 @@ export interface ParsedRow {
 export interface CsvMessage {
   id: string;
   text: string;
+  /**
+   * Whether this is about one row or about the file as a whole. A missing
+   * header column is not a bad row, and must not be counted as one.
+   */
+  scope: "file" | "row";
 }
 
 export interface CsvParseResult {
@@ -90,6 +95,7 @@ export function parseTransactionsCsv(csvText: string): CsvParseResult {
         {
           id: "file-too-short",
           text: "CSV must have a header row and at least one data row.",
+          scope: "file",
         },
       ],
       warnings: [],
@@ -107,6 +113,7 @@ export function parseTransactionsCsv(csvText: string): CsvParseResult {
       errors.push({
         id: `file-missing-${col}`,
         text: `Missing required column: "${col}"`,
+        scope: "file",
       });
     }
   }
@@ -132,13 +139,18 @@ export function parseTransactionsCsv(csvText: string): CsvParseResult {
 
     // Validate. Each of these drops the row, so they are errors.
     if (!name) {
-      errors.push({ id: `row-${rowNum}-name`, text: `Row ${rowNum}: Missing name` });
+      errors.push({
+        id: `row-${rowNum}-name`,
+        text: `Row ${rowNum}: Missing name`,
+        scope: "row",
+      });
       continue;
     }
     if (!isValidDate(dateStr)) {
       errors.push({
         id: `row-${rowNum}-date`,
         text: `Row ${rowNum}: Invalid date "${dateStr}"`,
+        scope: "row",
       });
       continue;
     }
@@ -146,6 +158,7 @@ export function parseTransactionsCsv(csvText: string): CsvParseResult {
       errors.push({
         id: `row-${rowNum}-amount`,
         text: `Row ${rowNum}: Invalid amount "${amountStr}"`,
+        scope: "row",
       });
       continue;
     }
@@ -171,6 +184,7 @@ export function parseTransactionsCsv(csvText: string): CsvParseResult {
       warnings.push({
         id: `row-${rowNum}-category`,
         text: `Row ${rowNum}: Unknown category "${rawCategory}" — imported as "${category}"`,
+        scope: "row",
       });
     }
 

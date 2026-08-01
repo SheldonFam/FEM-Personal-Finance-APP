@@ -17,19 +17,35 @@ export function useCurrentDate(): Date {
   const [today, setToday] = useState(() => new Date());
 
   useEffect(() => {
-    const nextMidnight = new Date(today);
-    nextMidnight.setHours(24, 0, 0, 0);
+    let timer: ReturnType<typeof setTimeout>;
 
-    // A delay that has already passed fires on the next tick, so a tab waking
-    // from sleep long after the boundary corrects itself rather than waiting
-    // out another full day.
-    const timer = setTimeout(
-      () => setToday(new Date()),
-      nextMidnight.getTime() - Date.now(),
-    );
+    const scheduleNextMidnight = () => {
+      const nextMidnight = new Date();
+      nextMidnight.setHours(24, 0, 0, 0);
 
+      // A second past the boundary, and never nearer than a second away.
+      // Timers may fire fractionally early; without the floor, one that did
+      // would find itself still on the old day, rearm with a ~0ms delay, and
+      // spin -- re-rendering every dependent memo -- until the clock caught
+      // up. A tab waking long after the boundary still lands on the floor and
+      // corrects on the next tick rather than waiting out another day.
+      const delay = Math.max(nextMidnight.getTime() - Date.now() + 1_000, 1_000);
+
+      timer = setTimeout(() => {
+        // Only a genuine day change mints a new object. Returning the previous
+        // one keeps identity stable, so a timer that fired early costs nothing
+        // downstream.
+        setToday((prev) => {
+          const now = new Date();
+          return prev.toDateString() === now.toDateString() ? prev : now;
+        });
+        scheduleNextMidnight();
+      }, delay);
+    };
+
+    scheduleNextMidnight();
     return () => clearTimeout(timer);
-  }, [today]);
+  }, []);
 
   return today;
 }

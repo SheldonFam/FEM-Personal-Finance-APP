@@ -28,7 +28,9 @@ export function StatCard({
         {label}
       </p>
       <p className="text-xl sm:text-2xl md:text-3xl font-bold truncate tabular-nums">
-        {formatCurrency(amount)}
+        {/* Sign preserved: Current Balance can legitimately be negative, and
+            an overdrawn account must not read as a positive one. */}
+        {formatCurrency(amount, false)}
       </p>
     </Card>
   );

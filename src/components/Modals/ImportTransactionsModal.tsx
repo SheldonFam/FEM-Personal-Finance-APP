@@ -139,11 +139,12 @@ export function ImportTransactionsModal({
       {step === "preview" && (
         <div className="space-y-4">
           {errors.length > 0 ? (
-            <Alert variant="destructive" aria-live="polite">
+            <Alert variant="destructive">
               <AlertDescription>
                 <p className="font-medium mb-1">
-                  {errors.length} row{errors.length !== 1 ? "s" : ""} could not
-                  be read and will not be imported:
+                  {errors.some((e) => e.scope === "file")
+                    ? "This file could not be read:"
+                    : `${errors.length} row${errors.length !== 1 ? "s" : ""} could not be read and will not be imported:`}
                 </p>
                 <ul className="list-disc list-inside text-xs space-y-0.5 max-h-24 overflow-y-auto">
                   {errors.map((err) => (
@@ -155,7 +156,7 @@ export function ImportTransactionsModal({
           ) : null}
 
           {warnings.length > 0 ? (
-            <Alert variant="warning" aria-live="polite">
+            <Alert variant="warning">
               <AlertDescription>
                 <p className="font-medium mb-1">
                   {warnings.length} row{warnings.length !== 1 ? "s" : ""} needed

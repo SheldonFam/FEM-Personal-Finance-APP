@@ -87,7 +87,7 @@ export default function BudgetsPage() {
     maxSpend: number;
     theme: string;
   }) => {
-    if (!editingBudget || !editingBudget.id) return;
+    if (!editingBudget) return;
     updateBudget.mutate(
       {
         id: editingBudget.id,
@@ -103,7 +103,7 @@ export default function BudgetsPage() {
   };
 
   const handleDeleteBudget = () => {
-    if (!deletingBudget || !deletingBudget.id) return;
+    if (!deletingBudget) return;
     deleteBudget.mutate(deletingBudget.id, {
       onSuccess: () => {
         setDeletingBudget(null);

@@ -45,9 +45,10 @@ export function filterAndSortItems<T>(
   const { searchTerm, selectedCategory, allCategoriesValue, sortBy } = criteria;
 
   // Each active criterion becomes a predicate first, so the pass below walks
-  // the list once and tests only what is actually selected. Two chained
-  // .filter() calls read the same array twice and allocate an intermediate
-  // that nothing else ever sees.
+  // the list once and tests only what is actually selected. Chaining a second
+  // .filter() would read the list again and allocate an intermediate nothing
+  // else sees -- which only bit when both criteria were active, but that is
+  // the case a long list is filtered in.
   const needle = searchTerm?.toLowerCase();
 
   const matchesSearch =
