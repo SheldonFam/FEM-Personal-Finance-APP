@@ -1,5 +1,6 @@
 import Image from "next/image";
 import { normalizeImagePath } from "@/lib/utils";
+import { formatCurrency } from "@/lib/formatters";
 
 interface TransactionItemProps {
   name: string;
@@ -37,7 +38,8 @@ export function TransactionItem({
             isPositive ? "text-finance-green" : "text-finance-navy"
           }`}
         >
-          {isPositive ? "+" : "-"}${Math.abs(amount).toFixed(2)}
+          {isPositive ? "+" : "-"}
+          {formatCurrency(amount)}
         </p>
         <p className="text-xs text-finance-grey mt-1">{date}</p>
       </div>

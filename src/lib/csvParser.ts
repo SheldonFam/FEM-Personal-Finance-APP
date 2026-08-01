@@ -11,9 +11,29 @@ export interface ParsedRow {
   rowIndex: number;
 }
 
+/**
+ * One thing worth telling the user about a parse.
+ *
+ * Carries its own id so a list of these can be keyed by identity. Ids are
+ * unique within a parse: a row contributes at most one error, because the
+ * first one drops it, and at most one warning.
+ */
+export interface CsvMessage {
+  id: string;
+  text: string;
+  /**
+   * Whether this is about one row or about the file as a whole. A missing
+   * header column is not a bad row, and must not be counted as one.
+   */
+  scope: "file" | "row";
+}
+
 export interface CsvParseResult {
   data: ParsedRow[];
-  errors: string[];
+  /** Fatal. The file was rejected, or these rows were dropped. */
+  errors: CsvMessage[];
+  /** Non-fatal. These rows imported, with something adjusted on the way. */
+  warnings: CsvMessage[];
 }
 
 const REQUIRED_COLUMNS = ["date", "name", "amount"];
@@ -69,21 +89,36 @@ export function parseTransactionsCsv(csvText: string): CsvParseResult {
     .filter((line) => line.trim().length > 0);
 
   if (lines.length < 2) {
-    return { data: [], errors: ["CSV must have a header row and at least one data row."] };
+    return {
+      data: [],
+      errors: [
+        {
+          id: "file-too-short",
+          text: "CSV must have a header row and at least one data row.",
+          scope: "file",
+        },
+      ],
+      warnings: [],
+    };
   }
 
   const headers = parseCsvLine(lines[0]).map(normalizeHeader);
-  const errors: string[] = [];
+  const errors: CsvMessage[] = [];
+  const warnings: CsvMessage[] = [];
   const data: ParsedRow[] = [];
 
   // Check required columns
   for (const col of REQUIRED_COLUMNS) {
     if (!headers.includes(col)) {
-      errors.push(`Missing required column: "${col}"`);
+      errors.push({
+        id: `file-missing-${col}`,
+        text: `Missing required column: "${col}"`,
+        scope: "file",
+      });
     }
   }
   if (errors.length > 0) {
-    return { data: [], errors };
+    return { data: [], errors, warnings };
   }
 
   const dateIdx = headers.indexOf("date");
@@ -102,38 +137,55 @@ export function parseTransactionsCsv(csvText: string): CsvParseResult {
     const amountStr = fields[amountIdx] ?? "";
     const recurringStr = recurringIdx >= 0 ? (fields[recurringIdx] ?? "") : "";
 
-    // Validate
+    // Validate. Each of these drops the row, so they are errors.
     if (!name) {
-      errors.push(`Row ${rowNum}: Missing name`);
+      errors.push({
+        id: `row-${rowNum}-name`,
+        text: `Row ${rowNum}: Missing name`,
+        scope: "row",
+      });
       continue;
     }
     if (!isValidDate(dateStr)) {
-      errors.push(`Row ${rowNum}: Invalid date "${dateStr}"`);
+      errors.push({
+        id: `row-${rowNum}-date`,
+        text: `Row ${rowNum}: Invalid date "${dateStr}"`,
+        scope: "row",
+      });
       continue;
     }
     if (!isValidAmount(amountStr)) {
-      errors.push(`Row ${rowNum}: Invalid amount "${amountStr}"`);
+      errors.push({
+        id: `row-${rowNum}-amount`,
+        text: `Row ${rowNum}: Invalid amount "${amountStr}"`,
+        scope: "row",
+      });
       continue;
     }
 
-    // Resolve category
+    // Resolve category. An unrecognised one does not drop the row -- it still
+    // imports, under a suggestion or the General fallback -- so the
+    // substitution is reported as a warning, and named so the user can see
+    // what it actually landed as.
     let category = rawCategory;
     let suggestedCat = false;
+    const unknownCategory = Boolean(category) && !isTransactionCategory(category);
 
-    if (category && !isTransactionCategory(category)) {
-      errors.push(`Row ${rowNum}: Unknown category "${category}", defaulting to suggestion or "General"`);
+    if (unknownCategory) {
       category = "";
     }
 
     if (!category) {
-      const suggestion = suggestCategory(name);
-      if (suggestion) {
-        category = suggestion;
-        suggestedCat = true;
-      } else {
-        category = "General";
-        suggestedCat = true;
-      }
+      category = suggestCategory(name) || "General";
+      suggestedCat = true;
+    }
+
+    if (unknownCategory) {
+      warnings.push({
+        id: `row-${rowNum}-category`,
+        text: `Row ${rowNum}: Unknown category "${rawCategory}" — imported as "${category}"`,
+        scope: "row",
+      });
     }
 
     const amount = parseFloat(amountStr.replace(/[$,]/g, ""));
@@ -152,5 +204,5 @@ export function parseTransactionsCsv(csvText: string): CsvParseResult {
     });
   }
 
-  return { data, errors };
+  return { data, errors, warnings };
 }

@@ -63,7 +63,7 @@ export default function PotsPage() {
     target: number;
     theme: string;
   }) => {
-    if (!editingPot || !editingPot.id) return;
+    if (!editingPot) return;
     updatePot.mutate(
       {
         id: editingPot.id,
@@ -80,7 +80,7 @@ export default function PotsPage() {
   };
 
   const handleDeletePot = () => {
-    if (!deletingPot || !deletingPot.id) return;
+    if (!deletingPot) return;
     deletePot.mutate(deletingPot.id, {
       onSuccess: () => {
         setDeletingPot(null);
@@ -89,7 +89,7 @@ export default function PotsPage() {
   };
 
   const handleAddMoney = (amount: number) => {
-    if (!addMoneyPot || !addMoneyPot.id) return;
+    if (!addMoneyPot) return;
     addMoneyToPot.mutate(
       { id: addMoneyPot.id, amount },
       {
@@ -101,7 +101,7 @@ export default function PotsPage() {
   };
 
   const handleWithdraw = (amount: number) => {
-    if (!withdrawPot || !withdrawPot.id) return;
+    if (!withdrawPot) return;
     withdrawFromPot.mutate(
       { id: withdrawPot.id, amount },
       {

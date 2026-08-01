@@ -58,7 +58,7 @@ export function PotsSection({ pots, isLoading }: PotsSectionProps) {
         <div className="w-full lg:flex-1 grid grid-cols-1 sm:grid-cols-2 gap-4">
           {displayPots.map((pot) => (
             <PotItem
-              key={pot.id ?? pot.name}
+              key={pot.id}
               label={pot.name}
               amount={pot.total}
               color={pot.theme}

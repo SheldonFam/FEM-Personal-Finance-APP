@@ -1,4 +1,5 @@
 import { Card } from "../ui/Card";
+import { formatCurrency } from "@/lib/formatters";
 
 interface StatCardProps {
   label: string;
@@ -27,11 +28,9 @@ export function StatCard({
         {label}
       </p>
       <p className="text-xl sm:text-2xl md:text-3xl font-bold truncate tabular-nums">
-        $
-        {amount.toLocaleString("en-US", {
-          minimumFractionDigits: 2,
-          maximumFractionDigits: 2,
-        })}
+        {/* Sign preserved: Current Balance can legitimately be negative, and
+            an overdrawn account must not read as a positive one. */}
+        {formatCurrency(amount, false)}
       </p>
     </Card>
   );

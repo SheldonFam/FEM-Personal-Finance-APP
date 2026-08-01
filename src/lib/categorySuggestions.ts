@@ -1,8 +1,7 @@
 import { TRANSACTION_CATEGORIES } from "@/lib/constants/constants";
+import type { TransactionCategory } from "@/lib/types";
 
-type Category = (typeof TRANSACTION_CATEGORIES)[number];
-
-const KEYWORD_CATEGORY_MAP: Record<string, Category> = {
+const KEYWORD_CATEGORY_MAP: Record<string, TransactionCategory> = {
   // Entertainment
   netflix: "Entertainment",
   spotify: "Entertainment",

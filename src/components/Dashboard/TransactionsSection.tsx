@@ -52,7 +52,7 @@ export function TransactionsSection({
       <div className="space-y-1">
         {recentTransactions.map((transaction) => (
           <TransactionItem
-            key={transaction.id ?? `${transaction.name}-${transaction.date}`}
+            key={transaction.id}
             name={transaction.name}
             amount={Math.abs(transaction.amount)}
             date={formatDate(transaction.date)}

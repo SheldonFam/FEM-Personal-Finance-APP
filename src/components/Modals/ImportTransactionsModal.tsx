@@ -11,7 +11,11 @@ import {
   SelectValue,
 } from "@/components/ui/Select";
 import { Alert, AlertDescription } from "@/components/ui/Alert";
-import { parseTransactionsCsv, type ParsedRow } from "@/lib/csvParser";
+import {
+  parseTransactionsCsv,
+  type ParsedRow,
+  type CsvMessage,
+} from "@/lib/csvParser";
 import { useBulkCreateTransactions } from "@/hooks/useBulkCreateTransactions";
 import { TRANSACTION_CATEGORIES } from "@/lib/constants/constants";
 import { formatCurrency, formatDate } from "@/lib/formatters";
@@ -29,7 +33,8 @@ export function ImportTransactionsModal({
 }: ImportTransactionsModalProps) {
   const [step, setStep] = useState<Step>("upload");
   const [rows, setRows] = useState<ParsedRow[]>([]);
-  const [errors, setErrors] = useState<string[]>([]);
+  const [errors, setErrors] = useState<CsvMessage[]>([]);
+  const [warnings, setWarnings] = useState<CsvMessage[]>([]);
   const [importCount, setImportCount] = useState(0);
 
   const bulkCreate = useBulkCreateTransactions();
@@ -38,6 +43,7 @@ export function ImportTransactionsModal({
     setStep("upload");
     setRows([]);
     setErrors([]);
+    setWarnings([]);
     setImportCount(0);
     bulkCreate.reset();
   };
@@ -57,6 +63,7 @@ export function ImportTransactionsModal({
       const result = parseTransactionsCsv(text);
       setRows(result.data);
       setErrors(result.errors);
+      setWarnings(result.warnings);
       setStep("preview");
     };
     reader.readAsText(file);
@@ -131,20 +138,38 @@ export function ImportTransactionsModal({
 
       {step === "preview" && (
         <div className="space-y-4">
-          {errors.length > 0 && (
+          {errors.length > 0 ? (
             <Alert variant="destructive">
               <AlertDescription>
                 <p className="font-medium mb-1">
-                  {errors.length} issue{errors.length !== 1 ? "s" : ""} found:
+                  {errors.some((e) => e.scope === "file")
+                    ? "This file could not be read:"
+                    : `${errors.length} row${errors.length !== 1 ? "s" : ""} could not be read and will not be imported:`}
                 </p>
                 <ul className="list-disc list-inside text-xs space-y-0.5 max-h-24 overflow-y-auto">
-                  {errors.map((err, i) => (
-                    <li key={i}>{err}</li>
+                  {errors.map((err) => (
+                    <li key={err.id}>{err.text}</li>
                   ))}
                 </ul>
               </AlertDescription>
             </Alert>
-          )}
+          ) : null}
+
+          {warnings.length > 0 ? (
+            <Alert variant="warning">
+              <AlertDescription>
+                <p className="font-medium mb-1">
+                  {warnings.length} row{warnings.length !== 1 ? "s" : ""} needed
+                  adjusting, and will still be imported:
+                </p>
+                <ul className="list-disc list-inside text-xs space-y-0.5 max-h-24 overflow-y-auto">
+                  {warnings.map((warning) => (
+                    <li key={warning.id}>{warning.text}</li>
+                  ))}
+                </ul>
+              </AlertDescription>
+            </Alert>
+          ) : null}
 
           {rows.length > 0 && (
             <div className="border rounded-lg overflow-hidden">

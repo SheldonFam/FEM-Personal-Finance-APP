@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { Card } from "@/components/ui/Card";
 import { Input } from "@/components/ui/Input";
 import { Button } from "@/components/ui/Button";
@@ -26,11 +26,12 @@ import { TransactionRow } from "@/components/Transactions/TransactionRow";
 import { Pagination } from "@/components/ui/Pagination";
 import { exportTransactionsToCsv } from "@/lib/exportCsv";
 import { ImportTransactionsModal } from "@/components/Modals/ImportTransactionsModal";
+import type { CategoryFilter } from "@/lib/types";
 
 export default function TransactionsPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] =
-    useState<string>(ALL_CATEGORIES_FILTER);
+    useState<CategoryFilter>(ALL_CATEGORIES_FILTER);
   const [sortBy, setSortBy] = useState<
     "latest" | "oldest" | "highest" | "lowest" | "a-z" | "z-a"
   >("latest");
@@ -55,10 +56,25 @@ export default function TransactionsPage() {
     currentPage,
   });
 
-  // Reset to page 1 when filters change
-  useEffect(() => {
+  // Narrowing or reordering the list invalidates whichever page you were on,
+  // so each filter change returns to the first. Done where the change
+  // happens rather than in an effect watching the values: an effect runs
+  // after the render it corrects, so every keystroke rendered twice -- once
+  // with the new search and the old page, once with the page put back.
+  const handleSearchChange = (value: string) => {
+    setSearchTerm(value);
     setCurrentPage(1);
-  }, [searchTerm, selectedCategory, sortBy]);
+  };
+
+  const handleSortChange = (value: typeof sortBy) => {
+    setSortBy(value);
+    setCurrentPage(1);
+  };
+
+  const handleCategoryChange = (value: CategoryFilter) => {
+    setSelectedCategory(value);
+    setCurrentPage(1);
+  };
 
   return (
     <PageLayout
@@ -95,7 +111,7 @@ export default function TransactionsPage() {
                     type="text"
                     placeholder="Search transaction"
                     value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
+                    onChange={(e) => handleSearchChange(e.target.value)}
                     className="pr-12 h-11"
                     aria-label="Search transactions"
                   />
@@ -109,25 +125,31 @@ export default function TransactionsPage() {
                 </div>
               </div>
 
-              {/* Category Filter and Sort */}
+              {/* Category Filter and Sort.
+                  Each group owns one control: its mobile icon button, its
+                  desktop label, and its Select. Keep them together. On mobile
+                  the SelectTrigger is absolutely positioned to fill its own
+                  relative wrapper, and Radix anchors the dropdown to that
+                  trigger -- so a button placed in the other group opens a menu
+                  that appears under the wrong icon. */}
               <div className="flex gap-3 sm:gap-6 flex-row flex-shrink-0 min-w-0">
-                {/* Sort By */}
+                {/* Sort */}
                 <div className="relative flex flex-row gap-2 items-center">
                   <Button
                     type="button"
                     variant="ghost"
                     size="icon-sm"
                     className="sm:hidden size-11 rounded-lg bg-transparent p-0 hover:bg-gray-100 focus-visible:ring-0 focus-visible:ring-offset-0"
-                    aria-label="Open category filter"
+                    aria-label="Open sort options"
                     aria-haspopup="listbox"
-                    aria-expanded={isCategorySelectOpen}
-                    onClick={() => setIsCategorySelectOpen(true)}
+                    aria-expanded={isSortSelectOpen}
+                    onClick={() => setIsSortSelectOpen(true)}
                   >
                     <Image
-                      src="/assets/images/icon-filter-mobile.svg"
+                      src="/assets/images/icon-sort-mobile.svg"
                       alt=""
-                      width={18}
-                      height={16}
+                      width={16}
+                      height={15}
                       className="shrink-0"
                       aria-hidden="true"
                     />
@@ -139,7 +161,7 @@ export default function TransactionsPage() {
                   <Select
                     value={sortBy}
                     onValueChange={(value) => {
-                      setSortBy(value as typeof sortBy);
+                      handleSortChange(value as typeof sortBy);
                       setIsSortSelectOpen(false);
                     }}
                     open={isSortSelectOpen}
@@ -168,22 +190,23 @@ export default function TransactionsPage() {
                     </SelectContent>
                   </Select>
                 </div>
+                {/* Category */}
                 <div className="relative flex flex-row gap-2 items-center">
                   <Button
                     type="button"
                     variant="ghost"
                     size="icon-sm"
                     className="sm:hidden size-11 rounded-lg bg-transparent p-0 hover:bg-gray-100 focus-visible:ring-0 focus-visible:ring-offset-0"
-                    aria-label="Open sort options"
+                    aria-label="Open category filter"
                     aria-haspopup="listbox"
-                    aria-expanded={isSortSelectOpen}
-                    onClick={() => setIsSortSelectOpen(true)}
+                    aria-expanded={isCategorySelectOpen}
+                    onClick={() => setIsCategorySelectOpen(true)}
                   >
                     <Image
-                      src="/assets/images/icon-sort-mobile.svg"
+                      src="/assets/images/icon-filter-mobile.svg"
                       alt=""
-                      width={16}
-                      height={15}
+                      width={18}
+                      height={16}
                       className="shrink-0"
                       aria-hidden="true"
                     />
@@ -194,7 +217,7 @@ export default function TransactionsPage() {
                   <Select
                     value={selectedCategory}
                     onValueChange={(value) => {
-                      setSelectedCategory(value);
+                      handleCategoryChange(value as CategoryFilter);
                       setIsCategorySelectOpen(false);
                     }}
                     open={isCategorySelectOpen}
