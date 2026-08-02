@@ -12,6 +12,12 @@ export async function createClient() {
         getAll() {
           return cookieStore.getAll();
         },
+        // The second argument @supabase/ssr 0.12 passes -- the no-store cache
+        // headers that keep an auth-cookie response out of a CDN -- is
+        // deliberately not taken here. next/headers gives a cookie store, not
+        // a response, so there is nothing in this context to set them on. The
+        // middleware applies them, and it is what produces the response that
+        // actually reaches a cache.
         setAll(cookiesToSet) {
           try {
             cookiesToSet.forEach(({ name, value, options }) =>

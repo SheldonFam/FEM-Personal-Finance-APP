@@ -230,16 +230,19 @@ function createEntityMutations<
 
         // supabase-js 2.111 tightened update() to reject excess properties
         // against the row type. `table` is a plain string here, so there is no
-        // row type to check against -- the client resolves it as `any` and the
-        // new wrapper then cannot prove the generic matches. The cast asserts
-        // what the signature already guarantees: `changes` is a partial TEntity
-        // with its id removed, which is exactly the shape of an update.
+        // row type to resolve -- it comes back as `any`, and the new wrapper
+        // then demands a whole TEntity rather than the partial an update
+        // legitimately sends.
+        //
+        // Cast to TEntity rather than `never`: `never` would silence any
+        // future mismatch here permanently, where this keeps the assertion
+        // pinned to the entity the factory was built for.
         //
         // A generated Database type would let this check for real. That is a
         // larger change than a security upgrade should carry.
         const { data, error } = await supabase
           .from(table)
-          .update(changes as never)
+          .update(changes as TEntity)
           .eq("id", id)
           .select()
           .single();

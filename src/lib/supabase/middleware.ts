@@ -14,7 +14,7 @@ export async function updateSession(request: NextRequest) {
         getAll() {
           return request.cookies.getAll();
         },
-        setAll(cookiesToSet) {
+        setAll(cookiesToSet, headers) {
           cookiesToSet.forEach(({ name, value }) =>
             request.cookies.set(name, value),
           );
@@ -23,6 +23,19 @@ export async function updateSession(request: NextRequest) {
           });
           cookiesToSet.forEach(({ name, value, options }) =>
             supabaseResponse.cookies.set(name, value, options),
+          );
+
+          // @supabase/ssr 0.12 added this second argument, and it must be
+          // applied. It carries Cache-Control: private, no-store and friends,
+          // because a response that sets an auth cookie must never be cached
+          // by a CDN or reverse proxy -- if one is, a session token belonging
+          // to one user can be served to another.
+          //
+          // Dropping a parameter is not a type error, so nothing would have
+          // caught this: the code compiled clean while silently discarding
+          // them. Every route here builds as static and is CDN-served.
+          Object.entries(headers).forEach(([key, value]) =>
+            supabaseResponse.headers.set(key, value),
           );
         },
       },
