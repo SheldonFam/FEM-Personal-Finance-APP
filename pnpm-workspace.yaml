@@ -1,0 +1,29 @@
+# pnpm settings. As of pnpm 11 these live here rather than under a "pnpm" key
+# in package.json, which is silently ignored.
+
+# Forced versions for transitive packages whose parents pin a vulnerable one.
+#
+# Everything else in the Dependabot list was fixed by upgrading the parent --
+# tar left the tree with @tailwindcss/oxide 4.3.3, and ws left it with
+# @supabase/realtime-js 2.111.0. These two cannot be:
+#
+#   postcss  next pins 8.4.31 exactly, and so does next 16, so no upgrade of
+#            the framework moves it. Tailwind already resolves 8.5.25, so this
+#            also collapses two copies into one.
+#   sharp    next declares it as an optional dependency at ^0.34.3. 0.35 is
+#            where the inherited libvips CVEs are fixed. Node >= 20.9 is
+#            required; this project and CI both run 22.
+#
+# Both should be dropped once Next ships versions that no longer need them.
+overrides:
+  postcss: ^8.5.25
+  sharp: ^0.35.3
+
+# pnpm blocks dependency build scripts by default, which is a sensible guard
+# against unknown postinstall code. These two are first-party native packages
+# that do not work without theirs: oxide is Tailwind's native engine, and sharp
+# compiles or downloads libvips. Left unset the tooling still runs, on slower
+# fallbacks -- and an unbuilt sharp would make the override above pointless.
+allowBuilds:
+  '@tailwindcss/oxide': true
+  sharp: true
