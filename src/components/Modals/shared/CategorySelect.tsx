@@ -1,13 +1,13 @@
 "use client";
 
-import { Control, FieldErrors } from "react-hook-form";
+import { Control, FieldErrors, FieldValues, Path } from "react-hook-form";
 import FormSelect from "@/components/Modals/shared/FormSelect";
 import type { TransactionCategory } from "@/lib/types";
 
-interface CategorySelectProps {
-  control: Control<any>;
-  errors: FieldErrors;
-  name?: string;
+interface CategorySelectProps<TFieldValues extends FieldValues = FieldValues> {
+  control: Control<TFieldValues>;
+  errors: FieldErrors<TFieldValues>;
+  name?: Path<TFieldValues>;
   label?: string;
   /**
    * Real categories only. Typed to exclude the filter sentinel, which must
@@ -16,13 +16,17 @@ interface CategorySelectProps {
   categories: readonly TransactionCategory[];
 }
 
-export default function CategorySelect({
+export default function CategorySelect<
+  TFieldValues extends FieldValues = FieldValues,
+>({
   control,
   errors,
-  name = "category",
+  // A literal default cannot be proven to be a path of the caller's form
+  // type, so it is asserted. Forms without a `category` field pass `name`.
+  name = "category" as Path<TFieldValues>,
   label = "Budget Category",
   categories,
-}: CategorySelectProps) {
+}: CategorySelectProps<TFieldValues>) {
   const options = categories.map((cat) => ({
     value: cat,
     label: cat,
