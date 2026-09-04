@@ -1,13 +1,13 @@
 "use client";
 
-import { Control, FieldErrors } from "react-hook-form";
+import { Control, FieldErrors, FieldValues, Path } from "react-hook-form";
 import FormSelect from "@/components/Modals/shared/FormSelect";
 import { COLOR_THEMES } from "@/lib/constants/constants";
 
-interface ThemeSelectorProps {
-  control: Control<any>;
-  errors: FieldErrors;
-  name?: string;
+interface ThemeSelectorProps<TFieldValues extends FieldValues = FieldValues> {
+  control: Control<TFieldValues>;
+  errors: FieldErrors<TFieldValues>;
+  name?: Path<TFieldValues>;
   availableThemes?: string[];
 }
 
@@ -18,12 +18,16 @@ const THEME_OPTIONS = Object.entries(COLOR_THEMES).map(([name, color]) => ({
 
 const NO_THEMES_OPTION = [{ value: "none", label: "No themes available", disabled: true }];
 
-export default function ThemeSelector({
+export default function ThemeSelector<
+  TFieldValues extends FieldValues = FieldValues,
+>({
   control,
   errors,
-  name = "theme",
+  // A literal default cannot be proven to be a path of the caller's form
+  // type, so it is asserted. Forms without a `theme` field pass `name`.
+  name = "theme" as Path<TFieldValues>,
   availableThemes,
-}: ThemeSelectorProps) {
+}: ThemeSelectorProps<TFieldValues>) {
   const availableSet = availableThemes ? new Set(availableThemes) : null;
   const themes = availableSet
     ? THEME_OPTIONS.filter((t) => availableSet.has(t.name))

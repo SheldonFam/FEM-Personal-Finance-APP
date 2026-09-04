@@ -1,6 +1,12 @@
 "use client";
 
-import { Controller, Control, FieldErrors } from "react-hook-form";
+import {
+  Controller,
+  Control,
+  FieldErrors,
+  FieldValues,
+  Path,
+} from "react-hook-form";
 import {
   Select,
   SelectContent,
@@ -18,10 +24,10 @@ interface SelectOption {
   disabled?: boolean;
 }
 
-interface FormSelectProps {
-  control: Control<any>;
-  errors: FieldErrors;
-  name: string;
+interface FormSelectProps<TFieldValues extends FieldValues = FieldValues> {
+  control: Control<TFieldValues>;
+  errors: FieldErrors<TFieldValues>;
+  name: Path<TFieldValues>;
   label: string;
   placeholder?: string;
   options: SelectOption[];
@@ -30,7 +36,9 @@ interface FormSelectProps {
   className?: string;
 }
 
-export default function FormSelect({
+export default function FormSelect<
+  TFieldValues extends FieldValues = FieldValues,
+>({
   control,
   errors,
   name,
@@ -40,8 +48,11 @@ export default function FormSelect({
   required = true,
   requiredMessage,
   className = "space-y-1",
-}: FormSelectProps) {
+}: FormSelectProps<TFieldValues>) {
   const errorMessage = requiredMessage || `${label} is required`;
+  const fieldError = errors[name]?.message;
+  const fieldErrorText =
+    typeof fieldError === "string" ? fieldError : fieldError?.toString();
 
   return (
     <div className={className}>
@@ -70,11 +81,11 @@ export default function FormSelect({
                 ))}
               </SelectContent>
             </Select>
-            {errors[name] && (
+            {fieldErrorText ? (
               <p role="alert" className="text-xs text-destructive font-medium">
-                {errors[name]?.message as string}
+                {fieldErrorText}
               </p>
-            )}
+            ) : null}
           </>
         )}
       />
