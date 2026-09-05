@@ -1,11 +1,11 @@
-import { QueryClient, environmentManager } from "@tanstack/react-query";
+import { QueryClient, isServer } from "@tanstack/react-query";
 
 function makeQueryClient() {
   return new QueryClient({
     defaultOptions: {
       queries: {
-        // With SSR, a staleTime above 0 stops every hydrated query from
-        // refetching the moment it reaches the client.
+        // With SSR, we usually want to set some default staleTime
+        // above 0 to avoid refetching immediately on the client
         staleTime: 60 * 1000,
         refetchOnWindowFocus: false,
       },
@@ -13,21 +13,17 @@ function makeQueryClient() {
   });
 }
 
-let browserQueryClient: QueryClient | undefined;
+let browserQueryClient: QueryClient | undefined = undefined;
 
-/**
- * The pattern from TanStack Query's App Router guide.
- *
- * On the server every request gets its own client, so cached data is never
- * shared between users. In the browser one client lives for the page: if
- * React discards the first render (something suspends with no boundary in
- * between), a client held in useState would be discarded with it, taking
- * the cache along. A module-level singleton survives that.
- */
 export function getQueryClient() {
-  if (environmentManager.isServer()) {
+  if (isServer) {
+    // Server: always make a new query client
     return makeQueryClient();
   }
-  browserQueryClient ??= makeQueryClient();
+  // Browser: make a new query client if we don't already have one
+  // This is very important, so we don't re-make a new client if React
+  // suspends during the initial render. This may not be needed if we
+  // have a suspense boundary BELOW the creation of the query client
+  if (!browserQueryClient) browserQueryClient = makeQueryClient();
   return browserQueryClient;
 }
